@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: elaboration
-**Iteration**: 6
-**Iteration Goal**: T-007 — AEAT/Verifactu submission spike (build-vs-buy)
+**Iteration**: 7
+**Iteration Goal**: T-008 — Add + detail corrective-invoice requirement (S-5/D-1)
 **Status**: completed
-**Current Task**: T-007
+**Current Task**: T-008
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 7** (2026-06-15): T-008 complete — added REQ-004 (corrective + cancellation invoices) and detailed UC-004 (factura rectificativa) + UC-005 (Verifactu anulación), distinguishing correction of a valid invoice from voiding a record sent in error. Closed the S-5/D-1 scope gap; docs validate clean. Común-territory only (no TicketBAI, N-6).
 
 - **Iteration 6** (2026-06-15): T-007 AEAT/Verifactu submission spike complete — founder ratified **BUILD direct, PoC-gated** (gateway fallback behind the same AD-3 interface), user-supplied certificate stored securely (O-1), Verifactu común-territory only / no TicketBAI in v1 (O-3). AD-3 resolved `proposed → accepted`; architecture notebook now has no open seams. O-2 (autónomo obligation timeline) carried to construction.
 
