@@ -2,7 +2,7 @@
 type: pricing-validation
 id: PRICE-001
 title: FacturaSimple — Willingness-to-Pay & Pricing Validation
-status: draft-pending-founder-decision
+status: agreed
 traces-from: [VIS-001, R-04]
 relates-to: [SCOPE-001]
 owner-role: analyst (decision: product-owner)
@@ -26,6 +26,19 @@ last-updated: 2026-06-15
 > willingness-to-pay numbers come only from target users — §6 defines how we
 > get them. Treat every figure here as a **directional benchmark to be
 > validated, not a measured fact.**
+
+## 0. Decisions (founder-ratified 2026-06-15)
+
+Recorded from `docs/input-requests/archive/2026-06-15-pricing-and-paying-target.md`.
+These are the binding outcomes; §3–§6 are the analysis behind them.
+
+| # | Decision | Value |
+|---|---|---|
+| **PD-1** | Pricing model | **A — single flat plan + free trial** (no permanent free tier in v1). |
+| **PD-2** | Price point | **~7 €/month**, **~70 €/year** annual (≈ 2 months free). |
+| **PD-3** | Free access | **Free trial only** (time-boxed, full product). Capped free tier reconsidered *only if* the deadline defers to 2027. |
+| **PD-4** | 12-month paying-accounts target | **150–400 paying accounts by month 12**; narrow to a point after a beta trial→paid read. *(Closes Vision §5 metric 5.)* |
+| **PD-5** | Deadline assumption | **Treat as uncertain; track it** (1 Jul 2026 vs. proposed 1 Jul 2027 prórroga). GTM robust to both; revisit free tier if 2027 confirmed. Ties to R-01. |
 
 ## 1. What this closes
 
@@ -158,31 +171,27 @@ build."* Concrete, checkable steps:
 
 **Owner:** Product Owner. **Addresses:** R-04 (and feeds R-05 positioning).
 
-## 7. Open decisions for the founder
+## 7. Founder decisions — RESOLVED (2026-06-15)
 
-These are raised in `docs/input-requests/2026-06-15-pricing-and-paying-target.md`
-(only the founder can supply them):
+All five questions were answered by the founder and are recorded in §0 (PD-1..PD-5);
+the answered request is archived at
+`docs/input-requests/archive/2026-06-15-pricing-and-paying-target.md`. Folded into
+Vision §5 (paying-accounts target set) and scope §6 (pricing marked decided). This
+document is now `status: agreed`.
 
-- **Q1** — Pricing model: A (single flat) / B (freemium) / C (tiered).
-- **Q2** — Price point / band for the paid plan.
-- **Q3** — Free trial vs. permanent free tier (and what it includes — must not
-  give the compliance core away).
-- **Q4** — Committed 12-month paying-accounts target (closes Vision §5).
-- **Q5** — Any steering input: current legal deadline assumption (§2), existing
-  market data, or a target sub-segment detail.
-
-Once answered, a future `/openup-next` cycle folds the decisions into Vision §5
-(set the target), scope.md §6 (mark pricing decided), and finalizes this
-document `status: agreed`.
+The remaining work is **measurement, not decision**: the §6 validation plan
+converts the WTP hypothesis to evidence in beta (owned by the Product Owner,
+executed in/after construction), and narrows PD-4 to a point target once a
+trial→paid read exists.
 
 ## 8. Traceability & status
 
 - **Traces from:** VIS-001 (§5 metric 5; §6 WTP assumption), R-04 (risk list).
 - **Relates to:** SCOPE-001 §6 (pricing open item), R-01/R-05 (deadline timing,
   competitive positioning).
-- **Status:** `draft-pending-founder-decision` — analysis complete; the four
-  decisions in §7 are pending founder input. Lane **suspended** on that
-  input-request; resumes via `/openup-next`.
+- **Status:** `agreed` — analysis complete and founder decisions PD-1..PD-5
+  ratified (§0); folded into Vision §5 and scope §6. Remaining R-04 work is the
+  §6 validation plan (measurement in beta), not a decision.
 
 ---
 

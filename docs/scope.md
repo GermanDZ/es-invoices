@@ -91,8 +91,12 @@ during T-005.
   rectificativa) and **UC-005** (Verifactu *anulación*); these distinguish correcting a
   valid invoice from voiding a record sent in error.
 - **Tech stack** — deferred to Elaboration (Vision §6 TODO); not a scope decision.
-- **Paying-accounts target** — to be set with the product owner once pricing is decided
-  (Vision §5 TODO); a business-metric, not a scope item.
+- ~~**Paying-accounts target** — to be set with the product owner once pricing is decided
+  (Vision §5 TODO).~~ **Resolved (T-009, Elaboration):** pricing decided — single
+  flat plan **~7 €/mo (~70 €/yr) + free trial**, no permanent free tier in v1
+  (revisit only if the Verifactu deadline defers to 2027); paying-accounts target
+  set to **150–400 by month 12**. See `docs/pricing-validation.md` (PRICE-001).
+  A business-metric, not a scope item — no change to S-1..S-6 or non-goals.
 
 ---
 

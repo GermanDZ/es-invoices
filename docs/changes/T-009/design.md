@@ -54,6 +54,22 @@ trial→paid (unknown, to be measured). The artifact gives an illustrative
 ~150–400 band so the founder ratifies a *funnel-consistent* number rather than a
 guess; the band narrows once beta conversion is read.
 
+## Completion verification (2026-06-15) — graded against the diff
+
+Lane is research/decision (quick track): acceptance is the handoff ACs, not GWT
+requirements. Success Measures: **n/a (quick track)** — the R-04 measurement is
+the §6 validation plan, executed in/after construction, not in this lane.
+
+- ✅ AC1 — `docs/pricing-validation.md` (PRICE-001) authored: market context,
+  benchmark, WTP hypothesis, models + recommendation, target options, R-04 plan.
+- ✅ AC2 — founder input-request raised + answered + archived
+  (`docs/input-requests/archive/2026-06-15-pricing-and-paying-target.md`,
+  `status: processed`).
+- ✅ AC3 — decisions PD-1..PD-5 recorded (PRICE-001 §0) from the founder answers.
+- ✅ AC4 — folded: Vision §5 target set (150–400 @ 12mo) + closing TODO struck;
+  scope §6 pricing open item resolved; PRICE-001 `status: agreed`.
+- ✅ AC5 — completed via `/openup-complete-task` (this run).
+
 ## Sources (competitor/deadline benchmarks — verify before quoting)
 
 - okdiario.com — mejores programas de facturación autónomos/pymes 2026.

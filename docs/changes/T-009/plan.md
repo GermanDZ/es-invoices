@@ -2,13 +2,12 @@
 id: T-009
 task_id: T-009
 title: "Willingness-to-pay / pricing validation"
-status: suspended
+status: in-progress
 track: quick
 phase: elaboration
 traces-from: [VIS-001, R-04, SCOPE-001]
 touches: [docs/pricing-validation.md, docs/changes/T-009/, docs/input-requests/, docs/vision.md, docs/scope.md]
 depends-on: [T-005]
-awaiting-input: docs/input-requests/2026-06-15-pricing-and-paying-target.md
 ---
 
 # T-009 — Willingness-to-pay / pricing validation
@@ -42,8 +41,8 @@ into the Vision and scope.
       options, R-04 validation plan.
 - [x] (analyst) Raise founder input-request (pricing model, price, free-tier,
       paying-accounts target, steering input) and suspend the lane.
-- [ ] (analyst) **[awaiting founder]** Fold answers into Vision §5 (set target)
-      and scope §6 (mark pricing decided); set PRICE-001 `status: agreed`.
+- [x] (analyst) Fold answers (PD-1..PD-5) into Vision §5 (target set), scope §6
+      (pricing decided), and PRICE-001 §0/§7 (`status: agreed`); archive request.
 - [ ] (analyst) Complete the task via `/openup-complete-task`.
 
 ## Notes

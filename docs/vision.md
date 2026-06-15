@@ -100,7 +100,10 @@ Supporting:
 4. **3-month retention** — % of users still issuing invoices after three months.
    Target: **≥ 40%**.
 5. **Active paying accounts** — paying autónomos/pymes within 12 months of
-   launch. Target: TODO (set with product owner once pricing is decided).
+   launch. Target: **150–400 by month 12** (funnel-derived band; narrow to a
+   point once a beta trial→paid conversion read exists). Set with the product
+   owner alongside the pricing decision — see `docs/pricing-validation.md`
+   (PRICE-001, PD-4).
 
 ## 6. Constraints and Assumptions
 
@@ -150,5 +153,7 @@ against which all future scope decisions should be validated.
 
 ---
 
-*Status: good-enough-for-Inception. Open TODOs: tech stack (Elaboration);
-paying-accounts target (with product owner). Authored via guided Q&A (T-002).*
+*Status: good-enough-for-Inception. Open TODOs: ~~tech stack (Elaboration)~~
+(resolved T-006: Python/Django + PostgreSQL); ~~paying-accounts target~~
+(resolved T-009: 150–400 by month 12 — see PRICE-001). Authored via guided Q&A
+(T-002).*

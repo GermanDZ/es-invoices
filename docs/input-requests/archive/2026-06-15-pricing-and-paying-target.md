@@ -2,7 +2,9 @@
 title: "Pricing model + paying-accounts target (R-04 / Vision §5)"
 created: "2026-06-15T14:45:00Z"
 created_by: "openup-next (T-009, analyst hat)"
-status: pending
+status: processed
+answered_by: "founder"
+answered: "2026-06-15"
 related_task: "T-009"
 run_id: "T-009-iter8"
 ---
@@ -44,7 +46,7 @@ This is brought to you (not decided by the analyst) because it sets your
 **Type**: multiple-choice
 **Accepts**: one option
 
-- [ ] `A — Single flat plan + free trial (recommended)` - One paid tier (~7 €/mo
+- [X] `A — Single flat plan + free trial (recommended)` - One paid tier (~7 €/mo
       + discounted annual), time-boxed trial, no permanent free tier. Simplest;
       fits "one job done well" and a near deadline.
 - [ ] `B — Freemium` - Capped free tier + paid ~7–10 €/mo. Lowest friction;
@@ -58,13 +60,15 @@ This is brought to you (not decided by the analyst) because it sets your
 
 What monthly (and annual, if any) price for the paid plan?
 
-**Answer**:
+**Answer**: **~7 €/month**, with a discounted **~70 €/year** annual plan (≈ 2
+months free, ~5.83 €/mo effective). Sits just below the competitor entry band
+(6–13 €/mo) — the simplicity+price wedge.
 
 ### Q3: Free trial vs. permanent free tier
 **Type**: multiple-choice
 **Accepts**: one option
 
-- [ ] `Free trial only (recommended)` - e.g. 14–30 day trial of the full
+- [X] `Free trial only (recommended)` - e.g. 14–30 day trial of the full
       product; no standing free-tier cost. Tests conversion cleanly.
 - [ ] `Permanent capped free tier` - e.g. N invoices/month free. Lower adoption
       friction; standing support cost; must NOT give the compliance core away.
@@ -72,7 +76,9 @@ What monthly (and annual, if any) price for the paid plan?
 
 If a free tier, what should it include / cap?
 
-**Answer**:
+**Answer**: **Free trial only** — a time-boxed trial of the full product (no
+standing free-tier cost). No permanent free tier in v1. *(Revisit a capped free
+tier only if the deadline defers to 2027 — see Q5.)*
 
 ### Q4: 12-month paying-accounts target (closes Vision §5)
 **Type**: text
@@ -82,7 +88,8 @@ The funnel math (signups × ≥50% activation × trial→paid) suggests an
 illustrative **~150–400 paying accounts by month 12**. What number (or band)
 should the Vision commit to?
 
-**Answer**:
+**Answer**: Commit the **150–400 paying accounts by month 12** band now; narrow
+to a point number once a beta trial→paid conversion read exists.
 
 ### Q5: Steering input (deadline, data, segment)
 **Type**: text
@@ -92,7 +99,11 @@ Optional — your current **legal-deadline assumption** (this changes Q1/Q3), an
 existing market/waitlist data, or a target sub-segment detail that should steer
 the choice.
 
-**Answer**:
+**Answer**: **Treat the Verifactu deadline as uncertain and track it** — do not
+bet the go-to-market calendar on either date (1 Jul 2026 per RD 254/2025 vs. the
+proposed 1 Jul 2027 prórroga). Keep the model-A + trial decision robust to both;
+revisit adding a capped free tier only if the 2027 prórroga is confirmed. (Ties
+to R-01 regulatory-timing monitoring.)
 
 ## Instructions for Respondent
 
