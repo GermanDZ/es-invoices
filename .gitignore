@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Source files (not included in repo - too large)
+.tmp/
+
+# Generated output (can be regenerated)
+# openup-knowledge-base/
+
+# Logs
+*.log
+
+# Claude Code
+/.claude
+
+# OpenUP runtime iteration state (machine-readable, regenerated per iteration)
+# The tracked schema + helper live in scripts/; only the runtime dir is ignored.
+/.openup/
+
+# Temporary files
+*.tmp
+temp/

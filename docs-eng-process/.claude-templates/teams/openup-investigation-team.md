@@ -1,0 +1,171 @@
+⚠️ **CRITICAL: READ THIS BEFORE SPAWNING TEAMMATES** ⚠️
+
+## STOP! DO NOT SPAWN TEAMMATES FIRST!
+
+**The correct OpenUP workflow is:**
+
+1. ✅ **FIRST**: Initialize the iteration with `/openup-start-iteration`
+2. ✅ **SECOND**: Spawn teammates
+3. ✅ **THIRD**: Coordinate work
+
+**❌ WRONG:**
+```
+"Create an OpenUP team..." → Spawns teammates immediately → NO ITERATION
+```
+
+**✅ RIGHT:**
+```
+"Create an OpenUP team..." → /openup-start-iteration → Spawns teammates
+```
+
+**Even when the user says "create a team", you MUST initialize the iteration FIRST.**
+
+The team lead's first action should always be calling `/openup-start-iteration`, not spawning teammates.
+
+---
+
+## Token-Efficient Team Protocol (Mandatory)
+
+To reduce token usage while preserving quality, the team lead and all teammates MUST follow these rules:
+
+1. **One subtask per session**: open a fresh session for each roadmap/task item. Do not keep long-running multi-task sessions.
+2. **Single orchestrator**: keep one active coordinator (usually project-manager). Spawn specialist agents only for bounded work, then stop them.
+3. **Milestone-only updates**: status messages are allowed only at `started`, `blocked`, and `done`. Do not send heartbeat or idle notifications.
+4. **Compact handoffs**: every handoff must be max 6 bullets with only: `decision`, `diff summary`, `risks`, `next action`.
+5. **No repeated large context**: do not resend full task lists/specs after kickoff. Refer by task ID and send only deltas.
+6. **Model tiering**: enforced via `model:` frontmatter and per-role assignments — see docs-eng-process/model-tiers.md.
+7. **Batch before reporting**: complete a meaningful chunk (code + tests for the subtask) before reporting back.
+8. **Budget gate**: define a token budget per iteration lane (PM/dev/test). If exceeded, checkpoint and restart with a fresh session.
+
+Default execution cycle:
+`/openup-start-iteration` -> assign one subtask -> specialist completes and reports once -> PM decides next subtask -> new session when scope changes.
+
+---
+
+# OpenUP Investigation Team Configuration
+
+This is a task-specific team configuration for debugging and technical investigation.
+
+⚠️ **RECOMMENDED: Start with an Iteration** ⚠️
+
+For proper tracking and traceability, the team lead should start an iteration before spawning teammates:
+
+```
+/openup-start-iteration goal: "Implement feature"
+# Or with a task ID if you have a roadmap:
+/openup-start-iteration task_id: T-005
+# Then spawn teammates...
+```
+
+**If you don't have a roadmap yet**, you can spawn teammates directly and track work informally.
+
+---
+
+
+## Team Purpose
+
+Investigate and resolve bugs, technical issues, or performance problems through collaborative analysis.
+
+## Team Members
+
+### architect (Lead)
+- **Model**: inherit
+- **Focus**: Analyze architecture and system design implications
+- **Key Activities**: Root cause analysis, architectural impact assessment
+- **Collaborates With**: Developer (code analysis), Tester (reproduction)
+- **Reference**: `.claude/teammates/architect.md`
+
+### developer (Lead)
+- **Model**: inherit
+- **Focus**: Analyze code, find root cause, implement fix
+- **Key Activities**: Code inspection, debugging, fix implementation
+- **Collaborates With**: Architect (design understanding), Tester (reproduction and verification)
+- **Reference**: `.claude/teammates/developer.md`
+
+### tester (Lead)
+- **Model**: inherit
+- **Focus**: Reproduce issue, verify fix, prevent regression
+- **Key Activities**: Issue reproduction, test creation, fix verification
+- **Collaborates With**: Developer (reproduction steps), Architect (impact assessment)
+- **Reference**: `.claude/teammates/tester.md`
+
+## Investigation Process
+
+**CRITICAL FIRST STEP**: Before starting investigation, the team lead MUST use `/openup-start-iteration` to initialize the iteration. All work must be tracked as part of an iteration.
+
+1. **Understand the Issue**
+   - Gather bug report or issue description
+   - Identify reproduction steps
+   - Understand expected vs. actual behavior
+
+2. **Analyze the Problem**
+   - Architect analyzes system design and potential causes
+   - Developer inspects relevant code
+   - Tester reproduces and documents the issue
+
+3. **Identify Root Cause**
+   - Collaborate to find the actual cause
+   - Assess architectural impact
+   - Consider potential side effects
+
+4. **Design Solution**
+   - Architect proposes fix approach
+   - Developer assesses implementation complexity
+   - Tester defines verification criteria
+
+5. **Implement Fix**
+   - Developer implements the fix
+   - Tester verifies the fix resolves the issue
+   - Architect ensures no architectural violations
+
+6. **Prevent Regression**
+   - Tester creates or updates test cases
+   - Developer adds tests if needed
+   - Document lessons learned
+
+## Creating This Team
+
+To create an OpenUP Investigation team, use this prompt:
+
+```
+Create an OpenUP investigation team to investigate [issue description].
+
+Spawn teammates for:
+- architect: to analyze the architecture and identify root causes
+- developer: to analyze the code and implement the fix
+- tester: to reproduce the issue and verify the fix
+
+The architect should analyze the system architecture and potential causes.
+The developer should find the root cause in the code and implement a fix.
+The tester should reproduce the issue, verify the fix works, and add tests to prevent regression.
+```
+
+## Task Assignment Guidelines
+
+- **Root cause analysis** → architect + developer
+- **Code inspection** → developer
+- **Issue reproduction** → tester
+- **Fix implementation** → developer
+- **Fix verification** → tester
+- **Test creation** → tester
+- **Architectural assessment** → architect
+
+## Collaboration Patterns
+
+- **Architect ↔ Developer**: Architecture understanding vs. code reality
+- **Developer ↔ Tester**: Fix implementation vs. verification
+- **All**: Root cause analysis and solution design
+
+## Example Usage
+
+```
+Create an OpenUP investigation team to investigate the login timeout issue.
+
+The team should:
+1. Reproduce the timeout issue
+2. Analyze the authentication flow code
+3. Identify the root cause
+4. Implement a fix
+5. Verify the fix works
+6. Add tests to prevent regression
+```

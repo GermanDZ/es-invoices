@@ -1,0 +1,169 @@
+⚠️ **CRITICAL: READ THIS BEFORE SPAWNING TEAMMATES** ⚠️
+
+## STOP! DO NOT SPAWN TEAMMATES FIRST!
+
+**The correct OpenUP workflow is:**
+
+1. ✅ **FIRST**: Initialize the iteration with `/openup-start-iteration`
+2. ✅ **SECOND**: Spawn teammates
+3. ✅ **THIRD**: Coordinate work
+
+**❌ WRONG:**
+```
+"Create an OpenUP team..." → Spawns teammates immediately → NO ITERATION
+```
+
+**✅ RIGHT:**
+```
+"Create an OpenUP team..." → /openup-start-iteration → Spawns teammates
+```
+
+**Even when the user says "create a team", you MUST initialize the iteration FIRST.**
+
+The team lead's first action should always be calling `/openup-start-iteration`, not spawning teammates.
+
+---
+
+## Token-Efficient Team Protocol (Mandatory)
+
+To reduce token usage while preserving quality, the team lead and all teammates MUST follow these rules:
+
+1. **One subtask per session**: open a fresh session for each roadmap/task item. Do not keep long-running multi-task sessions.
+2. **Single orchestrator**: keep one active coordinator (usually project-manager). Spawn specialist agents only for bounded work, then stop them.
+3. **Milestone-only updates**: status messages are allowed only at `started`, `blocked`, and `done`. Do not send heartbeat or idle notifications.
+4. **Compact handoffs**: every handoff must be max 6 bullets with only: `decision`, `diff summary`, `risks`, `next action`.
+5. **No repeated large context**: do not resend full task lists/specs after kickoff. Refer by task ID and send only deltas.
+6. **Model tiering**: enforced via `model:` frontmatter and per-role assignments — see docs-eng-process/model-tiers.md.
+7. **Batch before reporting**: complete a meaningful chunk (code + tests for the subtask) before reporting back.
+8. **Budget gate**: define a token budget per iteration lane (PM/dev/test). If exceeded, checkpoint and restart with a fresh session.
+
+Default execution cycle:
+`/openup-start-iteration` -> assign one subtask -> specialist completes and reports once -> PM decides next subtask -> new session when scope changes.
+
+---
+
+# OpenUP Construction Team Configuration
+
+This is an agent team configuration for the Construction phase of OpenUP.
+
+⚠️ **RECOMMENDED: Start with an Iteration** ⚠️
+
+For proper tracking and traceability, the team lead should start an iteration before spawning teammates:
+
+```
+/openup-start-iteration goal: "Implement feature"
+# Or with a task ID if you have a roadmap:
+/openup-start-iteration task_id: T-005
+# Then spawn teammates...
+```
+
+**If you don't have a roadmap yet**, you can spawn teammates directly and track work informally.
+
+---
+
+
+## Phase Overview
+
+**Construction** - Build the system incrementally. Implement all remaining features iteratively until ready for deployment.
+
+## Team Members
+
+### developer (Lead)
+- **Model**: inherit
+- **Focus**: Feature implementation, unit testing, integration
+- **Key Work Products**: Implementation (code), Developer Tests, Design
+- **Collaborates With**: Tester (test coverage), Architect (technical guidance)
+- **Reference**: `.claude/teammates/developer.md`
+
+### tester (Lead)
+- **Model**: inherit
+- **Focus**: Test planning, test implementation, test execution, quality assurance
+- **Key Work Products**: Test Cases, Test Scripts, Test Logs
+- **Collaborates With**: Developer (test implementation), Analyst (acceptance criteria)
+- **Reference**: `.claude/teammates/tester.md`
+
+### architect (As needed)
+- **Model**: inherit
+- **Focus**: Technical guidance, architecture adherence, code reviews
+- **Key Work Products**: Architecture updates, Design reviews
+- **Collaborates With**: Developer (implementation guidance)
+- **Reference**: `.claude/teammates/architect.md`
+
+### analyst (As needed)
+- **Model**: sonnet
+- **Focus**: Requirements clarification, acceptance criteria
+- **Key Work Products**: Requirements updates, Use case clarifications
+- **Collaborates With**: Tester (acceptance criteria), Developer (requirements understanding)
+- **Reference**: `.claude/teammates/analyst.md`
+
+## Phase Objectives
+
+1. Implement all remaining features
+2. Iteratively test and refine the system
+3. Prepare for beta testing
+4. Complete user documentation
+5. Achieve acceptable quality levels
+
+## Completion Criteria
+
+- [ ] Product is stable enough for beta testing
+- [ ] Alpha test results documented
+- [ ] Critical issues resolved
+- [ ] User documentation is adequate
+- [ ] Stakeholder agreement to deploy to beta users
+
+## Creating This Team
+
+To create an OpenUP Construction team, use this prompt:
+
+```
+Create an OpenUP agent team for the Construction phase.
+
+Spawn teammates for:
+- developer: to lead implementation
+- tester: to lead testing and quality assurance
+
+The developer should implement features from the roadmap with tests.
+The tester should create test cases, execute tests, and track quality metrics.
+```
+
+## Typical Workflow
+
+**CRITICAL FIRST STEP**: Before starting construction work, the team lead (developer) MUST use `/openup-start-iteration` to initialize the iteration. All work must be tracked as part of an iteration.
+
+Each iteration:
+
+1. **Developer** implements features with tests
+2. **Tester** creates and executes test cases
+3. **Developer** fixes bugs found by tester
+4. **Tester** validates fixes and updates test results
+5. **Architect** (if needed) provides technical guidance
+6. **Analyst** (if needed) clarifies requirements
+7. **Team Lead** ensures PR is created after task completion:
+   - Use `/complete-task task_id: T-XXX create_pr: true` to complete task and create PR
+   - Or use `/create-pr task_id: T-XXX` to create PR manually
+   - Verify PR description includes task context from roadmap
+
+## Task Assignment Guidelines
+
+- **Feature implementation** → developer
+- **Testing and quality** → tester
+- **Technical guidance** → architect
+- **Requirements clarification** → analyst
+- **PR creation and coordination** → Team Lead (developer)
+
+## Collaboration Patterns
+
+- **Developer ↔ Tester**: Implementation vs. test coverage, bug fixing
+- **Developer ↔ Architect**: Implementation vs. architecture adherence
+- **Tester ↔ Analyst**: Acceptance criteria validation
+- **All ↔ Project Manager**: Status updates (if PM is on team)
+
+## Iteration Focus
+
+Each construction iteration should:
+1. Select features from the roadmap
+2. Implement with tests
+3. Review and validate
+4. Update documentation
+5. Prepare for next iteration
