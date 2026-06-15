@@ -13,3 +13,4 @@
 {"run_id": "3aa87890cc2c4ca4969988f94b9d9468", "event": "commit", "task_id": "T-004", "branch": "docs/T-004-use-cases", "sha": "60a2d19705017fdb92a287031f16734ea417afea", "model": null, "session_id": null, "ts": "2026-06-15T08:38:44Z"}
 {"run_id":"run-T-004-20260615","event":"iteration_complete","task_id":"T-004","branch":"docs/T-004-use-cases","phase":"inception","track":"quick","ts":"2026-06-15T08:40:00Z"}
 {"run_id": "5a5251acf3c64921a6536014e44f2d99", "event": "commit", "task_id": "T-004", "branch": "docs/T-004-use-cases", "sha": "2b7bfad188d8ba466734c2207cb63251cfa0126f", "model": null, "session_id": null, "ts": "2026-06-15T08:39:02Z"}
+{"run_id":"T-005-iter4-start","event":"iteration_start","task_id":"T-005","goal":"Agree on scope + non-goals","branch":"docs/T-005-scope-non-goals","phase":"inception","ts":"2026-06-15"}
