@@ -1,17 +1,19 @@
 # Project Status
 
 **Project**: FacturaSimple
-**Phase**: inception
-**Iteration**: 4
-**Iteration Goal**: T-005 — Agree on scope + non-goals
-**Status**: completed
-**Current Task**: T-005
+**Phase**: elaboration
+**Iteration**: 5
+**Iteration Goal**: T-006 — Architecture notebook + tech stack ADR
+**Status**: ready to start
+**Current Task**: T-006
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: sync-status.py
+**Updated By**: quick-task (phase-transition)
 
 ## Notes
+
+- **Iteration 5 — Elaboration (2026-06-15)**: Phase transition from Inception to Elaboration per `/openup-phase-review`. Inception LCO milestone achieved (Vision approved, risks ranked, use cases + scope agreed). Elaboration focus: validate architecture, resolve AEAT integration (R-03), validate WTP/pricing (R-04), detail corrective-invoice requirement (S-5/D-1). First lane: T-006 (architecture + tech stack ADR).
 
 - **Iteration 4** (2026-06-15): Authored docs/scope.md (SCOPE-001) — ratified Vision §4/§6 into an explicit v1 scope (S-1..S-6) + non-goals (N-1..N-7), with three product-owner boundary decisions: corrective invoices in scope (D-1), B2B+B2C recipients (D-2), single-user/single-business account model (D-3). Follow-up: add a requirement for facturas rectificativas in Elaboration.
 
