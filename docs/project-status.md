@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: elaboration
-**Iteration**: 7
-**Iteration Goal**: T-008 — Add + detail corrective-invoice requirement (S-5/D-1)
-**Status**: completed
-**Current Task**: T-008
+**Iteration**: 8
+**Iteration Goal**: T-009 — Willingness-to-pay / pricing validation (close Vision §5 TODO, address R-04)
+**Status**: in-progress
+**Current Task**: T-009
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: sync-status.py
+**Updated By**: openup-start-iteration
 
 ## Notes
 
