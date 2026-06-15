@@ -16,3 +16,5 @@
 {"run_id":"T-005-iter4-start","event":"iteration_start","task_id":"T-005","goal":"Agree on scope + non-goals","branch":"docs/T-005-scope-non-goals","phase":"inception","ts":"2026-06-15"}
 {"run_id": "b8c0f6aec980441a9a9a9104a92ee9ea", "event": "commit", "task_id": "T-005", "branch": "docs/T-005-scope-non-goals", "sha": "b0665f12bae6c7ad0e06ccf9580b8245f71bf1d9", "model": null, "session_id": null, "ts": "2026-06-15T09:14:16Z"}
 {"run_id": "39b834d7a5cc4fb48721cfbab3f55e7d", "event": "commit", "task_id": "T-005", "branch": "docs/T-005-scope-non-goals", "sha": "cba52a7376f537f7cd6bce02157ba5485f7a99d4", "model": null, "session_id": null, "ts": "2026-06-15T09:14:52Z"}
+{"run_id":"T-005-iter4-complete","event":"iteration_complete","task_id":"T-005","branch":"docs/T-005-scope-non-goals","phase":"inception","track":"quick","ts":"2026-06-15T09:20:00Z"}
+{"run_id": "8100dc9763af4834837bde06517fc0d8", "event": "commit", "task_id": "T-005", "branch": "docs/T-005-scope-non-goals", "sha": "5d412be5e2a8f506eff46476a7bb92b5db650311", "model": null, "session_id": null, "ts": "2026-06-15T09:16:27Z"}
