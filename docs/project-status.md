@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: elaboration
-**Iteration**: 5
-**Iteration Goal**: T-006 — Architecture notebook + tech stack ADR
-**Status**: completed
-**Current Task**: T-006
+**Iteration**: 6
+**Iteration Goal**: T-007 — AEAT/Verifactu submission spike (build-vs-buy)
+**Status**: in-progress
+**Current Task**: T-007
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: sync-status.py
+**Updated By**: openup-start-iteration
 
 ## Notes
 
