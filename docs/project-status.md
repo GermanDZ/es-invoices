@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: inception
-**Iteration**: 3
-**Iteration Goal**: T-004 — Define top use cases
-**Status**: completed
-**Current Task**: T-004
+**Iteration**: 4
+**Iteration Goal**: T-005 — Agree on scope + non-goals
+**Status**: in-progress
+**Current Task**: T-005
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: sync-status.py
+**Updated By**: openup-start-iteration
 
 ## Notes
 
