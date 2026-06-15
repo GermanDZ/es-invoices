@@ -4,14 +4,16 @@
 **Phase**: elaboration
 **Iteration**: 6
 **Iteration Goal**: T-007 — AEAT/Verifactu submission spike (build-vs-buy)
-**Status**: in-progress
+**Status**: completed
 **Current Task**: T-007
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: openup-start-iteration
+**Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 6** (2026-06-15): T-007 AEAT/Verifactu submission spike complete — founder ratified **BUILD direct, PoC-gated** (gateway fallback behind the same AD-3 interface), user-supplied certificate stored securely (O-1), Verifactu común-territory only / no TicketBAI in v1 (O-3). AD-3 resolved `proposed → accepted`; architecture notebook now has no open seams. O-2 (autónomo obligation timeline) carried to construction.
 
 - **Iteration 5** (2026-06-15): T-006 complete — architecture notebook approved; founder resolved AD-5 (Python + Django) and AD-6 (PostgreSQL). AD-3 AEAT adapter remains open, deferred to the T-007 spike.
 

@@ -7,12 +7,12 @@
   "branch": "spike/T-007-aeat-verifactu-submission",
   "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices",
   "session_id": null,
-  "started_at": "2026-06-15T10:29:15Z",
+  "started_at": "2026-06-15T10:50:58Z",
   "gates": {
     "team_deployed": false,
     "plan_persisted": false,
-    "log_written": false,
-    "roadmap_synced": false,
+    "log_written": true,
+    "roadmap_synced": true,
     "retro_due": true
   },
   "iterations_since_retro": 5
