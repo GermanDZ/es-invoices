@@ -1,17 +1,24 @@
 # Project Status
 
 **Project**: FacturaSimple
-**Phase**: elaboration
+**Phase**: construction
 **Iteration**: 8
-**Iteration Goal**: T-009 — Willingness-to-pay / pricing validation
-**Status**: completed
-**Current Task**: T-009
+**Iteration Goal**: —
+**Status**: phase-initiated (ready to start T-010)
+**Current Task**: —
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: sync-status.py
+**Updated By**: openup-quick-task (construction backlog seed)
 
 ## Notes
+
+- **Phase transition → Construction** (2026-06-15): Elaboration LCA milestone
+  reviewed (4 criteria met, 2 carry-forward); recommendation **GO**. Seeded the
+  Construction backlog in `docs/roadmap.md` — T-010..T-018, risk-front-loaded
+  (T-010 AEAT `preproducción` PoC first to burn down residual R-03 with a running
+  proof). Carry-forwards: AEAT PoC (O-1), current-calendar obligation check (O-2),
+  pre-launch RGPD checklist (R-06). Next: `/openup-next` promotes T-010.
 
 - **Iteration 8** (2026-06-15): T-009 complete — willingness-to-pay/pricing validation (PRICE-001). Founder ratified single flat plan ~7 €/mo (~70 €/yr) + free trial (no permanent free tier in v1), 12-month paying-accounts target **150–400** (narrow after beta), Verifactu deadline treated as uncertain/tracked. Closed Vision §5 paying-accounts TODO + scope §6 pricing item; R-04 reduced to a verifiable beta validation plan. Común-territory, build-direct context unchanged.
 
