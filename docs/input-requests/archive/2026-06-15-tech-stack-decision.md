@@ -2,9 +2,10 @@
 title: "Tech stack decision for FacturaSimple (AD-5)"
 created: "2026-06-15T10:00:00Z"
 created_by: "openup-next (T-006, architect hat)"
-status: pending
+status: processed
 run_id: "T-006-it5"
 related_task: "T-006"
+answered_at: "2026-06-15T12:10:00Z"
 ---
 
 # Input Request — Tech Stack Decision (AD-5)
@@ -37,17 +38,20 @@ signed), reliable **PDF generation**, **EU-hostable** (AD-4), and — decisive �
 What language and web framework do you want to build FacturaSimple in? Pick what
 you are most productive in that can meet the criteria above.
 
-**Answer**:
+**Answer**: **Python + Django.** Mature XML signing (`signxml` for XAdES/XML-DSig),
+reliable PDF generation (WeasyPrint / ReportLab), EU-hostable on any provider
+(AD-4), and founder fluency. Meets all imposed criteria.
 
 ### Q2: Datastore confirmation
 **Type**: multiple-choice
 **Accepts**: one option
 
-- [ ] `PostgreSQL` - Confirm the AD-6 recommendation (relational, ACID, EU-hostable).
+- [x] `PostgreSQL` - Confirm the AD-6 recommendation (relational, ACID, EU-hostable).
 - [ ] `MySQL/MariaDB` - Relational alternative (e.g. if your stack defaults to it).
 - [ ] `Other / let the stack default decide` - Specify in the answer.
 
-**Answer**:
+**Answer**: **PostgreSQL** — confirms the AD-6 recommendation. Pairs cleanly with
+Django (first-class `django.db.backends.postgresql` support).
 
 ### Q3: Anything that further constrains the stack?
 **Type**: text
@@ -56,7 +60,7 @@ you are most productive in that can meet the criteria above.
 Optional — any existing code, library, hosting account, or skill that should
 steer or veto a choice.
 
-**Answer**:
+**Answer**: None supplied — no additional constraint.
 
 ## Instructions for Respondent
 

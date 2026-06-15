@@ -2,7 +2,7 @@
 type: decision
 id: D-01
 title: Architecture Notebook — FacturaSimple
-status: draft
+status: approved
 traces-from: [VIS-001]
 owner-role: architect
 ---
@@ -11,9 +11,9 @@ owner-role: architect
 
 > The architectural baseline for FacturaSimple v1 (Elaboration, T-006). Records
 > the load-bearing decisions, the constraints that force them, and the rejected
-> alternatives. Each decision is an ADR (`AD-n`). One decision — the application
-> tech stack (AD-5) — is **deferred to the founder** and tracked as an open
-> input-request; this notebook stays `status: draft` until AD-5 is resolved.
+> alternatives. Each decision is an ADR (`AD-n`). The tech stack (AD-5: Python +
+> Django) and datastore (AD-6: PostgreSQL) are now decided with the founder; the
+> only remaining open seam is the AD-3 AEAT adapter, resolved by the T-007 spike.
 
 ## 1. System Context
 
@@ -62,7 +62,7 @@ Ranked — the order is the tie-breaker when attributes conflict.
   Microservices' operational overhead is unjustifiable at this scale.
 - **Rejected:** Microservices (premature distribution cost); serverless-first
   (cold-start + stateful sequential-numbering complexity).
-- **Status:** proposed.
+- **Status:** **accepted.**
 
 ### AD-2 — Compliance logic isolated behind a versioned module
 - **Decision:** All Verifactu/AEAT rules — record format, hash-chaining/signing,
@@ -73,7 +73,7 @@ Ranked — the order is the tie-breaker when attributes conflict.
   in the risk list.
 - **Rejected:** Compliance logic spread across feature code (a spec change would
   ripple everywhere — exactly the risk R-01 warns against).
-- **Status:** proposed.
+- **Status:** **accepted.**
 
 ### AD-3 — AEAT submission behind a swappable provider interface
 - **Decision:** Submission is reached through an interface with one adapter;
@@ -96,28 +96,30 @@ Ranked — the order is the tie-breaker when attributes conflict.
   *Decided with the product owner during T-006.*
 - **Status:** **accepted.**
 
-### AD-5 — Application tech stack — **DEFERRED to founder expertise**
-- **Decision:** OPEN. The programming language and web framework are deferred to
-  the founder's existing expertise (a solo build succeeds or fails on what the
-  one builder knows best). No language/framework is committed yet.
-- **Constraint:** Q-6 (a solo founder must be productive day one) makes founder
-  fluency the dominant selection criterion — which only the founder can supply.
-- **Selection criteria (to apply once the founder names candidates):** mature
-  **XML + XAdES/XML-DSig signing** support (for Verifactu records); reliable PDF
-  generation; founder fluency; EU-hostable (AD-4).
-- **Status:** **deferred** — tracked as an input-request (see §7). This notebook
-  stays `draft` until AD-5 is resolved.
+### AD-5 — Application tech stack: Python + Django
+- **Decision:** Build FacturaSimple in **Python with the Django web framework.**
+- **Constraint that forces it:** Q-6 (a solo founder must be productive day one)
+  makes founder fluency the dominant selection criterion — founder confirmed
+  fluency in Python/Django during T-006.
+- **Meets the imposed criteria:** mature **XML + XAdES/XML-DSig signing**
+  (`signxml`); reliable **PDF generation** (WeasyPrint / ReportLab); **EU-hostable**
+  on any European provider (AD-4); and decisive **founder fluency**.
+- **Rejected:** TypeScript+Node, PHP+Laravel, C#+ASP.NET Core — all meet the
+  technical criteria, but none beat founder fluency, the dominant criterion at
+  solo scale.
+- **Status:** **accepted.** *Decided with the founder during T-006.*
 
-### AD-6 — Relational datastore (PostgreSQL recommended)
-- **Decision:** A **relational** datastore; **PostgreSQL** recommended, EU-hosted
-  (AD-4). Final confirmation pairs with AD-5 (some stacks bundle a default).
+### AD-6 — Relational datastore: PostgreSQL
+- **Decision:** **PostgreSQL**, EU-hosted (AD-4). Confirmed alongside AD-5 —
+  pairs cleanly with Django's first-class `django.db.backends.postgresql` support.
 - **Constraint that forces it:** Sequential-numbering invariants and fiscal
   records need ACID transactions and strong consistency (Q-1). Verifactu records
   form an append-only, hash-chained sequence — a transactional relational store
   fits naturally.
 - **Rejected:** Document/NoSQL store (weaker transactional guarantees for
-  gap-free numbering).
-- **Status:** proposed (recommended), confirm with AD-5.
+  gap-free numbering); MySQL/MariaDB (viable, but PostgreSQL's stronger
+  constraint/transaction semantics better fit the numbering invariants).
+- **Status:** **accepted.**
 
 ## 4. Subsystem Decomposition
 
@@ -140,33 +142,33 @@ internals.
 - **Spain-only legal model** — Spanish UI, EUR, AEAT (Vision §6; non-goal N-6).
 - **EU data residency / RGPD** — AD-4, Q-3.
 - **Solo / bootstrapped team** — lean; build-vs-buy for non-core (Vision §6; R-07).
-- **Tech stack open** — AD-5 deferred (§7).
+- **Tech stack: Python + Django, PostgreSQL** — AD-5, AD-6 (founder-decided).
 
 ## 6. Self-Critique
 
-- **Weakest point:** the architecture's two riskiest seams (AEAT integration,
-  AD-3; and the stack, AD-5) are both **unresolved** — AD-3 waits on the T-007
-  spike, AD-5 on founder input. This is honest, not hidden: both are recorded as
-  open with the interface (AD-3) / criteria (AD-5) that contain the risk until
-  resolved. The notebook is deliberately `draft`, not `approved`.
+- **Weakest point:** one seam remains open — the AEAT integration adapter (AD-3),
+  build-vs-buy. This is honest, not hidden: the **interface** is committed now so
+  the adapter can be swapped, and the decision is contained behind it until the
+  **T-007** spike resolves it. The stack (AD-5) and datastore (AD-6) are now
+  founder-decided, so the notebook is `approved`.
 - **Load-bearing assumption:** a relational store + modular monolith will scale
   to the v1 user base. For a single-user-per-account invoicing tool at
   bootstrap scale this is safe; revisit only if multi-tenant load profiles
   change (out of v1 scope, N-5).
-- **Resolution:** AD-4 is accepted; AD-1/AD-2/AD-6 are low-controversy and forced
-  by stated constraints; the two open items have explicit resolution paths
-  (T-007, the §7 input-request).
+- **Resolution:** AD-1/AD-2/AD-4/AD-5/AD-6 are accepted; the one open item (AD-3
+  adapter) has an explicit resolution path (T-007).
 
 ## 7. Open Decisions / Follow-ups
 
-- **AD-5 (tech stack)** — OPEN. Raised as an input-request this iteration; once
-  the founder names a stack, fold it in, confirm AD-6, and flip this notebook to
-  `approved`.
-- **AD-3 adapter (build-vs-buy)** — resolved by **T-007** (AEAT submission spike).
-- **AD-6** — confirm datastore once AD-5 lands.
+- **AD-5 (tech stack)** — RESOLVED: Python + Django (founder-decided T-006;
+  see `docs/input-requests/archive/2026-06-15-tech-stack-decision.md`).
+- **AD-6 (datastore)** — RESOLVED: PostgreSQL (founder-confirmed T-006).
+- **AD-3 adapter (build-vs-buy)** — open; resolved by **T-007** (AEAT submission
+  spike). The only remaining open seam.
 
 ---
 
 *Authored in Elaboration (T-006) via `/openup-create-architecture-notebook`.
-Traces from VIS-001. Status `proposed` pending AD-5 (founder tech-stack decision,
-§7) and the T-007 spike (AD-3).*
+Traces from VIS-001. Status `approved` — AD-5 (Python + Django) and AD-6
+(PostgreSQL) founder-decided; the AD-3 AEAT adapter remains open pending the
+T-007 spike.*
