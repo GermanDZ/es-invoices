@@ -4,7 +4,7 @@
 **Phase**: inception
 **Iteration**: 2
 **Iteration Goal**: T-003 — Draft initial risk list
-**Status**: in-progress
+**Status**: completed
 **Current Task**: T-003
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
