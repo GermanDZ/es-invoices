@@ -2,7 +2,9 @@
 title: "AEAT/Verifactu submission — build-vs-buy decision (AD-3)"
 created: "2026-06-15T12:45:00Z"
 created_by: "openup-next (T-007, architect hat)"
-status: pending
+status: processed
+answered_by: "founder"
+answered: "2026-06-15"
 run_id: "T-007-iter6"
 related_task: "T-007"
 ---
@@ -48,7 +50,7 @@ reason AD-5/AD-6 were yours to make.
 **Type**: multiple-choice
 **Accepts**: one option
 
-- [ ] `BUILD direct, PoC-gated (recommended)` - Attempt the sandbox PoC; commit to
+- [x] `BUILD direct, PoC-gated (recommended)` - Attempt the sandbox PoC; commit to
       direct integration if it clears the time box, else fall back to a gateway
       adapter behind the same AD-3 interface.
 - [ ] `BUY a gateway from the start` - Integrate a third-party e-invoice/AEAT
@@ -56,19 +58,23 @@ reason AD-5/AD-6 were yours to make.
 - [ ] `BUILD direct, unconditionally` - Commit to direct integration with no
       gateway fallback (highest control, highest R-03 exposure).
 
-**Answer**:
+**Answer**: BUILD direct. Taken as the **PoC-gated** variant (the recommendation) —
+keep AD-3's interface so a gateway adapter can be swapped in if the sandbox PoC
+blows its time box.
 
 ### Q2: Certificate model (O-1 — shapes the adapter either way)
 **Type**: multiple-choice
 **Accepts**: one option
 
-- [ ] `User supplies their own AEAT certificate` - Each user uploads/holds their
+- [x] `User supplies their own AEAT certificate` - Each user uploads/holds their
       qualified cert; we store + use it (more RGPD/storage burden on us).
 - [ ] `FacturaSimple submits on their behalf` - Act as colaborador social / use a
       sello de empresa to submit (less user friction; legal/agreement setup).
 - [ ] `Not sure — needs investigation` - Treat O-1 as an open spike sub-task.
 
-**Answer**:
+**Answer**: User supplies their own AEAT certificate; **we store it securely**
+(encrypted at rest in our EU stack). Accepts the added RGPD/secure-storage burden
+— a construction-phase requirement on the adapter + onboarding flow.
 
 ### Q3: Budget tolerance for a gateway, if the build path stalls
 **Type**: text
@@ -77,7 +83,8 @@ reason AD-5/AD-6 were yours to make.
 If the build PoC blows its time box, what recurring cost (if any) would you
 tolerate for a gateway fallback? This calibrates the fallback.
 
-**Answer**:
+**Answer**: Defer — decide later. To be calibrated at build time, only if the
+PoC actually stalls. Not load-bearing for this spike's decision.
 
 ### Q4: Anything else that should steer or veto the choice?
 **Type**: text
@@ -86,7 +93,9 @@ tolerate for a gateway fallback? This calibrates the fallback.
 Optional — existing certs, accounts, legal constraints, or a target segment
 detail (e.g. foral territories) that changes the calculus.
 
-**Answer**:
+**Answer**: No need to support País Vasco (TicketBAI). Confirms v1 is
+común-territory (Verifactu) **only** — resolves spike Open Question O-3; TicketBAI
+/ territorios forales stay out of v1 scope (consistent with N-6).
 
 ## Instructions for Respondent
 

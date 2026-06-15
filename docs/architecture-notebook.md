@@ -12,8 +12,9 @@ owner-role: architect
 > The architectural baseline for FacturaSimple v1 (Elaboration, T-006). Records
 > the load-bearing decisions, the constraints that force them, and the rejected
 > alternatives. Each decision is an ADR (`AD-n`). The tech stack (AD-5: Python +
-> Django) and datastore (AD-6: PostgreSQL) are now decided with the founder; the
-> only remaining open seam is the AD-3 AEAT adapter, resolved by the T-007 spike.
+> Django) and datastore (AD-6: PostgreSQL) are decided with the founder, and the
+> last open seam — the AD-3 AEAT adapter — is now resolved (BUILD direct, PoC-gated;
+> founder-ratified in T-007). All ADRs are accepted.
 
 ## 1. System Context
 
@@ -76,15 +77,32 @@ Ranked — the order is the tie-breaker when attributes conflict.
 - **Status:** **accepted.**
 
 ### AD-3 — AEAT submission behind a swappable provider interface
-- **Decision:** Submission is reached through an interface with one adapter;
-  whether the adapter is **direct integration or a gateway provider is left to
-  the T-007 spike**. The interface exists regardless so the adapter can be
-  swapped without touching callers.
-- **Constraint that forces it:** R-03 (integration is the highest live technical
-  exposure; build-vs-buy is not yet decided) and Q-2.
-- **Rejected:** Hard-coding a direct AEAT client now (pre-empts the T-007
-  decision and couples the app to a fiddly integration).
-- **Status:** proposed. **Depends on T-007** for the adapter choice.
+- **Decision:** Submission is reached through an interface with one adapter. The
+  v1 adapter is a **direct integration** with the AEAT VERI\*FACTU sending-mode
+  web service (SOAP/XML vs. published XSD, qualified-certificate auth), **gated by
+  a `preproducción` sandbox PoC** (cert auth + XSD conformance + `huella`
+  hash-chain — see T-007 `design.md §2`). If the PoC blows its time box, a
+  **gateway adapter is swapped in behind the same interface** — R-03's pre-agreed,
+  low-regret fallback, no caller changes. **Certificate model:** each user supplies
+  their **own** qualified AEAT certificate, which we **store securely** (encrypted
+  at rest in our EU stack, AD-4) and use to submit on their behalf — a
+  construction-phase requirement on the adapter + onboarding (RGPD surface).
+- **Constraint that forces it:** R-04 (price-sensitive market — a gateway's
+  per-document fee is a direct COGS hit), Q-3/R-06 (data stays in our EU stack, no
+  added sub-processor), and AD-2 (record generation + hash-chain + signing is
+  already core/in-house, so "buy" would only outsource a thin SOAP transport).
+  R-03 (integration risk) is the one pull toward buy — bounded by the PoC gate +
+  fallback.
+- **Scope:** común-territory **Verifactu only**. País Vasco/Navarra **TicketBAI**
+  is **out of v1** (founder-confirmed T-007; consistent with N-6) — resolves spike
+  Open Question O-3.
+- **Rejected:** *Buy a gateway from the start* (recurring per-invoice COGS in a
+  thin-margin market; splits compliance ownership away from AD-2; inserts a
+  third-party in the critical submission path). *Build direct unconditionally*
+  (drops the cheap fallback the interface already affords — needless R-03
+  exposure).
+- **Status:** **accepted.** *Build-vs-buy direction founder-ratified during T-007
+  (see `docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md`).*
 
 ### AD-4 — EU data residency on a European cloud provider
 - **Decision:** Host the app and datastore on a **European cloud provider**
@@ -146,29 +164,36 @@ internals.
 
 ## 6. Self-Critique
 
-- **Weakest point:** one seam remains open — the AEAT integration adapter (AD-3),
-  build-vs-buy. This is honest, not hidden: the **interface** is committed now so
-  the adapter can be swapped, and the decision is contained behind it until the
-  **T-007** spike resolves it. The stack (AD-5) and datastore (AD-6) are now
-  founder-decided, so the notebook is `approved`.
+- **Weakest point (now closed):** the AEAT integration adapter (AD-3) was the last
+  open seam. T-007 resolved it — **BUILD direct, PoC-gated**, with a gateway
+  fallback behind the same interface if the sandbox PoC blows its time box. The
+  residual exposure is R-03 (government-integration friction), explicitly bounded
+  by the PoC gate + low-regret fallback rather than left open. The stack (AD-5),
+  datastore (AD-6), and now the adapter (AD-3) are all decided.
 - **Load-bearing assumption:** a relational store + modular monolith will scale
   to the v1 user base. For a single-user-per-account invoicing tool at
   bootstrap scale this is safe; revisit only if multi-tenant load profiles
   change (out of v1 scope, N-5).
-- **Resolution:** AD-1/AD-2/AD-4/AD-5/AD-6 are accepted; the one open item (AD-3
-  adapter) has an explicit resolution path (T-007).
+- **Resolution:** AD-1 through AD-6 are all accepted — no open architectural
+  decisions remain (AD-3 resolved by T-007).
 
 ## 7. Open Decisions / Follow-ups
 
 - **AD-5 (tech stack)** — RESOLVED: Python + Django (founder-decided T-006;
   see `docs/input-requests/archive/2026-06-15-tech-stack-decision.md`).
 - **AD-6 (datastore)** — RESOLVED: PostgreSQL (founder-confirmed T-006).
-- **AD-3 adapter (build-vs-buy)** — open; resolved by **T-007** (AEAT submission
-  spike). The only remaining open seam.
+- **AD-3 adapter (build-vs-buy)** — RESOLVED: **BUILD direct, PoC-gated** with a
+  gateway fallback behind the AD-3 interface; user-supplied certificate stored
+  securely; común-territory (Verifactu) only — no TicketBAI in v1. Founder-ratified
+  T-007 (see `docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md`).
+- **Carried to construction (T-007 follow-ups):** run the `preproducción` build PoC
+  (the 3 proofs in T-007 `design.md §2`); the secure certificate-storage / upload
+  flow (O-1); verify the autónomo obligation timeline against the *current* AEAT
+  rollout calendar at build time (O-2 — dates have moved, do not hard-code).
 
 ---
 
 *Authored in Elaboration (T-006) via `/openup-create-architecture-notebook`.
 Traces from VIS-001. Status `approved` — AD-5 (Python + Django) and AD-6
-(PostgreSQL) founder-decided; the AD-3 AEAT adapter remains open pending the
-T-007 spike.*
+(PostgreSQL) founder-decided; AD-3 (AEAT adapter: BUILD direct, PoC-gated)
+founder-ratified in T-007. All ADRs accepted; no open architectural seams.*

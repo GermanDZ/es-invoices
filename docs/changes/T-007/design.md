@@ -133,7 +133,39 @@ business model). This mirrors AD-5/AD-6, which were founder-ratified for the sam
 
 ## 6. Spike status
 
-Research + analysis complete and persisted. The build-vs-buy **direction** is a
-founder ratification (input request raised, lane suspended). On answer: fold the
-decision into **AD-3** (resolve `proposed → accepted` with the chosen adapter),
-update the architecture notebook §3/§7, and complete T-007.
+**COMPLETE.** Research + analysis persisted; build-vs-buy **direction
+founder-ratified** (2026-06-15, see
+`docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md`):
+
+- **Q1 → BUILD direct, PoC-gated** (the §4 recommendation): direct AEAT
+  integration as the v1 target, gated by a `preproducción` PoC; gateway adapter as
+  the fallback behind the same AD-3 interface if the PoC blows its time box.
+- **Q2 → user supplies their own certificate, stored securely** (encrypted at rest
+  in our EU stack). Resolves **O-1**: each user holds their qualified cert; we
+  store + use it on their behalf — a construction-phase requirement on the adapter
+  + onboarding (added RGPD surface).
+- **Q3 → gateway budget deferred** ("decide later"): calibrate the fallback at
+  build time, only if the PoC stalls. Not load-bearing for this decision.
+- **Q4 → no TicketBAI.** Resolves **O-3**: v1 is común-territory (Verifactu) only;
+  País Vasco/Navarra foral support stays out of v1 (N-6).
+
+Folded into **AD-3** (`proposed → accepted`) in `docs/architecture-notebook.md`
+§3/§6/§7. **O-2** (autónomo obligation timeline) carried to construction as a
+build-time verification. T-007 complete.
+
+## 7. Completion verification (step 1a — graded vs. the diff)
+
+Spike deliverable = a documented decision, not code. Graded against `plan.md`
+acceptance criteria and the working-tree diff:
+
+- ✅ Submission target characterised — `design.md §1–§2` (pre-existing, persisted).
+- ✅ BUILD feasibility + PoC proof-points — `design.md §2`.
+- ✅ Build-vs-buy analysis + recommendation — `design.md §3–§4`.
+- ✅ **Founder ratifies the direction** — answers recorded in
+  `docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md` (status `processed`).
+- ✅ **AD-3 resolved `proposed → accepted`** — `architecture-notebook.md` §3 (AD-3
+  decision rewritten + status `accepted`), §6, §7, and header all updated.
+
+**Success Measures:** n/a — quick-track research/decision spike; the deliverable
+is the ADR resolution itself, not instrumented behavior.
+**Rollout:** n/a — no feature flag (no shipped code).

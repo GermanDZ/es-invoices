@@ -6,9 +6,8 @@ status: in-progress
 track: quick
 phase: elaboration
 traces-from: [R-03, AD-3, UC-002]
-touches: [docs/architecture-notebook.md, docs/changes/T-007/]
+touches: [docs/architecture-notebook.md, docs/changes/T-007/, docs/input-requests/]
 depends-on: [T-005, T-006]
-awaiting-input: docs/input-requests/2026-06-15-aeat-build-vs-buy.md
 ---
 
 # T-007 — AEAT/Verifactu submission spike (build-vs-buy)
@@ -31,10 +30,11 @@ recommendation, so AD-3's adapter (`proposed`) can be resolved to `accepted`.
       `design.md §2`.
 - [x] Build-vs-buy evaluated against the architecture's quality attributes/risks,
       with a recommendation — `design.md §3–§4`.
-- [ ] **Founder ratifies the build-vs-buy direction** (input request) — the one
+- [x] **Founder ratifies the build-vs-buy direction** (input request) — the one
       load-bearing decision the architect cannot make alone (cost/eng-time trade,
-      like AD-5/AD-6).
-- [ ] AD-3 resolved (`proposed → accepted`) in `docs/architecture-notebook.md`
+      like AD-5/AD-6). Decided: **BUILD direct, PoC-gated**; user-supplied cert
+      (stored securely); común-territory only (no TicketBAI). See archived request.
+- [x] AD-3 resolved (`proposed → accepted`) in `docs/architecture-notebook.md`
       §3/§7 with the chosen adapter; T-007 completed.
 
 ## Operations
@@ -43,8 +43,8 @@ recommendation, so AD-3's adapter (`proposed`) can be resolved to `accepted`.
 - [x] (architect) Assess BUILD feasibility; name the sandbox PoC proof-points.
 - [x] (architect) Build-vs-buy analysis vs Q-attributes/risks; write recommendation.
 - [x] (architect) Raise founder ratification as an input request; suspend the lane.
-- [ ] (architect) **[BLOCKED on founder]** Fold the ratified decision into AD-3;
-      update architecture notebook; complete the task.
+- [x] (architect) Fold the ratified decision into AD-3; update architecture
+      notebook; complete the task.
 
 ## Out of scope
 
