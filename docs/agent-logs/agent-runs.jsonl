@@ -19,3 +19,5 @@
 {"run_id":"T-005-iter4-complete","event":"iteration_complete","task_id":"T-005","branch":"docs/T-005-scope-non-goals","phase":"inception","track":"quick","ts":"2026-06-15T09:20:00Z"}
 {"run_id": "8100dc9763af4834837bde06517fc0d8", "event": "commit", "task_id": "T-005", "branch": "docs/T-005-scope-non-goals", "sha": "5d412be5e2a8f506eff46476a7bb92b5db650311", "model": null, "session_id": null, "ts": "2026-06-15T09:16:27Z"}
 {"run_id": "fe3693e356bd4c1cace27c5e2956d92f", "event": "commit", "task_id": "phase-transition-inception-to-elaboration", "branch": "quick/20260615-115214-inception-to-elaboration", "sha": "87738530558a1c8cdd639cc7bf3124dcbfbe5fab", "model": null, "session_id": null, "ts": "2026-06-15T09:52:52Z"}
+{"run_id":"T-006-it5","event":"iteration_start","task_id":"T-006","goal":"Architecture notebook + tech stack ADR","branch":"design/T-006-architecture-notebook","phase":"elaboration","ts":"2026-06-15T09:58:52Z"}
+{"run_id":"T-006-it5","event":"artifact_authored","task_id":"T-006","artifact":"docs/architecture-notebook.md","status":"draft","open":"AD-5 tech stack (input-request)","ts":"2026-06-15T10:07:09Z"}

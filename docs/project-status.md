@@ -4,12 +4,12 @@
 **Phase**: elaboration
 **Iteration**: 5
 **Iteration Goal**: T-006 — Architecture notebook + tech stack ADR
-**Status**: ready to start
+**Status**: in-progress
 **Current Task**: T-006
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: quick-task (phase-transition)
+**Updated By**: openup-start-iteration
 
 ## Notes
 
