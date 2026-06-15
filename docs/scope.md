@@ -30,7 +30,7 @@ deliberately excludes the broader accounting/ERP surface of competitor suites
 | S-2 | **Compliant invoice issuance** — mandatory legal fields, IVA + IRPF calculation, gap-free sequential numbering per series. | REQ-001, UC-001 |
 | S-3 | **PDF generation + send by email** — produce a clean invoice PDF and deliver it to the recipient. | REQ-001 (Vision §4.3) |
 | S-4 | **Verifactu record + AEAT submission** — generate the tamper-evident record per invoice, submit it, and store the accepted/rejected outcome. | REQ-002, UC-002 |
-| S-5 | **Corrective / cancellation invoices** — issue *facturas rectificativas* and the matching Verifactu record annulment, so a user can legally fix or void an issued invoice. | *(new — see §5 D-1; REQ to be added)* |
+| S-5 | **Corrective / cancellation invoices** — issue *facturas rectificativas* (correct/reverse a valid invoice) and Verifactu *anulación* records (void a record sent in error), so a user can legally fix or void an issued invoice. | REQ-004, UC-004, UC-005 (D-1) |
 | S-6 | **Basic invoice status tracking** — issued / sent state per invoice. | Vision §4.5 |
 
 ### Boundary clarifications (in scope, made explicit)
@@ -86,9 +86,10 @@ during T-005.
 
 ## 6. Open Items (tracked, not blocking)
 
-- **REQ for corrections (S-5/D-1) not yet written.** Existing requirements REQ-001..003
-  predate this decision; a requirement covering *facturas rectificativas* + Verifactu
-  annulment should be added and detailed in Elaboration.
+- ~~**REQ for corrections (S-5/D-1) not yet written.**~~ **Resolved (T-008, Elaboration):**
+  added **REQ-004** (corrective + cancellation invoices) detailed by **UC-004** (factura
+  rectificativa) and **UC-005** (Verifactu *anulación*); these distinguish correcting a
+  valid invoice from voiding a record sent in error.
 - **Tech stack** — deferred to Elaboration (Vision §6 TODO); not a scope decision.
 - **Paying-accounts target** — to be set with the product owner once pricing is decided
   (Vision §5 TODO); a business-metric, not a scope item.
