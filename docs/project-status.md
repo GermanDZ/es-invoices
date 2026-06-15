@@ -3,15 +3,17 @@
 **Project**: FacturaSimple
 **Phase**: elaboration
 **Iteration**: 8
-**Iteration Goal**: T-009 — Willingness-to-pay / pricing validation (close Vision §5 TODO, address R-04)
-**Status**: in-progress
+**Iteration Goal**: T-009 — Willingness-to-pay / pricing validation
+**Status**: completed
 **Current Task**: T-009
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
 **Last Updated**: 2026-06-15
-**Updated By**: openup-start-iteration
+**Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 8** (2026-06-15): T-009 complete — willingness-to-pay/pricing validation (PRICE-001). Founder ratified single flat plan ~7 €/mo (~70 €/yr) + free trial (no permanent free tier in v1), 12-month paying-accounts target **150–400** (narrow after beta), Verifactu deadline treated as uncertain/tracked. Closed Vision §5 paying-accounts TODO + scope §6 pricing item; R-04 reduced to a verifiable beta validation plan. Común-territory, build-direct context unchanged.
 
 - **Iteration 7** (2026-06-15): T-008 complete — added REQ-004 (corrective + cancellation invoices) and detailed UC-004 (factura rectificativa) + UC-005 (Verifactu anulación), distinguishing correction of a valid invoice from voiding a record sent in error. Closed the S-5/D-1 scope gap; docs validate clean. Común-territory only (no TicketBAI, N-6).
 
