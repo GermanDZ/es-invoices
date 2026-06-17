@@ -2,23 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 8
-**Iteration Goal**: —
-**Status**: phase-initiated (ready to start T-010)
-**Current Task**: —
+**Iteration**: 9
+**Iteration Goal**: T-010 — AEAT `preproducción` submission PoC (3 proofs)
+**Status**: completed
+**Current Task**: T-010
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-15
-**Last Updated**: 2026-06-15
-**Updated By**: openup-quick-task (construction backlog seed)
+**Last Updated**: 2026-06-17
+**Updated By**: sync-status.py
 
 ## Notes
 
-- **Phase transition → Construction** (2026-06-15): Elaboration LCA milestone
-  reviewed (4 criteria met, 2 carry-forward); recommendation **GO**. Seeded the
-  Construction backlog in `docs/roadmap.md` — T-010..T-018, risk-front-loaded
-  (T-010 AEAT `preproducción` PoC first to burn down residual R-03 with a running
-  proof). Carry-forwards: AEAT PoC (O-1), current-calendar obligation check (O-2),
-  pre-launch RGPD checklist (R-06). Next: `/openup-next` promotes T-010.
+- **Iteration 9** (2026-06-17): T-010 complete — AEAT `preproducción` submission PoC. All three proofs PASS against the live sandbox (prewww1.aeat.es): client-cert mTLS auth accepted; self-built F1 `alta` validated vs XSD and accepted (`Correcto`+CSV); second record hash-chained on the prior `huella` accepted with no encadenamiento error. **AD-3 BUILD-direct confirmed**, gateway-fallback not triggered; residual R-03 high→managed. Throwaway harness; secrets git-ignored.
 
 - **Iteration 8** (2026-06-15): T-009 complete — willingness-to-pay/pricing validation (PRICE-001). Founder ratified single flat plan ~7 €/mo (~70 €/yr) + free trial (no permanent free tier in v1), 12-month paying-accounts target **150–400** (narrow after beta), Verifactu deadline treated as uncertain/tracked. Closed Vision §5 paying-accounts TODO + scope §6 pricing item; R-04 reduced to a verifiable beta validation plan. Común-territory, build-direct context unchanged.
 

@@ -1,7 +1,7 @@
 ---
 id: T-010
 title: AEAT preproducción submission PoC (3 proofs)
-status: in-progress   # proposed → ready → in-progress → done → verified
+status: done   # proposed → ready → in-progress → done → verified
 priority: high   # critical | high | medium | low
 estimate: 2 sessions   # time-boxed PoC; exceeding the box triggers the AD-3 gateway fallback
 plan: docs/roadmap.md#construction
