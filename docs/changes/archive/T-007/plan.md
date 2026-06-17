@@ -2,7 +2,7 @@
 id: T-007
 task_id: T-007
 title: "AEAT/Verifactu submission spike (build-vs-buy)"
-status: in-progress
+status: verified   # corrected on T-010 branch: completed+archived (roadmap: completed); was stale in-progress, false-blocking dependents in preflight
 track: quick
 phase: elaboration
 traces-from: [R-03, AD-3, UC-002]
