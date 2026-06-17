@@ -151,8 +151,13 @@ role's call). Then promote it **by task shape**:
   suspends cleanly (step 0 resumes it once answered) rather than dead-ending.
 
 If the roadmap has **no** pending task to promote either, then there is genuinely
-nothing to do → **stop cleanly** and say so (the roadmap is empty or fully
-delivered).
+nothing to do → **stop cleanly** and say so. Make the stop *actionable*:
+- **Every roadmap row is `completed` and the phase's exit criteria look met** →
+  the phase backlog is delivered. Name the next move explicitly: run
+  `/openup-phase-review` to advance to the next phase, then populate that phase's
+  roadmap section. That re-prioritization is a **product-manager decision** the
+  loop does not make on its own — surface it, do not perform it.
+- **The roadmap is simply empty** → say so and stop.
 
 ### 2. Claim it + create the worktree (delegate to start-iteration)
 
@@ -171,6 +176,13 @@ re-implement pre-flight / worktree / lease / state here:
 That skill runs the collision pre-flight, creates the branch + worktree, writes
 the lease, and initializes `.openup/state.json`. Teams stay opt-in: a `standard`
 lane is solo; only a `full` lane (or an explicit request) deploys one.
+
+It also runs the **cross-machine remote-check** (T-044) before claiming: the
+local lease only sees this clone, so start-iteration asks `origin` whether
+another teammate already pushed a branch for this task and refuses (recording a
+`duplicate_start_blocked` event) if so. It is advisory/fail-open — offline or
+remote-less runs are never blocked. This is the parallel-`openup-next`-across-
+machines guardrail; the local lease guards parallel sessions on one clone.
 
 ### 3. Self-brief and assume the lane's hat
 

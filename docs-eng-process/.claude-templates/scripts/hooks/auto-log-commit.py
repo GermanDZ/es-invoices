@@ -44,8 +44,23 @@ from pathlib import Path
 
 COMMIT_RE = re.compile(r"\bgit\b.*\bcommit\b", re.DOTALL)
 
-LOG_REL = "docs/agent-logs/agent-runs.jsonl"
 LOG_DIR = "docs/agent-logs/"
+RUNS_REL = "docs/agent-logs/runs"  # T-046: lane-owned run shards live here
+
+
+def shard_key(task_id, branch):
+    """Lane key for the run shard filename (T-046) — must match
+    openup-state.py `_shard_key` so both writers target the same lane file."""
+    raw = (task_id or "").strip() or (branch or "").strip() or "no-task"
+    if raw in ("null",):
+        raw = (branch or "no-task").strip() or "no-task"
+    slug = re.sub(r"[^0-9A-Za-z._-]+", "-", raw).strip("-")
+    return slug or "no-task"
+
+
+def shard_path(cwd: str, task_id, branch, ts: str) -> Path:
+    """`docs/agent-logs/runs/<UTC-date>-<key>.jsonl` for this lane (T-046)."""
+    return Path(cwd) / RUNS_REL / f"{ts[:10]}-{shard_key(task_id, branch)}.jsonl"
 
 
 def run(cmd: str, cwd: str) -> tuple[int, str]:
@@ -58,6 +73,41 @@ def run(cmd: str, cwd: str) -> tuple[int, str]:
 def state_get(cwd: str, key: str) -> tuple[int, str]:
     script = Path(cwd) / "scripts" / "openup-state.py"
     return run(f'python3 "{script}" get {key}', cwd)
+
+
+def resolve_state_root(cwd: str) -> str:
+    """Repo/worktree root that holds the active iteration state.
+
+    With worktree-per-task, .openup/state.json lives in the task worktree while
+    the harness cwd may stay pinned to the main repo — leaving the commit record
+    with task_id null. Prefer cwd if it has state; else scan linked worktrees
+    (`git worktree list`) for one that does, preferring the worktree whose branch
+    matches HEAD. Fail-safe: cwd when nothing resolves (T-042 Fix-7b).
+    """
+    if (Path(cwd) / ".openup" / "state.json").exists():
+        return cwd
+    rc, out = run("git worktree list --porcelain", cwd)
+    if rc != 0 or not out:
+        return cwd
+    candidates, path = [], None
+    for line in out.splitlines():
+        if line.startswith("worktree "):
+            path = line[len("worktree "):].strip()
+        elif line.startswith("branch ") and path:
+            candidates.append((path, line[len("branch "):].strip()))
+            path = None
+        elif not line.strip():
+            path = None
+    with_state = [(p, b) for (p, b) in candidates
+                  if (Path(p) / ".openup" / "state.json").exists()]
+    if not with_state:
+        return cwd
+    _, cur = run("git rev-parse --abbrev-ref HEAD", cwd)
+    cur = cur.strip()
+    for p, b in with_state:
+        if b == cur or b.endswith("/" + cur):
+            return p
+    return with_state[0][0]
 
 
 def set_gate(cwd: str, name: str, value: str) -> None:
@@ -164,25 +214,36 @@ def main() -> None:
             sys.exit(0)
 
         # Self-reference guard: skip commits that only touched audit-trail
-        # files (anything under docs/agent-logs/) — logging them would re-dirty
-        # the run log and tail-chase forever.
+        # files (anything under docs/agent-logs/, which includes the run shards)
+        # — logging them would re-dirty the shard and tail-chase forever.
         if commit_only_touches_logs(cwd, sha):
-            sys.exit(0)
-
-        log_path = Path(cwd) / LOG_REL
-
-        # Idempotency: skip if this SHA is already the last commit record.
-        if last_logged_sha(log_path) == sha:
             sys.exit(0)
 
         # Gather fields.
         _, branch = run("git rev-parse --abbrev-ref HEAD", cwd)
         branch = branch.strip()
 
-        scode, task_id = state_get(cwd, "task_id")
+        # Read iteration state from the worktree that owns it, not a cwd pinned
+        # to the main repo (T-042 Fix-7b) — otherwise commits log task_id null.
+        sroot = resolve_state_root(cwd)
+        scode, task_id = state_get(sroot, "task_id")
         task_id = task_id.strip() if scode == 0 else None
+        if task_id in ("null", ""):
+            task_id = None
 
-        sidcode, session_id = state_get(cwd, "session_id")
+        ts = (
+            payload.get("ts")
+            or payload.get("timestamp")
+            or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        )
+
+        # T-046: write to the LANE-OWNED shard, never the shared agent-runs.jsonl
+        # (now a gitignored derived view). Idempotency reads the same shard.
+        log_path = shard_path(cwd, task_id, branch, ts)
+        if last_logged_sha(log_path) == sha:
+            sys.exit(0)
+
+        sidcode, session_id = state_get(sroot, "session_id")
         session_id = session_id.strip() if sidcode == 0 else None
         if session_id in ("null", ""):
             session_id = None
@@ -190,12 +251,6 @@ def main() -> None:
         model = payload.get("model") or payload.get("permission_mode_model")
         if not model:
             model = None
-
-        ts = (
-            payload.get("ts")
-            or payload.get("timestamp")
-            or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        )
 
         record = {
             "run_id": uuid.uuid4().hex,
@@ -214,7 +269,7 @@ def main() -> None:
 
         # Flip the log_written gate (best-effort; only if state exists).
         if scode == 0:
-            set_gate(cwd, "log_written", "true")
+            set_gate(sroot, "log_written", "true")
 
         sys.exit(0)
 

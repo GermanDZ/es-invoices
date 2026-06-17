@@ -243,18 +243,30 @@ intention.
 ### 5. Create Traceability Logs
 
 > **Scribe step** — collect commit SHAs and metadata yourself (they require git
-> commands), then delegate the writes to the `openup-scribe` agent (Agent tool,
-> subagent_type: "openup-scribe"). Brief it with:
+> commands). **Timestamps come from the clock, never from the model**: capture
+> `START=$(python3 scripts/openup-state.py get started_at)` (script-stamped at
+> iteration start) and `END=$(date -u +%Y-%m-%dT%H:%M:%SZ)`, and pass those
+> concrete values — not `[ts]` placeholders — into the scribe brief for the
+> human-readable `.md`:
 >
 > ```
 > Agent(subagent_type="openup-scribe", description="Write agent run log",
 >   prompt="Write a traceability log entry.
 >   Branch: [branch]. Task: [task_id]. Commits: [sha list]. Phase: [phase].
->   Start: [ts]. End: [ts]. Files changed: [list]. Decisions: [list].
->   1. Create docs/agent-logs/YYYY/MM/DD/<timestamp>-agent-<branch>.md
->      with the run metadata above.
->   2. Append a JSONL record to docs/agent-logs/agent-runs.jsonl.
->   Report: file paths created.")
+>   Start: $START. End: $END. Files changed: [list]. Decisions: [list].
+>   Create docs/agent-logs/YYYY/MM/DD/<timestamp>-agent-<branch>.md with the
+>   run metadata above. Report: file path created.")
+> ```
+>
+> Then append the machine-readable `iteration_complete` record with the
+> **deterministic logger** — it stamps `ts` itself, keeping the JSONL trail
+> honest (this replaces the old "scribe appends a JSONL record with `[ts]`"
+> step that produced fabricated times):
+>
+> ```bash
+> python3 scripts/openup-state.py log-event \
+>   --event iteration_complete --task-id "[task_id]" \
+>   --branch "[branch]" --phase "[phase]"
 > ```
 
 ### 6. Save Iteration Learnings
@@ -305,9 +317,18 @@ Once gates pass, archive the iteration state and the **change folder** (Ring 2 �
 **If the task has a change folder** (`docs/changes/{task_id}/` exists — the standard three-ring case):
 
 ```bash
-# 1. Archive .openup/state.json INTO the change folder as state.json (validate, copy, remove live file)
+# 1. Flip the spec's frontmatter status to `done` — dependency resolution
+#    (openup-claims.py preflight) reads this frontmatter, NOT the derived
+#    roadmap, so a dependent task is blocked unless the dep is marked done here.
+python3 - "$PWD/docs/changes/{task_id}/plan.md" <<'PY'
+import re, sys
+p = sys.argv[1]; t = open(p).read()
+t = re.sub(r'(?m)^status:\s*.*$', 'status: done', t, count=1)
+open(p, 'w').write(t)
+PY
+# 2. Archive .openup/state.json INTO the change folder as state.json (validate, copy, remove live file)
 python3 scripts/openup-state.py archive "docs/changes/{task_id}/state.json"
-# 2. Move the whole change folder into the archive ring (preserves history)
+# 3. Move the whole change folder into the archive ring (preserves history)
 git mv "docs/changes/{task_id}" "docs/changes/archive/{task_id}"
 ```
 

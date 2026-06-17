@@ -7,6 +7,37 @@ overlapping **code** surfaces. This document covers the other half: the
 **process documents** every lane writes, which is where parallel-PR conflicts
 actually came from (T-024).
 
+## Parallelism scope: where the lease coordinates (and where it doesn't)
+
+**The lease is a single-clone mechanism, by design.** Everything below — the
+write-fence, the claims, the ID reservations — coordinates lanes that share one
+`.git`. It does **not** reach across machines. Knowing the boundary is the
+difference between "safe parallel work" and "two people building the same task."
+
+Claims live at `<git-common-dir>/openup/claims/T-NNN.json` — i.e. **inside
+`.git/`, never committed and never pushed**. `git rev-parse --git-common-dir`
+resolves to the *same* directory for every linked worktree of one clone, which
+is exactly why the next two rows differ:
+
+| Setup | Shared `.git/openup/claims/`? | Coordination | Collision caught |
+|---|---|---|---|
+| **N sessions / worktrees, one clone** (your machine) | ✅ yes | Lease coordinates them — session 2's pre-flight sees session 1's live claim (by `task_id` **and** `touches` overlap) and skips to the next free lane. | **Before** work starts — *provided every session runs the claim/pre-flight gate.* |
+| **N clones on N machines** (you + a teammate) | ❌ no — each `.git` is separate | **None.** Each side claims locally, neither sees the other; both can even `reserve-id` the *same* `T-NNN`. | **Only at PR time** — two branches / two PRs for one task (the manual cleanup we want to avoid). |
+
+Two consequences worth stating outright:
+
+- **Same-clone safety is conditional.** The lease can only protect against a lane
+  that *takes* it. An agent that edits code without running
+  `openup-claims.py claim`/`preflight` is invisible to every other session — the
+  observed failure mode where one of two parallel lanes shipped a duplicate
+  because it never claimed.
+- **Cross-machine coordination must ride on pushed git state.** The only thing
+  two clones share is the remote: change folders (`docs/changes/T-NNN/`), the
+  roadmap, branches, and PRs — and only after a `push`/`pull`, never in real
+  time. The local lease is the wrong tool for that case; see
+  [the cross-machine exploration](../docs/explorations/2026-06-16-cross-machine-claim-coordination.md)
+  for the git-as-coordination design under evaluation.
+
 ## The four classes of shared files
 
 Every file a lane may write falls into one class, and each class has a
@@ -14,8 +45,8 @@ git-native, conflict-free discipline:
 
 | Class | Examples | Discipline |
 |---|---|---|
-| **1. Lane-owned** | `docs/changes/T-NNN/**`, dated `docs/agent-logs/YYYY/MM/DD/*.md`, `docs/status-notes/*.md`, `docs/explorations/*.md` | One writer per file by construction. Write freely; never conflicts. **Maximize this class.** |
-| **2. Append-only set** | `docs/agent-logs/agent-runs.jsonl` | `merge=union` in `.gitattributes` (T-023): both sides' appended lines are kept; order/duplication is tolerable for an audit trail. |
+| **1. Lane-owned** | `docs/changes/T-NNN/**`, dated `docs/agent-logs/YYYY/MM/DD/*.md`, `docs/agent-logs/runs/<date>-<lane>.jsonl` (T-046), `docs/status-notes/*.md`, `docs/explorations/*.md` | One writer per file by construction. Write freely; never conflicts. **Maximize this class.** |
+| **2. Append-only set** | *(empty — the run log left this class in T-046)* | `merge=union` in `.gitattributes` keeps both sides' appended lines **locally** — but GitHub does **not** run merge drivers server-side, so a union file still conflicts on PRs. That is why `agent-runs.jsonl` was sharded into class 1 (T-046) and the consolidated file is now a derived view (class 3). Avoid this class. |
 | **3. Derived view** | `docs/roadmap.md` Status cells, the whole `docs/project-status.md` header + `## Notes` | Written **only** by `scripts/sync-status.py`, **only** against a fresh trunk (rebase first). Never hand-edited on a task branch, never hand-merged: on conflict, rebase and re-run the script. |
 | **4. Global mutable prose** | roadmap program sections (Context, "Next step" narrative), plan docs | Cannot be derived. Edited only by a task whose `touches` includes the file, after rebasing — i.e. serialized through the normal claim machinery, not written as a side effect of every completion. |
 

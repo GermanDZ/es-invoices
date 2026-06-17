@@ -5,13 +5,13 @@ on-stop.py — OpenUP hook: fires when the agent tries to stop.
 Two layers of enforcement:
 
   1. Uncommitted-work block (existing): if the worktree is dirty, block stop
-     so changes are not abandoned. EXEMPTION: docs/agent-logs/agent-runs.jsonl
-     is hook-managed traceability appended by auto-log-commit AFTER each commit,
-     so it always lags HEAD by one append and can never be committed in the
-     commit it records. It is excluded from the dirty check (otherwise every
-     commit re-dirties it and on-stop tail-chases forever); it stays tracked
-     and is swept into the next code commit naturally. Only NON-exempt dirty
-     files block stop.
+     so changes are not abandoned. EXEMPTION: the lane-owned run shards under
+     docs/agent-logs/runs/ (T-046) are hook-managed traceability appended by
+     auto-log-commit AFTER each commit, so a shard always lags HEAD by one
+     append and can never be committed in the commit it records. They are
+     excluded from the dirty check (otherwise every commit re-dirties the shard
+     and on-stop tail-chases forever); they stay tracked and are swept into a
+     log-only commit here. Only NON-exempt dirty files block stop.
   2. Unmet-gate block (new): if an OpenUP iteration is active (.openup/state.json
      present) and commits were made on this branch since trunk, then:
        - gates.log_written false → block (exit 2) naming the gate; or
@@ -37,8 +37,16 @@ import sys
 from pathlib import Path
 
 
-# Hook-managed files that lag HEAD by design and must not block stop.
-EXEMPT_DIRTY_PATHS = {"docs/agent-logs/agent-runs.jsonl"}
+# Hook-managed paths that lag HEAD by design and must not block stop. T-046:
+# the run log is now sharded under docs/agent-logs/runs/ (lane-owned); the
+# auto-log-commit hook appends a commit record to the lane shard AFTER each
+# commit, so the shard lags HEAD by one append exactly as agent-runs.jsonl used
+# to. Exempt the whole shard dir by prefix (filenames vary by date+lane).
+EXEMPT_DIRTY_PREFIXES = ("docs/agent-logs/runs/",)
+
+
+def is_exempt_dirty(path: str) -> bool:
+    return any(path.startswith(pre) for pre in EXEMPT_DIRTY_PREFIXES)
 
 
 def run(cmd: str, cwd: str) -> tuple[int, str]:
@@ -95,6 +103,41 @@ def state_get(cwd: str, key: str) -> tuple[int, str]:
     return run(f'python3 "{script}" get {key}', cwd)
 
 
+def resolve_state_root(cwd: str) -> str:
+    """Repo/worktree root that holds the active iteration state.
+
+    With worktree-per-task, .openup/state.json lives in the task worktree while
+    the harness cwd may stay pinned to the main repo. Prefer cwd if it has
+    state; else scan linked worktrees (`git worktree list`) for one that does,
+    preferring the worktree whose branch matches HEAD. Fail-safe: cwd when
+    nothing resolves, so the common (cwd == root) case is unchanged (T-042 Fix-7b).
+    """
+    if (Path(cwd) / ".openup" / "state.json").exists():
+        return cwd
+    rc, out = run("git worktree list --porcelain", cwd)
+    if rc != 0 or not out:
+        return cwd
+    candidates, path = [], None
+    for line in out.splitlines():
+        if line.startswith("worktree "):
+            path = line[len("worktree "):].strip()
+        elif line.startswith("branch ") and path:
+            candidates.append((path, line[len("branch "):].strip()))
+            path = None
+        elif not line.strip():
+            path = None
+    with_state = [(p, b) for (p, b) in candidates
+                  if (Path(p) / ".openup" / "state.json").exists()]
+    if not with_state:
+        return cwd
+    _, cur = run("git rev-parse --abbrev-ref HEAD", cwd)
+    cur = cur.strip()
+    for p, b in with_state:
+        if b == cur or b.endswith("/" + cur):
+            return p
+    return with_state[0][0]
+
+
 def main() -> None:
     raw = sys.stdin.read().strip()
     try:
@@ -116,7 +159,7 @@ def main() -> None:
     if dirty:
         non_exempt = [
             line for line in dirty.splitlines()
-            if porcelain_path(line) not in EXEMPT_DIRTY_PATHS
+            if not is_exempt_dirty(porcelain_path(line))
         ]
         if non_exempt:
             file_list = "\n".join(f"  {l}" for l in non_exempt[:10])
@@ -142,33 +185,37 @@ def main() -> None:
             # new record and therefore no tail-chase. Fail open on any git error
             # (e.g. missing identity): a stop hook must never trap the session.
             code, _ = run(
-                "git add docs/agent-logs/agent-runs.jsonl && "
-                'git commit -m "chore(process): sweep agent-runs.jsonl log tail '
+                "git add docs/agent-logs/runs/ && "
+                'git commit -m "chore(process): sweep run-log shards '
                 '[openup-skip]"',
                 cwd,
             )
             if code == 0:
                 print(
-                    "[on-stop] ✓ Swept the agent-runs.jsonl log tail into a "
+                    "[on-stop] ✓ Swept the run-log shards into a "
                     "log-only commit — tree is clean.",
                     file=sys.stderr,
                 )
 
     # 2. Unmet-gate block (only when an iteration is active) ──────────────────
     try:
-        state_code, _ = state_get(cwd, "task_id")
+        # Resolve the worktree that owns the iteration (T-042 Fix-7b): the gate
+        # block reads state AND the branch/commits it gates, so both must come
+        # from the state-bearing worktree, not a cwd pinned elsewhere.
+        sroot = resolve_state_root(cwd)
+        state_code, _ = state_get(sroot, "task_id")
         if state_code == 0:
-            trunk = get_trunk(cwd)
-            _, current_branch = run("git rev-parse --abbrev-ref HEAD", cwd)
+            trunk = get_trunk(sroot)
+            _, current_branch = run("git rev-parse --abbrev-ref HEAD", sroot)
 
             # Only enforce when commits exist on this branch beyond trunk.
             _, commits = run(
-                f"git log origin/{trunk}..HEAD --oneline 2>/dev/null", cwd
+                f"git log origin/{trunk}..HEAD --oneline 2>/dev/null", sroot
             )
             if not commits:
                 # Fall back to local trunk comparison if no remote tracking.
                 _, commits = run(
-                    f"git log {trunk}..HEAD --oneline 2>/dev/null", cwd
+                    f"git log {trunk}..HEAD --oneline 2>/dev/null", sroot
                 )
 
             if commits:
@@ -179,7 +226,7 @@ def main() -> None:
                 #   exit 3 → no state file at all: handled by the outer guard
                 #            (state_code != 0), so we never reach here without state.
                 #   any other code: fail open (handled by the except below).
-                lcode, log_written = state_get(cwd, "gates.log_written")
+                lcode, log_written = state_get(sroot, "gates.log_written")
                 log_truthy = lcode == 0 and log_written.strip() not in ("false", "null", "")
                 if lcode in (0, 5) and not log_truthy:
                     print(
@@ -194,7 +241,7 @@ def main() -> None:
                     )
                     sys.exit(2)
 
-                rcode, roadmap_synced = state_get(cwd, "gates.roadmap_synced")
+                rcode, roadmap_synced = state_get(sroot, "gates.roadmap_synced")
                 roadmap_truthy = (
                     rcode == 0 and roadmap_synced.strip() not in ("false", "null", "")
                 )
