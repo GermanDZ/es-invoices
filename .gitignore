@@ -39,3 +39,15 @@ Thumbs.db
 # Temporary files
 *.tmp
 temp/
+
+# T-010 AEAT PoC — NEVER commit certificate/key material or credentialed payloads
+# (RGPD surface, even against preproducción). The harness reads the cert from an
+# env-injected local path; nothing secret belongs in the tree.
+poc/aeat-preproduccion/secrets/
+poc/aeat-preproduccion/captured/
+*.p12
+*.pfx
+*.pem
+*.key
+*.cer
+*.crt
