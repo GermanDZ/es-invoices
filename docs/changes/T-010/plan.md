@@ -7,10 +7,11 @@ estimate: 2 sessions   # time-boxed PoC; exceeding the box triggers the AD-3 gat
 plan: docs/roadmap.md#construction
 depends-on: [T-006, T-007]
 blocks: [T-011, T-013, T-014]
-awaiting-input: docs/input-requests/2026-06-17-aeat-preproduccion-access.md
 touches:
   - poc/aeat-preproduccion/
   - docs/changes/T-010/
+  - docs/architecture-notebook.md   # AD-3 §3 running-proof annotation (Operations box)
+  - docs/input-requests/            # resume: answer + archive the access request
 last-synced: ""
 ---
 
@@ -168,20 +169,20 @@ for reuse, abstraction, or coverage breadth. Keep all secrets out of the repo.
       `signxml`, `lxml`, `cryptography`), fetch/reference the published
       `preproducción` WSDL + XSD, and add the README + `.gitignore` entries for
       cert/key material.
-- [ ] **Proof 1** — implement client-cert TLS auth to the `preproducción` endpoint;
+- [x] **Proof 1** — implement client-cert TLS auth to the `preproducción` endpoint;
       run it and record the auth outcome (handshake accepted + SOAP response, or
       blocker) in `design.md`.
-- [ ] **Proof 2** — build one `alta` record from a sample invoice, validate it
+- [x] **Proof 2** — build one `alta` record from a sample invoice, validate it
       locally against the XSD, submit it, and record the per-record status
       (`Correcto`/`AceptadoConErrores`/`Incorrecto` + AEAT error codes) in `design.md`.
-- [ ] **Proof 3** — compute the `huella`, submit a second record chained to the
+- [x] **Proof 3** — compute the `huella`, submit a second record chained to the
       first, and record the chain-acceptance outcome (both `huella` values, any
       encadenamiento error) in `design.md`.
-- [ ] (analyst) Write the PoC verdict in `design.md`: per-proof PASS/FAIL with
+- [x] (analyst) Write the PoC verdict in `design.md`: per-proof PASS/FAIL with
       evidence, and the AD-3 consequence — **proceed with BUILD** (all proofs
       cleared) **or** trigger the gateway-fallback escalation via
       `/openup-request-input` (any proof blocked at the time box).
-- [ ] On a clear verdict, annotate AD-3 §3 of `docs/architecture-notebook.md` with
+- [x] On a clear verdict, annotate AD-3 §3 of `docs/architecture-notebook.md` with
       the running-proof outcome.
 
 ## Norms

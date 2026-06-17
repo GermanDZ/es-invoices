@@ -101,8 +101,18 @@ Ranked — the order is the tie-breaker when attributes conflict.
   third-party in the critical submission path). *Build direct unconditionally*
   (drops the cheap fallback the interface already affords — needless R-03
   exposure).
-- **Status:** **accepted.** *Build-vs-buy direction founder-ratified during T-007
-  (see `docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md`).*
+- **Status:** **accepted — now backed by a running proof.** *Build-vs-buy
+  direction founder-ratified during T-007 (see
+  `docs/input-requests/archive/2026-06-15-aeat-build-vs-buy.md`).*
+- **Running-proof outcome (T-010, 2026-06-17):** the `preproducción` PoC gate
+  **passed all three proofs** against the live AEAT sandbox
+  (`prewww1.aeat.es/.../VerifactuSOAP`, port `SistemaVerifactuPruebas`): (1)
+  qualified-cert mutual-TLS **auth** accepted; (2) a self-built F1 `alta` validated
+  vs the published XSD and **accepted** (`Correcto` + CSV); (3) a second record
+  **hash-chained** on the prior `huella` accepted with no `encadenamiento` error.
+  Cleared inside the 2-session time box ⇒ **gateway-fallback NOT triggered;
+  BUILD-direct confirmed.** Residual **R-03** drops *high → managed*. Evidence:
+  `docs/changes/T-010/design.md`.
 
 ### AD-4 — EU data residency on a European cloud provider
 - **Decision:** Host the app and datastore on a **European cloud provider**
