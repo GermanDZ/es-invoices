@@ -51,3 +51,7 @@ poc/aeat-preproduccion/captured/
 *.key
 *.cer
 *.crt
+# Env files may hold the cert passphrase (AEAT_CERT_PASSWORD) — never commit.
+.env
+.env.*
+!.env.example
