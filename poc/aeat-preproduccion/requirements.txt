@@ -1,0 +1,7 @@
+# AEAT preproducción PoC (T-010) — AD-5 toolchain. Throwaway; not the production lock file.
+zeep>=4.2          # SOAP client (WSDL-driven)
+signxml>=3.2       # XAdES / XML-DSig signing
+lxml>=5.0          # XML build + XSD validation
+cryptography>=42   # cert / key handling, client-cert TLS
+requests>=2.31     # transport (requests-based zeep session for client-cert TLS)
+requests-pkcs12>=1.24  # client-cert (.p12) TLS adapter for requests/zeep
