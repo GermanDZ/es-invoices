@@ -1,7 +1,7 @@
 ---
 id: T-012
 title: "Invoicing core: line items, IVA/IRPF, gap-free numbering"
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high   # critical | high | medium | low
 estimate: 2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any
@@ -191,21 +191,21 @@ issues serialize (R-02). Mirror the `models / services / calc / tests` split the
 
 ## Operations
 
-- [ ] Scaffold the `invoicing` app and register it in `config/settings.py`; add the
+- [x] Scaffold the `invoicing` app and register it in `config/settings.py`; add the
       `Series`, `Invoice`, `LineItem` models with the `(series, number)` unique constraint
       and the initial migration.
-- [ ] Implement `invoicing/calc.py` — pure `Decimal` calculation: per-line amount, taxable
+- [x] Implement `invoicing/calc.py` — pure `Decimal` calculation: per-line amount, taxable
       base grouped by IVA rate, per-group IVA rounded independently (`ROUND_HALF_UP`),
       invoice-level IRPF retention, grand total.
-- [ ] Implement `invoicing/services.py` `issue_invoice(...)` — open a transaction, lock the
+- [x] Implement `invoicing/services.py` `issue_invoice(...)` — open a transaction, lock the
       series row (or use a per-series DB sequence), validate ≥1 line item + structural
       mandatory fields, assign the next gap-free number, persist; roll back without
       consuming a number on validation failure.
-- [ ] Enforce issued-invoice immutability on the numbering/identifying fields (number,
+- [x] Enforce issued-invoice immutability on the numbering/identifying fields (number,
       issue date) at the model layer.
-- [ ] (tester) Write the calc test suite: multi-rate totals, per-rate-group rounding,
+- [x] (tester) Write the calc test suite: multi-rate totals, per-rate-group rounding,
       exempt rate, IRPF on/off — assert exact `Decimal` values to the cent.
-- [ ] (tester) Write the numbering test suite: sequential assignment, concurrent issuance
+- [x] (tester) Write the numbering test suite: sequential assignment, concurrent issuance
       (no gap / no duplicate), and validation-failure rollback proving the number is not
       consumed; confirm `python manage.py test invoicing` is green.
 

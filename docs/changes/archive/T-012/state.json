@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-012",
+  "iteration": 11,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "feat/T-012-invoicing-core",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-012",
+  "session_id": null,
+  "started_at": "2026-06-18T08:58:02Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": "docs/changes/T-012/plan.md",
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 1
+}
