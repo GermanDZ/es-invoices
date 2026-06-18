@@ -1,7 +1,7 @@
 ---
 id: T-016
 title: PDF generation + send by email
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: medium
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
