@@ -44,6 +44,18 @@ INSTALLED_APPS = [
     "documents",
 ]
 
+# Dev-only shim (T-020): registered ONLY under DEBUG so its management command and
+# /dev/ URLs cannot exist in production. There is intentionally no production auth
+# surface here — the real login flow is a separate, future roadmap item. DEBUG in
+# production is already a critical, separately-guarded misconfiguration.
+if DEBUG:
+    INSTALLED_APPS.append("devtools")
+
+# Dev-login shortcut config (consumed only by the DEBUG-gated devtools app).
+DEV_LOGIN_REDIRECT = _env("DEV_LOGIN_REDIRECT", "/clients/")
+DEV_OWNER_USERNAME = _env("DEV_OWNER_USERNAME", "dev")
+DEV_OWNER_PASSWORD = _env("DEV_OWNER_PASSWORD", "dev")
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
