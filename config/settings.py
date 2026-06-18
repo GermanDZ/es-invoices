@@ -104,12 +104,17 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # AEAT SUBMISSION (T-014, AD-3) -------------------------------------------------
-# The submission adapter only calls the AEAT when AEAT_SUBMISSION_ENABLED is truthy
+# The submission adapter only calls the AEAT when AEAT_SUBMISSION_LIVE is truthy
 # — a config-read kill-switch (default OFF) so local/CI never reach the tax
-# authority by accident. AEAT_ENV selects the target; the endpoint defaults to the
-# preproducción (sandbox) address and must be overridden explicitly for production,
-# so production is never the default. See docs/changes/T-014/plan.md §Rollout.
-AEAT_SUBMISSION_ENABLED = _env("AEAT_SUBMISSION_ENABLED", "0") == "1"
+# authority by accident. This is PERMANENT safety infrastructure, NOT a rollout
+# flag: it must exist for the life of the product so non-production environments
+# can never make a real, legally-effective submission. Do not "remove once rolled
+# out" — there is no rolled-out state in which dev/CI should hit the live AEAT.
+# AEAT_ENV selects the target; the endpoint defaults to the preproducción
+# (sandbox) address and must be overridden explicitly for production, so
+# production is never the default. See docs/changes/T-019/plan.md (reframe) and
+# docs/changes/T-014/plan.md §Rollout.
+AEAT_SUBMISSION_LIVE = _env("AEAT_SUBMISSION_LIVE", "0") == "1"
 AEAT_ENV = _env("AEAT_ENV", "preproduccion")  # "preproduccion" | "produccion"
 # Preproducción VERI*FACTU sending endpoint (prewww1 — sandbox, no tax effect).
 AEAT_ENDPOINT = _env(

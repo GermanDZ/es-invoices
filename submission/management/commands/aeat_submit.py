@@ -1,10 +1,10 @@
 """Submit one VerifactuRecord to the AEAT via the configured gateway (T-014).
 
 The cert-gated preproducción **smoke path**: run it against a record whose owner has
-a real qualified certificate stored, with ``AEAT_SUBMISSION_ENABLED=1`` and
+a real qualified certificate stored, with ``AEAT_SUBMISSION_LIVE=1`` and
 ``AEAT_ENDPOINT`` pointing at the sandbox, to confirm the end-to-end transport. It
 refuses cleanly (no call) when the kill-switch is off — so it is safe to wire into
-CI/local where the flag defaults off. It is also the seed for a future scheduled
+CI/local where the gate defaults off. It is also the seed for a future scheduled
 re-drive of ``pending`` attempts.
 
     python manage.py aeat_submit <record_id>
@@ -25,9 +25,9 @@ class Command(BaseCommand):
         parser.add_argument("record_id", type=int)
 
     def handle(self, *args, **opts):
-        if not getattr(settings, "AEAT_SUBMISSION_ENABLED", False):
+        if not getattr(settings, "AEAT_SUBMISSION_LIVE", False):
             raise CommandError(
-                "AEAT_SUBMISSION_ENABLED is off — refusing to submit. "
+                "AEAT_SUBMISSION_LIVE is off — refusing to submit. "
                 "Set it (and AEAT_ENDPOINT) to run the preproducción smoke."
             )
         try:

@@ -1,8 +1,9 @@
 """Submission orchestration (T-014 Operation 4).
 
 ``submit_record`` is the verb the rest of the app calls. It owns the policy the
-adapter deliberately does not: the ``AEAT_SUBMISSION_ENABLED`` kill-switch, the
-bounded transport-retry → ``pending`` degradation, and persisting the
+adapter deliberately does not: the ``AEAT_SUBMISSION_LIVE`` kill-switch (permanent
+safety infrastructure — default OFF so non-production never reaches the live AEAT),
+the bounded transport-retry → ``pending`` degradation, and persisting the
 :class:`~submission.models.SubmissionAttempt`. The adapter (AD-3) stays a pure
 transport; swapping a gateway adapter in changes nothing here.
 """
@@ -39,13 +40,13 @@ def _persist(record, outcome: SubmissionOutcome) -> SubmissionAttempt:
 def submit_record(record, *, gateway: SubmissionGateway | None = None) -> SubmissionOutcome:
     """Submit ``record`` to the AEAT and persist the outcome.
 
-    Returns the :class:`SubmissionOutcome`. When ``AEAT_SUBMISSION_ENABLED`` is
+    Returns the :class:`SubmissionOutcome`. When ``AEAT_SUBMISSION_LIVE`` is
     falsey the call short-circuits **before** any cert resolution or network call
     and persists no attempt (a ``DISABLED`` outcome). Transport failures retry up to
     ``AEAT_SUBMISSION_MAX_RETRIES`` times then persist a ``pending`` attempt; a
     business ``Incorrecto`` rejection is never retried.
     """
-    if not getattr(settings, "AEAT_SUBMISSION_ENABLED", False):
+    if not getattr(settings, "AEAT_SUBMISSION_LIVE", False):
         return SubmissionOutcome(status=SubmissionStatus.DISABLED)
 
     gateway = gateway or _default_gateway()

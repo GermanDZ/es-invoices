@@ -145,11 +145,11 @@ machinery is not re-triggered. Mirrors the existing config-read-at-startup patte
 
 ## Operations
 
-- [ ] Rename `AEAT_SUBMISSION_ENABLED` → `AEAT_SUBMISSION_LIVE` in `config/settings.py` and rewrite the §AEAT SUBMISSION comment to frame it as a permanent safety kill-switch (not rollout debt); confirm default stays OFF.
-- [ ] Update the gate read in `submission/services.py` (`submit_record`) and its module docstring to the new name + permanent framing.
-- [ ] Update `submission/management/commands/aeat_submit.py` — settings check, `CommandError` message, help/docstring — to the new name.
-- [ ] Update test overrides/keys in `submission/tests/test_services.py` and `invoicing/tests/test_corrective.py` to `AEAT_SUBMISSION_LIVE`.
-- [ ] (tester) Run `grep -rn AEAT_SUBMISSION_ENABLED --include='*.py'` excluding `docs/changes/archive` and audit logs — expect zero matches; then run the full test suite and confirm it is green with unchanged pass/skip counts.
+- [x] Rename `AEAT_SUBMISSION_ENABLED` → `AEAT_SUBMISSION_LIVE` in `config/settings.py` and rewrite the §AEAT SUBMISSION comment to frame it as a permanent safety kill-switch (not rollout debt); confirm default stays OFF.
+- [x] Update the gate read in `submission/services.py` (`submit_record`) and its module docstring to the new name + permanent framing.
+- [x] Update `submission/management/commands/aeat_submit.py` — settings check, `CommandError` message, help/docstring — to the new name.
+- [x] Update test overrides/keys in `submission/tests/test_services.py` and `invoicing/tests/test_corrective.py` to `AEAT_SUBMISSION_LIVE`.
+- [x] (tester) Run `grep -rn AEAT_SUBMISSION_ENABLED --include='*.py'` excluding `docs/changes/archive` and audit logs — expect zero matches; then run the full test suite and confirm it is green with unchanged pass/skip counts.
 
 ## Norms
 

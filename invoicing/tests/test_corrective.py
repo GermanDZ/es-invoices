@@ -21,7 +21,7 @@ from invoicing.tests.factories import make_invoice, make_series
 from submission.gateway import SubmissionGateway, SubmissionOutcome, SubmissionStatus
 
 FECHA_HORA = "2026-06-18T12:00:00+02:00"
-ENABLED = dict(AEAT_SUBMISSION_ENABLED=True, AEAT_SUBMISSION_MAX_RETRIES=3,
+ENABLED = dict(AEAT_SUBMISSION_LIVE=True, AEAT_SUBMISSION_MAX_RETRIES=3,
                AEAT_ENV="preproduccion")
 
 

@@ -24,10 +24,10 @@ class _ScriptedGateway(SubmissionGateway):
         return step
 
 
-ENABLED = dict(AEAT_SUBMISSION_ENABLED=True, AEAT_SUBMISSION_MAX_RETRIES=3, AEAT_ENV="preproduccion")
+ENABLED = dict(AEAT_SUBMISSION_LIVE=True, AEAT_SUBMISSION_MAX_RETRIES=3, AEAT_ENV="preproduccion")
 
 
-@override_settings(AEAT_SUBMISSION_ENABLED=False)
+@override_settings(AEAT_SUBMISSION_LIVE=False)
 class FlagOffTests(TestCase):
     def test_disabled_short_circuits_and_writes_no_attempt(self):
         record = make_record()
