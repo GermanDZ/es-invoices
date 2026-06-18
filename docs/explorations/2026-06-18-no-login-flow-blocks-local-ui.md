@@ -1,7 +1,7 @@
 # Problem note: web UI is unreachable locally — no login flow exists
 
 **Date:** 2026-06-18
-**Status:** observed (pre-iteration) — not yet scoped for delivery
+**Status:** scoped → **T-020** (dev-only shim, option 3) — see `docs/changes/T-020/plan.md`. The real product login (option 2) remains an open gap, recommended as a follow-up roadmap item.
 **Surfaced by:** attempting to run the app locally to "fiddle with the current state of the product"
 
 ## Symptom
