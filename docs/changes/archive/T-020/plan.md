@@ -1,7 +1,7 @@
 ---
 id: T-020
 title: Dev-only local auth shim (seed user + DEBUG-gated login shortcut)
-status: in-progress
+status: done
 priority: low
 estimate: 1 session
 plan: docs/roadmap.md#construction

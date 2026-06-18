@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-020",
+  "iteration": 19,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "feat/T-020-dev-auth-shim",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices",
+  "session_id": null,
+  "started_at": "2026-06-18T16:10:37Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": true,
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 1
+}
