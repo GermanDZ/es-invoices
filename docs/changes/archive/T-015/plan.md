@@ -1,7 +1,7 @@
 ---
 id: T-015
 title: "Client/contact management (recipient fiscal data)"
-status: done   # proposed → ready → in-progress → done → verified
+status: done
 priority: medium   # critical | high | medium | low
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any

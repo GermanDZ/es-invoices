@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-015",
+  "iteration": 14,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "feature/T-015-client-management",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-015",
+  "session_id": null,
+  "started_at": "2026-06-18T11:11:11Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": "docs/changes/T-015/plan.md",
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}
