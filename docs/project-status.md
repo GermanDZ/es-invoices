@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 13
-**Iteration Goal**: T-014 — AEAT submission adapter behind AD-3 interface
+**Iteration**: 14
+**Iteration Goal**: T-015 — Client/contact management (recipient fiscal data)
 **Status**: completed
-**Current Task**: T-014
+**Current Task**: T-015
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 14** (2026-06-18): T-015 complete — client/contact management (new Django `clients` app, S-1 / UC-003 / REQ-003). Owner-scoped Client model typed B2B/B2C with Spanish DNI/NIE/CIF format+checksum validation (`clients/validation.py`); type-conditional tax-id rule in `Client.clean` (B2B required, B2C optional per D-2); `@login_required` CRUD (list/create/edit/delete) with 404 cross-owner scoping; `recipient_snapshot` bridges a saved client into the invoice recipient snapshot and rejects an unusable B2B client; additive nullable `Invoice.client` provenance FK (never read by numbering/compliance). 23 client tests, full suite 92 green (2 Postgres-gated skips).
 
 - **Iteration 13** (2026-06-18): T-014 complete — AEAT submission adapter behind the AD-3 interface (Django `submission` app). `SubmissionGateway` interface + one direct mTLS-SOAP adapter productionizing the T-010 PoC transport; `SubmissionAttempt` outcome model (accepted+CSV / rejected+code / pending); bounded transport-retry degrading to pending (no retry on business `Incorrecto`); `AEAT_SUBMISSION_ENABLED` kill-switch with preproducción-default endpoint. Cert material only via `certificates.services`; record/invoice never mutated. `aeat_submit` management command as the cert-gated preproducción smoke. 15 submission tests, full suite 69 green. Realizes UC-002.
 
