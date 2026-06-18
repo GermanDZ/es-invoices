@@ -3,15 +3,17 @@
 **Project**: FacturaSimple
 **Phase**: construction
 **Iteration**: 19
-**Iteration Goal**: T-020 — Dev-only local auth shim: a DEBUG-gated /dev/login/ shortcut + seed_dev_owner command in a new devtools app, giving local browser access to product pages with zero production auth surface
-**Status**: in-progress
+**Iteration Goal**: T-020 — Dev-only local auth shim (seed user + DEBUG-gated login shortcut)
+**Status**: completed
 **Current Task**: T-020
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
-**Updated By**: openup-start-iteration
+**Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 19** (2026-06-18): T-020 complete — dev-only local auth shim. New `devtools` app registered **only under DEBUG** so it has zero production auth surface: a `/dev/login/` view get-or-creates the single owner (scope.md D-3/N-5 single-operator) and authenticates the browser session, a DEBUG-gated root redirect points `/` at it, and a `seed_dev_owner` command idempotently seeds the user for shell use. Closes the local-fiddling gap from the no-login exploration **without** building the real product login (that genuine gap stays an explicit out-of-scope follow-up). Notable: Django's test runner forces DEBUG=False at urlconf-load, so the DEBUG-gated routes never register under `manage.py test` — tests swap in a dedicated test urlconf to assert wiring and drive the view's own DEBUG guard separately. 6 new tests, full suite 129 green (2 Postgres-gated skips); no models/migrations.
 
 - **Iteration 18** (2026-06-18): T-019 complete — reframed the AEAT submission gate as **permanent** safety infrastructure instead of removable rollout debt (the roadmap's "remove flag" premise was false: a default-OFF kill-switch that keeps local/CI from making real tax-authority submissions is never "fully rolled out"). Product-owner decision: repurpose, don't delete. Renamed `AEAT_SUBMISSION_ENABLED` → `AEAT_SUBMISSION_LIVE` across settings, `submit_record`, the `aeat_submit` command, and test overrides (submission + invoicing), keeping truthy=submit + default-OFF semantics unchanged; settings/services docs now state the control is permanent so it is not re-enqueued for removal. No flag-removal follow-up created (by design). Old name gone from all *.py; full suite 123 green (2 Postgres-gated skips). Deploy note: prod must rename the env var `AEAT_SUBMISSION_ENABLED=1` → `AEAT_SUBMISSION_LIVE=1`.
 

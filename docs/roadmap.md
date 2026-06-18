@@ -54,6 +54,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-016 | PDF generation + send by email | completed (2026-06-18) | medium | T-012 |
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | completed (2026-06-18) | medium | T-013, T-014 |
 | T-018 | Basic invoice status tracking (issued / sent) | completed (2026-06-18) | low | T-014, T-016 |
+| T-020 | Dev-only local auth shim (seed user + DEBUG-gated login shortcut) | completed (2026-06-18) | low | T-011, T-015 |
 
 ### Task notes
 
@@ -84,6 +85,13 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
   rectificativas* (UC-004) and Verifactu *anulación* records (UC-005). Promote
   UC-004/UC-005 `draft → approved` as part of this task.
 - **T-018**: Basic invoice status tracking (S-6) — issued / sent state per invoice.
+- **T-020**: Dev-only local auth shim — a DEBUG-gated `/dev/login/` shortcut + a
+  `seed_dev_owner` command in a new `devtools` app, giving a developer browser
+  access to the `@login_required` product pages on a fresh checkout with zero
+  production auth surface. **Value**: unblocks every developer/contributor from
+  "fiddling with the product" locally (the no-login exploration showed the UI was
+  unreachable in a browser), shortening the inner dev loop. Does **not** close the
+  real product-login gap — that remains a recommended future roadmap item.
 
 > **Construction-wide carry-forwards** (architecture notebook §7): verify the
 > autónomo obligation timeline against the *current* AEAT rollout calendar at build
