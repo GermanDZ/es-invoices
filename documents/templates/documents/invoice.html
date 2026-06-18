@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: A4; margin: 1.6cm; }
+  body { font-family: "Helvetica", "Arial", sans-serif; font-size: 11px;
+         color: #1a1a1a; }
+  h1 { font-size: 20px; margin: 0 0 2px; }
+  .muted { color: #666; }
+  .row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .parties { display: flex; justify-content: space-between; margin: 18px 0; }
+  .party { width: 48%; }
+  .party h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+              color: #888; margin: 0 0 4px; border-bottom: 1px solid #ddd;
+              padding-bottom: 2px; }
+  table.lines { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  table.lines th { text-align: left; font-size: 10px; text-transform: uppercase;
+                   color: #888; border-bottom: 1px solid #333; padding: 5px 4px; }
+  table.lines td { padding: 5px 4px; border-bottom: 1px solid #eee; }
+  td.num, th.num { text-align: right; }
+  table.totals { margin-left: auto; margin-top: 12px; border-collapse: collapse; }
+  table.totals td { padding: 3px 8px; }
+  table.totals td.num { text-align: right; }
+  tr.grand td { font-weight: bold; font-size: 13px; border-top: 2px solid #333; }
+  .verifactu { margin-top: 26px; display: flex; align-items: center; gap: 14px;
+               border-top: 1px dashed #999; padding-top: 12px; }
+  .verifactu img { width: 96px; height: 96px; }
+  .legend { font-size: 10px; color: #444; }
+  .legend strong { letter-spacing: 1px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div>
+      <h1>Factura {{ num_serie }}</h1>
+      <div class="muted">Fecha de expedición: {{ fecha_exp }}</div>
+    </div>
+    <div class="party" style="text-align:right; width:auto;">
+      <strong>{{ issuer.name }}</strong><br>
+      NIF: {{ issuer.nif }}<br>
+      {% if issuer.address %}{{ issuer.address }}{% endif %}
+    </div>
+  </div>
+
+  <div class="parties">
+    <div class="party">
+      <h2>Emisor</h2>
+      <strong>{{ issuer.name }}</strong><br>
+      NIF: {{ issuer.nif }}<br>
+      {% if issuer.address %}{{ issuer.address }}{% endif %}
+    </div>
+    <div class="party">
+      <h2>Destinatario</h2>
+      <strong>{{ invoice.recipient_name }}</strong><br>
+      NIF/CIF: {{ invoice.recipient_taxid|default:"—" }}<br>
+      {% if invoice.recipient_address %}{{ invoice.recipient_address }}{% endif %}
+    </div>
+  </div>
+
+  <table class="lines">
+    <thead>
+      <tr>
+        <th>Descripción</th>
+        <th class="num">Cantidad</th>
+        <th class="num">Precio</th>
+        <th class="num">IVA %</th>
+        <th class="num">Importe</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.description }}</td>
+        <td class="num">{{ item.quantity }}</td>
+        <td class="num">{{ item.unit_price }} €</td>
+        <td class="num">{{ item.iva_rate }} %</td>
+        <td class="num">{{ item.amount }} €</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <table class="totals">
+    <tr>
+      <td>Base imponible</td>
+      <td class="num">{{ totals.taxable_base }} €</td>
+    </tr>
+    {% for g in totals.groups %}
+    <tr>
+      <td class="muted">IVA {{ g.rate }}% sobre {{ g.base }} €</td>
+      <td class="num muted">{{ g.iva }} €</td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td>Total IVA</td>
+      <td class="num">{{ totals.iva_total }} €</td>
+    </tr>
+    {% if totals.irpf_retention %}
+    <tr>
+      <td>Retención IRPF ({{ invoice.irpf_rate }}%)</td>
+      <td class="num">− {{ totals.irpf_retention }} €</td>
+    </tr>
+    {% endif %}
+    <tr class="grand">
+      <td>Total factura</td>
+      <td class="num">{{ invoice.grand_total }} €</td>
+    </tr>
+  </table>
+
+  <div class="verifactu">
+    <img src="{{ qr_data_uri }}" alt="QR de verificación VERI*FACTU">
+    <div class="legend">
+      <strong>VERI*FACTU</strong><br>
+      Factura verificable en la sede electrónica de la AEAT.<br>
+      Escanee el código QR para validar este registro de facturación.
+    </div>
+  </div>
+</body>
+</html>

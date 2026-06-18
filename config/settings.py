@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "invoicing",
     "compliance",
     "submission",
+    "documents",
 ]
 
 MIDDLEWARE = [
@@ -119,3 +120,29 @@ AEAT_ENDPOINT = _env(
 # rejections). 1 + this many retries are attempted before degrading to "pending".
 AEAT_SUBMISSION_MAX_RETRIES = int(_env("AEAT_SUBMISSION_MAX_RETRIES", "3"))
 AEAT_SUBMISSION_TIMEOUT = int(_env("AEAT_SUBMISSION_TIMEOUT", "45"))
+
+# DOCUMENT & DELIVERY (T-016, S-3) ---------------------------------------------
+# PDF generation + send-by-email. Email uses Django's pluggable backend so the
+# concrete provider is config, not code: the console backend (default) prints to
+# stdout for local/dev and never sends, while deployments set EMAIL_BACKEND to an
+# SMTP backend and wire EMAIL_HOST/PORT/USER/PASSWORD via env. See
+# docs/changes/T-016/plan.md §Rollout.
+EMAIL_BACKEND = _env(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = _env("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(_env("EMAIL_PORT", "25"))
+EMAIL_HOST_USER = _env("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = _env("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = _env("EMAIL_USE_TLS", "0") == "1"
+DEFAULT_FROM_EMAIL = _env("DEFAULT_FROM_EMAIL", "no-reply@facturasimple.example")
+
+# Base URL of the AEAT VERI*FACTU public QR-verification service embedded on the
+# invoice PDF. Defaults to the preproducción (sandbox) address so a misconfigured
+# deployment never silently points consumers at the wrong host; production must
+# override it explicitly (prewww → www2). The QR encodes this base + the invoice's
+# persisted NIF / NumSerie / FechaExpedicion / ImporteTotal (compliance values).
+VERIFACTU_QR_BASE_URL = _env(
+    "VERIFACTU_QR_BASE_URL",
+    "https://prewww2.aeat.es/wlpl/TIKE-CONT/ValidarQR",
+)

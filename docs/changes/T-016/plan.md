@@ -171,21 +171,21 @@ the console/locmem backend and deployments wire a real provider via config alone
 
 ## Operations
 
-- [ ] Add `weasyprint` + `segno` to `requirements.txt`; add `documents` to
+- [x] Add `weasyprint` + `segno` to `requirements.txt`; add `documents` to
       `INSTALLED_APPS` and `EMAIL_BACKEND`/`DEFAULT_FROM_EMAIL`/`VERIFACTU_QR_BASE_URL`
       settings (env-driven, console backend default) in `config/settings.py`.
-- [ ] Scaffold the `documents` app (`apps.py`, `__init__.py`) and the
+- [x] Scaffold the `documents` app (`apps.py`, `__init__.py`) and the
       `Issuer` dataclass + `build_qr_url(invoice, issuer)` helper in
       `documents/services.py`.
-- [ ] Author `documents/templates/documents/invoice.html` rendering all mandatory
+- [x] Author `documents/templates/documents/invoice.html` rendering all mandatory
       legal fields, the VERI\*FACTU legend, and the inline-SVG QR.
-- [ ] Implement `render_invoice_pdf(invoice, *, issuer)` (issued-only guard →
+- [x] Implement `render_invoice_pdf(invoice, *, issuer)` (issued-only guard →
       template render → WeasyPrint → bytes) in `documents/services.py`.
-- [ ] Implement `send_invoice_email(invoice, *, issuer, to_email=None)` building an
+- [x] Implement `send_invoice_email(invoice, *, issuer, to_email=None)` building an
       `EmailMessage` with the PDF attached, defaulting `to_email` to the recipient.
-- [ ] (tester) Write `test_pdf.py` (Req 1, 2, 4, 5) and `test_email.py`
+- [x] (tester) Write `test_pdf.py` (Req 1, 2, 4, 5) and `test_email.py`
       (Req 3, 4) using the locmem backend; run `python manage.py test documents`.
-- [ ] (tester) Run the full suite (`python manage.py test`) to confirm no
+- [x] (tester) Run the full suite (`python manage.py test`) to confirm no
       regression in invoicing/compliance/submission.
 
 ## Norms

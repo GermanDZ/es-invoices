@@ -6,3 +6,6 @@ psycopg[binary]>=3.1     # PostgreSQL driver (AD-6); SQLite is the local/test fa
 lxml>=5                  # Verifactu XML build/parse + XSD validation (T-013 compliance)
 signxml>=4               # XAdES-enveloped XML-DSig signing/verification (T-013, AD-2)
 requests-pkcs12>=1.24    # PKCS#12 mutual-TLS session to the AEAT (T-014, AD-3)
+weasyprint>=60           # HTML/CSS -> PDF invoice rendering (T-016, S-3, AD Document & delivery)
+segno>=1.6               # pure-Python Verifactu QR (no Pillow/native deps) (T-016)
+pypdf>=4                 # test-only: extract PDF text layer to assert rendered content (T-016)
