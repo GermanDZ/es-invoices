@@ -88,7 +88,22 @@ responses (T-014), or signature/XSD verification of externally-supplied records 
 use **`defusedxml`** (stdlib parsers are open to XXE / billion-laughs). Flagged by
 the security hook during this task.
 
-## Handoff — what remains (external-dependency boundary)
+## Completion grade (step 1a/1b) — graded vs the diff + green suite (2026-06-18)
+
+All 7 requirements ✅ (17 compliance tests; full suite 54 green, 2 Postgres-gated skips):
+- ✅ **R1** interface — `compliance/__init__.py` lazy `__getattr__` + `MODULE_VERSION`; `test_interface` (2).
+- ✅ **R2** validation — `compliance/validation.py`; `test_validation` rejects missing taxid/NIF/unissued, persists nothing (3).
+- ✅ **R3** XSD-conformance — `records.wrap_envelope` + `_sistema_informatico`; `test_xsd` validates the full `RegFactu` envelope vs the vendored AEAT schemas for single-rate AND 21%+exempt; per-group Desglose in `test_records`.
+- ✅ **R4** huella — `records.compute_huella` (ported, AEAT-proven); `test_records` asserts byte-exact SHA-256 of the spec concat + `PrimerRegistro=S`.
+- ✅ **R5** chain — `services._lock_chain` (IssuerChain `select_for_update`); `test_chain` linkage; `ConcurrentChainTests` (Postgres-gated, skipped on SQLite like T-012) proves fork-safety.
+- ✅ **R6** signature — `signing.py` XAdES (signxml); `test_signing` verifies + fails on tamper + end-to-end via `signer_for_user` + cert store.
+- ✅ **R7** annulment — `services.generate_anulacion`; `test_chain` AnnulmentTests references original `IDFactura`, chains on the tail.
+
+**Step 1b — Success Measures: n/a (argued).** Internal compliance core; deterministic
+correctness (XSD-conformance + huella reproduction + signature verify/tamper) is read back
+in CI on every run, not on a release date. No user-facing funnel until T-014 submission.
+
+## Handoff — what remains (external-dependency boundary) — RESOLVED this session
 
 Completed this cycle (dependency-free): Operations 1, 2, 3, 5, 6 — scaffold + model
 + migration + settings, validation gate, record/huella builders, transactional
