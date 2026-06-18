@@ -3,3 +3,5 @@
 Django>=5.0,<6.0
 cryptography>=42         # AES-256-GCM at-rest encryption + PKCS#12 loading
 psycopg[binary]>=3.1     # PostgreSQL driver (AD-6); SQLite is the local/test fallback
+lxml>=5                  # Verifactu XML build/parse + XSD validation (T-013 compliance)
+signxml>=4               # XAdES-enveloped XML-DSig signing/verification (T-013, AD-2)

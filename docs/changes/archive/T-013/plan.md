@@ -1,7 +1,7 @@
 ---
 id: T-013
 title: "Compliance/Verifactu module: record gen + hash-chain + XAdES"
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high   # critical | high | medium | low
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
@@ -181,13 +181,13 @@ persisted, signed record; submission is T-014's adapter behind AD-3.
 
 ## Operations
 
-- [ ] Scaffold the `compliance` app: `apps.py`, `__init__.py` exposing `MODULE_VERSION` + public API stubs, the `VerifactuRecord` model + initial migration; register it in `config/settings.py`.
-- [ ] Implement `validation.py` — the legal-field gate that rejects an invoice missing a mandatory Verifactu field (issuer NIF, recipient name/taxid, ≥1 line, totals, issue date), persisting nothing on failure.
-- [ ] Implement `records.py` — port `compute_huella` + the `RegistroAlta` builder from the PoC, fed from the invoice and `invoicing.calc` rate groups (one `DetalleDesglose` per IVA rate); add the `RegistroAnulación` builder.
-- [ ] Implement `signing.py` — XAdES-enveloped signature over a built record using `certificates.services.get_cert_material`, plus a verify helper; add `lxml` + the signing library to `requirements.txt`.
-- [ ] Implement `services.py` `generate_alta` — one `transaction.atomic()` that row-locks the issuer's chain tail, computes the chained `huella` (or `PrimerRegistro=S`), signs, and persists the `VerifactuRecord`.
-- [ ] Implement `services.py` `generate_anulacion` — build the chained, signed `RegistroAnulación` referencing an existing record's `IDFactura` and persist it as a `anulacion` record (UC-005).
-- [ ] (tester) Add the `compliance` test suite covering all seven requirements — validation rejection, alta XSD-conformance + per-group Desglose, huella reproduction, chain linkage + fork-safety (Postgres-gated race like T-012), signature verify/tamper, annulment reference — and run the full suite green.
+- [x] Scaffold the `compliance` app: `apps.py`, `__init__.py` exposing `MODULE_VERSION` + public API stubs, the `VerifactuRecord` model + initial migration; register it in `config/settings.py`.
+- [x] Implement `validation.py` — the legal-field gate that rejects an invoice missing a mandatory Verifactu field (issuer NIF, recipient name/taxid, ≥1 line, totals, issue date), persisting nothing on failure.
+- [x] Implement `records.py` — port `compute_huella` + the `RegistroAlta` builder from the PoC, fed from the invoice and `invoicing.calc` rate groups (one `DetalleDesglose` per IVA rate); add the `RegistroAnulación` builder.
+- [x] Implement `signing.py` — XAdES-enveloped signature over a built record using `certificates.services.get_cert_material`, plus a verify helper; add `lxml` + the signing library to `requirements.txt`. *(signxml `XAdESSigner`/`XAdESVerifier`; signature verifies + fails on tamper — 3 tests green incl. end-to-end via `signer_for_user` + the cert store.)*
+- [x] Implement `services.py` `generate_alta` — one `transaction.atomic()` that row-locks the issuer's chain tail, computes the chained `huella` (or `PrimerRegistro=S`), signs, and persists the `VerifactuRecord`. *(chain + persist done; signing wired via an injectable `signer` callable — the XAdES signer arrives with the box above.)*
+- [x] Implement `services.py` `generate_anulacion` — build the chained, signed `RegistroAnulación` referencing an existing record's `IDFactura` and persist it as a `anulacion` record (UC-005).
+- [x] (tester) Add the `compliance` test suite covering all seven requirements — validation rejection, alta XSD-conformance + per-group Desglose, huella reproduction, chain linkage + fork-safety (Postgres-gated race like T-012), signature verify/tamper, annulment reference — and run the full suite green. *(17 compliance tests green covering req 1–7; req-3 XSD-conformance validates the full `RegFactu` envelope against the vendored AEAT schemas for both single-rate and 21%+exempt; Postgres race present + skipped on SQLite like T-012. Full suite 54 green, 2 Postgres-gated skips.)*
 
 ## Norms
 

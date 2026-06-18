@@ -1,2 +1,4 @@
 {"run_id": "58e89046548443658825b76a54df7616", "event": "commit", "task_id": "T-013", "branch": "main", "sha": "bd3f5600db666feffe71e76ba68bd8e1eaa38692", "model": null, "session_id": null, "ts": "2026-06-18T09:57:12Z"}
 {"run_id": "1147a126623441b9941336c7f109dc87", "event": "commit", "task_id": "T-013", "branch": "main", "sha": "37ab2bca3890a3852806e3c11061f5e792b4d50f", "model": null, "session_id": null, "ts": "2026-06-18T10:02:46Z"}
+{"run_id": "iter-12-T-013", "event": "iteration_start", "task_id": "T-013", "goal": "Compliance/Verifactu module: record gen + hash-chain + XAdES", "branch": "feat/T-013-compliance-verifactu", "phase": "construction", "ts": "2026-06-18T09:44:41Z"}
+{"event": "iteration_complete", "task_id": "T-013", "branch": "feat/T-013-compliance-verifactu", "phase": "construction", "ts": "2026-06-18T10:20:04Z"}
