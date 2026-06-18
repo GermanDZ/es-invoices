@@ -1,1 +1,2 @@
 {"run_id": "null", "event": "iteration_start", "task_id": "T-018", "goal": "T-018 \u2014 Basic invoice status tracking (issued / sent)", "branch": "feat/T-018-invoice-status-tracking", "phase": "construction", "ts": "2026-06-18T12:38:54Z"}
+{"event": "iteration_complete", "task_id": "T-018", "branch": "feat/T-018-invoice-status-tracking", "phase": "construction", "ts": "2026-06-18T12:43:12Z"}

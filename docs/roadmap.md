@@ -53,7 +53,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-015 | Client/contact management (recipient fiscal data) | completed (2026-06-18) | medium | T-012 |
 | T-016 | PDF generation + send by email | completed (2026-06-18) | medium | T-012 |
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | completed (2026-06-18) | medium | T-013, T-014 |
-| T-018 | Basic invoice status tracking (issued / sent) | pending | low | T-014, T-016 |
+| T-018 | Basic invoice status tracking (issued / sent) | completed (2026-06-18) | low | T-014, T-016 |
 
 ### Task notes
 

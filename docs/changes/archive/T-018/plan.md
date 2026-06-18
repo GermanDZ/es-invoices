@@ -1,7 +1,7 @@
 ---
 id: T-018
 title: Basic invoice status tracking (issued / sent)
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: low   # critical | high | medium | low
 estimate: 0.5–1 session
 plan: docs/roadmap.md#construction

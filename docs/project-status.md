@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 16
-**Iteration Goal**: T-017 — Corrective / cancellation invoices (rectificativa + anulación)
+**Iteration**: 17
+**Iteration Goal**: T-018 — Basic invoice status tracking (issued / sent)
 **Status**: completed
-**Current Task**: T-017
+**Current Task**: T-018
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 17** (2026-06-18): T-018 complete — basic invoice status tracking (S-6). `Invoice` gains a nullable `sent_at` timestamp + a derived read-only `status` property (draft → issued → sent) over the existing `issued` flag, plus a `mark_sent(when=None)` helper that persists only `sent_at` (update_fields, so it never trips the issued-identity guard). `documents.services.send_invoice_email` stamps `sent_at` on a confirmed non-zero send; a zero/failed send leaves it untouched. Post-issuance overlay like T-017's `corrected_by`/`annulled` (absent from `_IMMUTABLE_WHEN_ISSUED`). AEAT submission outcome stays in `submission.SubmissionAttempt` (T-014), deliberately not folded into `status`. Not user-facing (no UI/flag); migration-reversible. 7 new tests (status property, immutability-safe stamp, re-send advance, send-persists-sent / zero-send-noop), full suite 123 green (2 Postgres-gated skips).
 
 - **Iteration 16** (2026-06-18): T-017 complete — corrective/cancellation invoices (S-5, REQ-004, UC-004/UC-005). Built on the shipped compliance/submission machinery: `invoicing` gains `Invoice.corrected_by` (self-FK) + `annulled` and two service orchestrators — `issue_rectificativa` (por sustitución, TipoFactura=R1/TipoRectificativa=S; clones the original, issues gap-free in a dedicated rectificativa series, generates a rectificativa-type alta referencing the original, submits, links `original.corrected_by` on accepted/disabled) and `annul_invoice` (reuses `generate_anulacion`, marks `annulled`, creates no Invoice, refuses when a rectificativa exists — UC-005 2b). `compliance.build_registro_alta`/`generate_alta` extended with rectificativa metadata (FacturasRectificadas + ImporteRectificacion, XSD-conformant); `tipo_factura` now persisted from the param (default F1 unchanged). corrected/annulled gated on the submission outcome; both excluded from the issued-immutability set. UC-004/UC-005 promoted draft→approved. 12 new tests (rectificativa record incl. XSD, issuance/linkage, annulment, guardrail, no-number-burn, post-issue mutation); full suite 116 green (2 Postgres-gated skips). No new feature flag — reaches AEAT via the existing `AEAT_SUBMISSION_ENABLED` kill-switch. Ships dark (no UI caller); acceptance read-back gated on the corrective UI task.
 
