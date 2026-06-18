@@ -1,1 +1,2 @@
 {"run_id": "iter-12-T-013", "event": "iteration_start", "task_id": "T-013", "goal": "Compliance/Verifactu module: record gen + hash-chain + XAdES", "branch": "feat/T-013-compliance-verifactu", "phase": "construction", "ts": "2026-06-18T09:44:41Z"}
+{"event": "iteration_complete", "task_id": "T-013", "branch": "feat/T-013-compliance-verifactu", "phase": "construction", "ts": "2026-06-18T10:20:04Z"}

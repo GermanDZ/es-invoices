@@ -1,7 +1,7 @@
 ---
 id: T-013
 title: "Compliance/Verifactu module: record gen + hash-chain + XAdES"
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high   # critical | high | medium | low
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
