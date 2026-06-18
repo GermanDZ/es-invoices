@@ -1,0 +1,6 @@
+{"run_id": "run-T-020-20260618", "event": "iteration_start", "task_id": "T-020", "goal": "Dev-only local auth shim (DEBUG-gated /dev/login/ + seed_dev_owner)", "branch": "feat/T-020-dev-auth-shim", "phase": "construction", "ts": "2026-06-18T16:11:20Z"}
+{"run_id": "cb6f73eead0f4c88bc371102923fd197", "event": "commit", "task_id": "T-020", "branch": "feat/T-020-dev-auth-shim", "sha": "01f3056f045dde9219dc6493503b3d717d141613", "model": null, "session_id": null, "ts": "2026-06-18T16:18:40Z"}
+{"run_id": "e303c812a2b84f2c8761ff3083baee72", "event": "commit", "task_id": "T-020", "branch": "feat/T-020-dev-auth-shim", "sha": "214bd04b4261ed3272cde4c1558855f5505c05e0", "model": null, "session_id": null, "ts": "2026-06-18T16:19:10Z"}
+{"run_id": "50519f4509664cad9e4a3f747db6cf76", "event": "commit", "task_id": "T-020", "branch": "feat/T-020-dev-auth-shim", "sha": "6d8193484db52329e75ec52f809f6b8e882ce4c6", "model": null, "session_id": null, "ts": "2026-06-18T16:20:07Z"}
+{"run_id": "a41cfd2fc50941659071fa1e4698400b", "event": "commit", "task_id": "T-020", "branch": "feat/T-020-dev-auth-shim", "sha": "6da8e14bff9178802fb9b9a7e9d3a48da059a265", "model": null, "session_id": null, "ts": "2026-06-18T16:21:23Z"}
+{"event": "iteration_complete", "task_id": "T-020", "branch": "feat/T-020-dev-auth-shim", "phase": "construction", "ts": "2026-06-18T16:23:13Z"}
