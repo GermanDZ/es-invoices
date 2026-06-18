@@ -55,6 +55,7 @@ class VerifactuRecord(models.Model):
 
     # Chain key + record identity (the huella input fields, stored verbatim) ---
     issuer_nif = models.CharField(max_length=16)
+    issuer_name = models.CharField(max_length=120, default="")
     num_serie = models.CharField(max_length=64)
     fecha_expedicion = models.CharField(max_length=10)  # FechaExpedicionFactura
     tipo_factura = models.CharField(max_length=4, default="F1")

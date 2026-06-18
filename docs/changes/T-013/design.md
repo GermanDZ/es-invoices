@@ -41,7 +41,36 @@
   build layer. lxml + the XAdES library are added **with** the signing box, where
   C14N + XSD validation actually need them (the spec's open architect-assumption).
 
-## Exempt-rate Desglose — known simplification (XSD-gated)
+## Resolved in the second cycle (signing + XSD)
+
+- **DD8 — XAdES via signxml.** `signing.py` uses `signxml.xades.XAdESSigner` /
+  `XAdESVerifier` (lxml-backed). `records` builds stdlib ET; we bridge to lxml by
+  serialise→parse (trusted self-generated XML). `requirements.txt` pins `lxml>=5`
+  + `signxml>=4`. Verified end-to-end through `generate_alta(..., signer=signing.signer_for_user(owner))`
+  using a self-signed **fixture** cert stored via `certificates.services` (never a real cert).
+- **DD9 — XSD-conformance validates the full envelope.** The published schema makes
+  `RegistroAlta` valid only inside `RegFactuSistemaFacturacion`, so `records.wrap_envelope`
+  builds `Cabecera`/`ObligadoEmision` + `RegistroFactura`. The 3 AEAT schemas
+  (`SuministroLR.xsd`, `SuministroInformacion.xsd`, `xmldsig-core-schema.xsd`) are vendored
+  under `compliance/tests/fixtures/` with the xmldsig import rewritten to a local path.
+  `ds:Signature` is `minOccurs=0` → the **unsigned** envelope is conformant (signature
+  tested separately). Both single-rate and 21%+exempt validate.
+- **DD10 — `SistemaInformatico` (SIF) block is mandatory.** The schema requires it on
+  alta and anulación; adding it fixed the first XSD failure. NombreRazon/NIF currently
+  record the **issuer** as a self-developed-style producer (XSD-valid). **Open item:** for
+  FacturaSimple-as-SaaS the SIF producer is FacturaSimple's own fiscal identity — a real-data
+  constant to set before production (flagged for T-014 / launch).
+- **DD11 — `issuer_name` stored on `VerifactuRecord`.** Needed for the SIF block; storing it
+  at alta time lets `generate_anulacion` reproduce it without re-deriving issuer identity.
+
+## Exempt-rate Desglose — structurally valid; semantics still open
+
+The exempt (rate 0) branch writes `CalificacionOperacion=S2` + base only, and this **passes
+the published XSD** (validated in `test_xsd`). The XSD does not enforce *which* exempt code
+applies; confirming S2 vs an `OperacionExenta`/`CausaExencion` block is the right code for a
+given exemption is a business-rule question for the product owner — not a structural gap.
+
+## (original) Exempt-rate Desglose — known simplification (XSD-gated)
 
 `records._desglose` emits one `DetalleDesglose` per IVA rate group. For rate > 0 it
 writes `CalificacionOperacion=S1` + `TipoImpositivo` + `CuotaRepercutida`. For an

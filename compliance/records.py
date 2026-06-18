@@ -82,6 +82,30 @@ def compute_huella_anulacion(*, id_emisor, num_serie, fecha_exp,
     return hashlib.sha256(concat.encode("utf-8")).hexdigest().upper()
 
 
+# SIF (Sistema Informático de Facturación) identity — the software producing the
+# record. NombreRazon/NIF identify the producer; for v1 we record the issuer as a
+# self-developed-style producer (XSD-valid). The FacturaSimple-as-SaaS producer
+# fiscal identity is a real-data item flagged in design.md.
+SIF_NAME = "FacturaSimple"
+SIF_ID = "01"
+SIF_VERSION = "1.0"
+SIF_INSTALACION = "001"
+
+
+def _sistema_informatico(parent, issuer_nif, issuer_name):
+    """Append the mandatory SistemaInformatico block (SistemaInformaticoType)."""
+    si = _e(parent, SF, "SistemaInformatico")
+    _e(si, SF, "NombreRazon", issuer_name)
+    _e(si, SF, "NIF", issuer_nif)
+    _e(si, SF, "NombreSistemaInformatico", SIF_NAME)
+    _e(si, SF, "IdSistemaInformatico", SIF_ID)
+    _e(si, SF, "Version", SIF_VERSION)
+    _e(si, SF, "NumeroInstalacion", SIF_INSTALACION)
+    _e(si, SF, "TipoUsoPosibleSoloVerifactu", "S")
+    _e(si, SF, "TipoUsoPosibleMultiOT", "N")
+    _e(si, SF, "IndicadorMultiplesOT", "N")
+
+
 def _desglose(alta, groups):
     """Build one DetalleDesglose per IVA rate group (from invoicing.calc)."""
     desg = _e(alta, SF, "Desglose")
@@ -151,14 +175,15 @@ def build_registro_alta(*, issuer_nif, issuer_name, num_serie, fecha_exp,
     else:
         _e(enc, SF, "PrimerRegistro", "S")
 
+    _sistema_informatico(alta, issuer_nif, issuer_name)
     _e(alta, SF, "FechaHoraHusoGenRegistro", fecha_hora)
     _e(alta, SF, "TipoHuella", "01")  # SHA-256
     _e(alta, SF, "Huella", huella)
     return alta, huella, cuota_total, importe_total
 
 
-def build_registro_anulacion(*, issuer_nif, num_serie, fecha_exp, fecha_hora,
-                             previous=None):
+def build_registro_anulacion(*, issuer_nif, issuer_name, num_serie, fecha_exp,
+                             fecha_hora, previous=None):
     """Return ``(registro_anulacion_element, huella)`` voiding a prior record.
 
     References the annulled invoice's identity (IDFactura of the original alta)
@@ -187,10 +212,29 @@ def build_registro_anulacion(*, issuer_nif, num_serie, fecha_exp, fecha_hora,
     else:
         _e(enc, SF, "PrimerRegistro", "S")
 
+    _sistema_informatico(anul, issuer_nif, issuer_name)
     _e(anul, SF, "FechaHoraHusoGenRegistro", fecha_hora)
     _e(anul, SF, "TipoHuella", "01")
     _e(anul, SF, "Huella", huella)
     return anul, huella
+
+
+def wrap_envelope(registros, *, issuer_nif, issuer_name):
+    """Wrap built record element(s) in a `RegFactuSistemaFacturacion` envelope.
+
+    The submission/XSD-validation unit: `Cabecera` (the obligado emisor) + one
+    `RegistroFactura` per record. Each ``registros`` element is an `sf`-namespaced
+    `RegistroAlta`/`RegistroAnulacion` from the builders above.
+    """
+    root = ET.Element(f"{{{LR}}}RegFactuSistemaFacturacion")
+    cab = _e(root, LR, "Cabecera")
+    obl = _e(cab, SF, "ObligadoEmision")
+    _e(obl, SF, "NombreRazon", issuer_name)
+    _e(obl, SF, "NIF", issuer_nif)
+    for registro in registros:
+        rf = _e(root, LR, "RegistroFactura")
+        rf.append(registro)
+    return root
 
 
 def serialize(element) -> str:

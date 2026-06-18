@@ -4,12 +4,14 @@ Deterministic linkage is covered here. The fork-safety clause of Requirement 5
 (a true concurrent race serialises into a linear chain) needs real row locks and
 is Postgres-gated like T-012's ConcurrentIssuanceTests — see the handoff.
 """
+import threading
 from xml.etree import ElementTree as ET
 
-from django.test import TestCase
+from django.db import connection
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 import compliance
-from compliance.models import VerifactuRecord
+from compliance.models import IssuerChain, VerifactuRecord
 from compliance.records import SF
 from compliance.tests.factories import (
     ISSUER_NAME,
@@ -82,3 +84,55 @@ class AnnulmentTests(TestCase):
         self.assertEqual(anul.previous_huella, rec2.huella)
         self.assertEqual(anul.previous_record_id, rec2.id)
         self.assertEqual(VerifactuRecord.objects.count(), 3)
+
+
+@skipUnlessDBFeature("has_select_for_update")
+class ConcurrentChainTests(TransactionTestCase):
+    """Requirement 5 (fork-safety) — true concurrent generation serialises.
+
+    Skipped on the SQLite fallback (no ``select_for_update`` row lock, no
+    cross-thread in-memory DB); the deterministic linkage tests above cover the
+    lock-less path. On PostgreSQL (AD-6) this proves two racing ``generate_alta``
+    calls for the same issuer serialise on the ``IssuerChain`` row lock into a
+    linear chain — no two records share a predecessor (no fork).
+    """
+
+    def test_two_racing_altas_form_a_linear_chain(self):
+        series_a = make_series(prefix="A")
+        series_b = make_series(prefix="B")
+        ready = threading.Barrier(2)
+        errors = []
+
+        def worker(series):
+            try:
+                invoice = issued_invoice(series=series, lines=[(1, "100.00", "21")])
+                ready.wait()
+                compliance.generate_alta(
+                    invoice, issuer_nif=ISSUER_NIF, issuer_name=ISSUER_NAME,
+                )
+            except Exception as exc:  # noqa: BLE001
+                errors.append(exc)
+            finally:
+                connection.close()
+
+        threads = [
+            threading.Thread(target=worker, args=(series_a,)),
+            threading.Thread(target=worker, args=(series_b,)),
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        self.assertEqual(errors, [])
+        records = list(VerifactuRecord.objects.order_by("id"))
+        self.assertEqual(len(records), 2)
+        # Exactly one root (PrimerRegistro); the other chains on it — no fork.
+        roots = [r for r in records if r.previous_record_id is None]
+        self.assertEqual(len(roots), 1)
+        tail = [r for r in records if r.previous_record_id is not None]
+        self.assertEqual(len(tail), 1)
+        self.assertEqual(tail[0].previous_record_id, roots[0].id)
+        self.assertNotEqual(records[0].huella, records[1].huella)
+        head = IssuerChain.objects.get(issuer_nif=ISSUER_NIF)
+        self.assertEqual(head.last_huella, tail[0].huella)

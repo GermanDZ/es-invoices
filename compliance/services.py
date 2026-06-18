@@ -95,6 +95,7 @@ def generate_alta(invoice, *, issuer_nif, issuer_name, fecha_hora=None,
             invoice=invoice,
             record_type=VerifactuRecord.ALTA,
             issuer_nif=issuer_nif,
+            issuer_name=issuer_name,
             num_serie=num_serie,
             fecha_expedicion=fecha_exp,
             tipo_factura="F1",
@@ -123,12 +124,14 @@ def generate_anulacion(original, *, issuer_name=None, fecha_hora=None,
     annulment record.
     """
     issuer_nif = original.issuer_nif
+    issuer_name = issuer_name or original.issuer_name
     fecha_hora = fecha_hora or _now_stamp()
 
     with transaction.atomic():
         head, prev = _lock_chain(issuer_nif)
         element, huella = records.build_registro_anulacion(
             issuer_nif=issuer_nif,
+            issuer_name=issuer_name,
             num_serie=original.num_serie,
             fecha_exp=original.fecha_expedicion,
             fecha_hora=fecha_hora,
@@ -144,6 +147,7 @@ def generate_anulacion(original, *, issuer_name=None, fecha_hora=None,
             invoice=original.invoice,
             record_type=VerifactuRecord.ANULACION,
             issuer_nif=issuer_nif,
+            issuer_name=issuer_name,
             num_serie=original.num_serie,
             fecha_expedicion=original.fecha_expedicion,
             tipo_factura=original.tipo_factura,
