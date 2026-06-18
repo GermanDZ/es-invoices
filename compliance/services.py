@@ -58,13 +58,18 @@ def _lock_chain(issuer_nif: str) -> tuple[IssuerChain, VerifactuRecord | None]:
 
 
 def generate_alta(invoice, *, issuer_nif, issuer_name, fecha_hora=None,
-                  signer=None):
+                  signer=None, tipo_factura="F1", tipo_rectificativa=None,
+                  rectifies=None):
     """Validate, build, chain, (optionally) sign and persist an alta record.
 
     ``signer`` is an optional ``element -> signed_xml_str`` callable
     (:mod:`compliance.signing`). ``fecha_hora`` may be pinned for deterministic
     tests; it defaults to now. Returns the persisted
     :class:`~compliance.models.VerifactuRecord`.
+
+    For a factura rectificativa (T-017, UC-004), pass ``tipo_factura`` in R1–R5,
+    ``tipo_rectificativa`` ("S"/"I") and ``rectifies`` — the rectified invoice's
+    prior alta record. The defaults produce an ordinary F1 alta unchanged.
     """
     validate_issuable(invoice, issuer_nif=issuer_nif, issuer_name=issuer_name)
     fecha_hora = fecha_hora or _now_stamp()
@@ -84,6 +89,9 @@ def generate_alta(invoice, *, issuer_nif, issuer_name, fecha_hora=None,
             recipient_name=invoice.recipient_name,
             recipient_taxid=invoice.recipient_taxid,
             previous=prev,
+            tipo_factura=tipo_factura,
+            tipo_rectificativa=tipo_rectificativa,
+            rectifies=rectifies,
         )
         signed = False
         xml = records.serialize(element)
@@ -98,7 +106,7 @@ def generate_alta(invoice, *, issuer_nif, issuer_name, fecha_hora=None,
             issuer_name=issuer_name,
             num_serie=num_serie,
             fecha_expedicion=fecha_exp,
-            tipo_factura="F1",
+            tipo_factura=tipo_factura,
             cuota_total=cuota,
             importe_total=importe,
             fecha_hora_gen=fecha_hora,

@@ -85,3 +85,97 @@ def issue_invoice(invoice: Invoice) -> Invoice:
             continue
 
     raise last_error
+
+
+def _original_alta(invoice):
+    """The earliest alta VerifactuRecord for ``invoice`` (the one to act on)."""
+    from compliance.models import VerifactuRecord
+
+    return (
+        invoice.verifactu_records.filter(record_type=VerifactuRecord.ALTA)
+        .order_by("id")
+        .first()
+    )
+
+
+def issue_rectificativa(rectificativa, original, *, issuer_nif, issuer_name,
+                        tipo_factura="R1", fecha_hora=None, signer=None,
+                        gateway=None):
+    """Issue a draft ``rectificativa`` *por sustitución* correcting ``original`` (UC-004).
+
+    The caller builds the draft ``rectificativa`` like any invoice — its own
+    (corrected, fully-restated) line items, recipient snapshot and a dedicated
+    rectificativa ``series``. This verb then: issues it gap-free
+    (:func:`issue_invoice`), generates a rectificativa-type *alta*
+    (``TipoFactura=R1``, ``TipoRectificativa=S``) referencing ``original``'s alta
+    record, submits it via the AD-3 gateway, and — on an **accepted or disabled**
+    outcome — links ``original.corrected_by = rectificativa`` (a rejection leaves
+    the original untouched; UC-004 9a). Returns ``(rectificativa, record, outcome)``.
+    """
+    import compliance
+    from submission.gateway import SubmissionStatus
+    from submission.services import submit_record
+
+    if not original.issued:
+        raise ValidationError("Only an issued invoice can be corrected (UC-004).")
+    original_record = _original_alta(original)
+    if original_record is None:
+        raise ValidationError("Original invoice has no alta record to rectify.")
+
+    # Issue the rectificativa in its own series (gap-free; rolls back without
+    # consuming a number if it is not issuable — requirement 6).
+    issue_invoice(rectificativa)
+
+    record = compliance.generate_alta(
+        rectificativa,
+        issuer_nif=issuer_nif,
+        issuer_name=issuer_name,
+        fecha_hora=fecha_hora,
+        signer=signer,
+        tipo_factura=tipo_factura,
+        tipo_rectificativa="S",
+        rectifies=original_record,
+    )
+    outcome = submit_record(record, gateway=gateway)
+    if outcome.status in (SubmissionStatus.ACCEPTED, SubmissionStatus.DISABLED):
+        original.corrected_by = rectificativa
+        original.save(update_fields=["corrected_by"])
+    return rectificativa, record, outcome
+
+
+def annul_invoice(invoice, *, issuer_name=None, fecha_hora=None, signer=None,
+                  gateway=None):
+    """Annul an issued invoice's Verifactu record — sent-in-error only (UC-005).
+
+    Reserved for records that should never have existed: **refuses** when the
+    invoice already carries a rectificativa (``corrected_by`` set) — a real-sale
+    correction belongs to :func:`issue_rectificativa` (UC-005 exception 2b).
+    Reuses the shipped :func:`compliance.generate_anulacion` + the AD-3 gateway;
+    on an **accepted or disabled** outcome marks ``invoice.annulled`` (a rejection
+    leaves the prior state; UC-005 5a). Creates **no** new Invoice and consumes no
+    series number. Returns ``(record, outcome)``.
+    """
+    import compliance
+    from submission.gateway import SubmissionStatus
+    from submission.services import submit_record
+
+    if not invoice.issued:
+        raise ValidationError("Only an issued invoice can be annulled (UC-005).")
+    if invoice.corrected_by_id is not None:
+        raise ValidationError(
+            "Invoice has a rectificativa; a real sale is corrected with a factura "
+            "rectificativa, not annulled (UC-005)."
+        )
+    original_record = _original_alta(invoice)
+    if original_record is None:
+        raise ValidationError("Invoice has no alta record to annul.")
+
+    record = compliance.generate_anulacion(
+        original_record, issuer_name=issuer_name, fecha_hora=fecha_hora,
+        signer=signer,
+    )
+    outcome = submit_record(record, gateway=gateway)
+    if outcome.status in (SubmissionStatus.ACCEPTED, SubmissionStatus.DISABLED):
+        invoice.annulled = True
+        invoice.save(update_fields=["annulled"])
+    return record, outcome

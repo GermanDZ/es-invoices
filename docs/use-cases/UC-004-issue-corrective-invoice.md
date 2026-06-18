@@ -2,7 +2,7 @@
 type: use-case
 id: UC-004
 title: Issue a corrective invoice (factura rectificativa)
-status: draft
+status: approved
 traces-from: [REQ-004]
 owner-role: analyst
 ---

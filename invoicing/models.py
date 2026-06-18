@@ -75,6 +75,22 @@ class Invoice(models.Model):
         related_name="invoices",
     )
 
+    # Corrective / cancellation linkage (T-017, S-5) --------------------------
+    # ``corrected_by`` points an issued original at the factura rectificativa that
+    # supersedes it (UC-004); the reverse manager ``corrects`` gives the
+    # rectificativa its reference back to the original(s) it corrects. ``annulled``
+    # marks a record voided in error (UC-005) — excluded from the active set but
+    # never deleted. Both are set *after* issuance and are therefore deliberately
+    # absent from ``_IMMUTABLE_WHEN_ISSUED`` (post-issue mutation is allowed).
+    corrected_by = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="corrects",
+    )
+    annulled = models.BooleanField(default=False)
+
     # Tax config + persisted computed totals (filled at issue time) -----------
     irpf_rate = models.DecimalField(
         max_digits=5, decimal_places=2, default=Decimal("0")

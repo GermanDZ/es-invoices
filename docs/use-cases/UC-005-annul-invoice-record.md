@@ -2,7 +2,7 @@
 type: use-case
 id: UC-005
 title: Annul an invoice record (Verifactu anulación)
-status: draft
+status: approved
 traces-from: [REQ-004]
 owner-role: analyst
 ---

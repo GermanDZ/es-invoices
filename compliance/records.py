@@ -128,15 +128,24 @@ def _desglose(alta, groups):
 
 def build_registro_alta(*, issuer_nif, issuer_name, num_serie, fecha_exp,
                         fecha_hora, totals, recipient_name, recipient_taxid,
-                        descripcion="Factura", previous=None):
+                        descripcion="Factura", previous=None,
+                        tipo_factura="F1", tipo_rectificativa=None,
+                        rectifies=None):
     """Return ``(registro_alta_element, huella, cuota_total, importe_total)``.
 
     ``totals`` is an :class:`invoicing.calc.InvoiceTotals`. ``previous`` is the
     prior :class:`~compliance.models.VerifactuRecord` for this issuer (or None
     for the first record). ImporteTotal is base+IVA (IRPF retention is **not**
     part of the Verifactu importe).
+
+    **Rectificativa (T-017, UC-004).** A factura rectificativa is an *alta* with
+    ``tipo_factura`` in R1–R5 and ``tipo_rectificativa`` "S" (sustitución) / "I"
+    (diferencias); ``rectifies`` is the rectified invoice's prior alta
+    :class:`~compliance.models.VerifactuRecord`, which yields the
+    ``FacturasRectificadas`` reference and — for sustitución — the
+    ``ImporteRectificacion`` (the substituted base/cuota). The defaults keep an
+    ordinary F1 alta byte-identical to the pre-T-017 builder.
     """
-    tipo_factura = "F1"
     cuota_total = _d2(totals.iva_total)
     importe_total = _d2(Decimal(totals.taxable_base) + Decimal(totals.iva_total))
     huella_anterior = previous.huella if previous else None
@@ -156,6 +165,22 @@ def build_registro_alta(*, issuer_nif, issuer_name, num_serie, fecha_exp,
     _e(idf, SF, "FechaExpedicionFactura", fecha_exp)
     _e(alta, SF, "NombreRazonEmisor", issuer_name)
     _e(alta, SF, "TipoFactura", tipo_factura)
+    # Rectificativa block — XSD order: TipoRectificativa, FacturasRectificadas,
+    # ImporteRectificacion (all between TipoFactura and DescripcionOperacion).
+    if tipo_rectificativa is not None:
+        _e(alta, SF, "TipoRectificativa", tipo_rectificativa)
+    if rectifies is not None:
+        rects = _e(alta, SF, "FacturasRectificadas")
+        idr = _e(rects, SF, "IDFacturaRectificada")
+        _e(idr, SF, "IDEmisorFactura", rectifies.issuer_nif)
+        _e(idr, SF, "NumSerieFactura", rectifies.num_serie)
+        _e(idr, SF, "FechaExpedicionFactura", rectifies.fecha_expedicion)
+        if tipo_rectificativa == "S":
+            # Sustitución carries the substituted (original) base + cuota.
+            imp = _e(alta, SF, "ImporteRectificacion")
+            base_rect = Decimal(rectifies.importe_total) - Decimal(rectifies.cuota_total)
+            _e(imp, SF, "BaseRectificada", _d2(base_rect))
+            _e(imp, SF, "CuotaRectificada", _d2(rectifies.cuota_total))
     _e(alta, SF, "DescripcionOperacion", descripcion)
     dests = _e(alta, SF, "Destinatarios")
     dest = _e(dests, SF, "IDDestinatario")

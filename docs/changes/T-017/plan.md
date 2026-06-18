@@ -8,6 +8,11 @@ plan: docs/roadmap.md#construction
 depends-on: [T-013, T-014]
 blocks: [T-018]
 last-synced: ""
+touches:
+  - invoicing/
+  - compliance/
+  - docs/use-cases/UC-004-issue-corrective-invoice.md
+  - docs/use-cases/UC-005-annul-invoice-record.md
 ---
 
 # T-017 — Corrective / cancellation invoices (rectificativa + anulación)
@@ -174,12 +179,12 @@ enum (that is T-018).
 
 ## Operations
 
-- [ ] Add `Invoice.corrected_by` (nullable self-FK) and `Invoice.annulled` (bool) + migration; confirm they are excluded from the issued-immutability set (post-issue mutation must be allowed).
-- [ ] Implement `annul_invoice()` in `invoicing/services.py`: guardrail (refuse if `corrected_by` set), call `generate_anulacion()` + `submit_record()`, mark `annulled` on acceptance/disabled — transactional, no new Invoice.
-- [ ] Extend `compliance` (`build_registro_alta` + `generate_alta`) to carry rectificativa metadata (`TipoFactura=R1`, `TipoRectificativa=S`, rectified reference) into the alta XML.
-- [ ] Implement `issue_rectificativa()` in `invoicing/services.py`: clone-from-original into a rectificativa series, recompute totals, number gap-free, generate rectificativa alta + submit, mark original `corrected` on acceptance.
-- [ ] (tester) Write `compliance/tests/test_rectificativa.py` and `invoicing/tests/test_corrective.py` covering all six requirements' scenarios incl. mandatory-field/no-number-burn and the annulment guardrail; run `.venv/bin/python -m django test invoicing compliance`.
-- [ ] (analyst) Promote `UC-004` and `UC-005` `draft → approved` via `/openup-create-use-case` (re-run through the rubric), reflecting the v1 por-sustitución / R1 scope assumptions.
+- [x] Add `Invoice.corrected_by` (nullable self-FK) and `Invoice.annulled` (bool) + migration; confirm they are excluded from the issued-immutability set (post-issue mutation must be allowed).
+- [x] Implement `annul_invoice()` in `invoicing/services.py`: guardrail (refuse if `corrected_by` set), call `generate_anulacion()` + `submit_record()`, mark `annulled` on acceptance/disabled — transactional, no new Invoice.
+- [x] Extend `compliance` (`build_registro_alta` + `generate_alta`) to carry rectificativa metadata (`TipoFactura=R1`, `TipoRectificativa=S`, rectified reference) into the alta XML.
+- [x] Implement `issue_rectificativa()` in `invoicing/services.py`: clone-from-original into a rectificativa series, recompute totals, number gap-free, generate rectificativa alta + submit, mark original `corrected` on acceptance.
+- [x] (tester) Write `compliance/tests/test_rectificativa.py` and `invoicing/tests/test_corrective.py` covering all six requirements' scenarios incl. mandatory-field/no-number-burn and the annulment guardrail; run `.venv/bin/python -m django test invoicing compliance`.
+- [x] (analyst) Promote `UC-004` and `UC-005` `draft → approved` via `/openup-create-use-case` (re-run through the rubric), reflecting the v1 por-sustitución / R1 scope assumptions.
 
 ## Norms
 
