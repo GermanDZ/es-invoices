@@ -46,7 +46,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | ID | Title | Status | Priority | Depends-on |
 |----|-------|--------|----------|------------|
 | T-010 | AEAT `preproducción` submission PoC (3 proofs) | completed (2026-06-17) | high | T-006, T-007 |
-| T-011 | Secure user-certificate upload + encrypted storage | pending | high | T-010 |
+| T-011 | Secure user-certificate upload + encrypted storage | in-progress | high | T-010 |
 | T-012 | Invoicing core: line items, IVA/IRPF, gap-free numbering | pending | high | T-006 |
 | T-013 | Compliance/Verifactu module: record gen + hash-chain + XAdES | pending | high | T-010, T-012 |
 | T-014 | AEAT submission adapter behind AD-3 interface | pending | high | T-011, T-013 |
