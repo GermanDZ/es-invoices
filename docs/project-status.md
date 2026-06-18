@@ -2,10 +2,10 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 11
-**Iteration Goal**: T-012 — Invoicing core: line items, IVA/IRPF, gap-free numbering
-**Status**: completed
-**Current Task**: T-012
+**Iteration**: 12
+**Iteration Goal**: T-013 — Compliance/Verifactu module: record gen + hash-chain + XAdES
+**Status**: in-progress
+**Current Task**: T-013
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
