@@ -58,3 +58,6 @@ poc/aeat-preproduccion/captured/
 .env
 .env.*
 !.env.example
+
+# T-046: derived run-log consolidation (source = docs/agent-logs/runs/*.jsonl)
+docs/agent-logs/agent-runs.jsonl
