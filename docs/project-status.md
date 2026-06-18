@@ -4,7 +4,7 @@
 **Phase**: construction
 **Iteration**: 12
 **Iteration Goal**: T-013 — Compliance/Verifactu module: record gen + hash-chain + XAdES
-**Status**: in-progress
+**Status**: completed
 **Current Task**: T-013
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
@@ -12,6 +12,8 @@
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 12** (2026-06-18): T-013 complete — compliance/Verifactu module (Django `compliance` app, AD-2). Versioned public API (lazy); legal-field validation; `RegistroAlta`/`RegistroAnulacion` builders + AEAT-proven `huella`; per-issuer `IssuerChain` row-lock for fork-safe chaining; XAdES-enveloped signing (signxml) verifying + tamper-failing; full `RegFactu` envelope validates against the vendored AEAT XSDs (single-rate + exempt). 17 compliance tests (1 Postgres-gated), full suite 54 green. Generates/persists signed records; submission is T-014.
 
 - **Iteration 11** (2026-06-18): T-012 complete — invoicing core (Django `invoicing` app). Series/Invoice/LineItem models; pure-`Decimal` per-IVA-rate-group calc + invoice-level IRPF (R-02); transactional `issue_invoice` with `select_for_update` + unique `(series,number)` + bounded retry for gap-free, duplicate-free numbering; validation failure rolls back without consuming a number; issued invoices immutable on number/issue-date with recipient snapshot + totals persisted. 15 tests green (Postgres-gated true-concurrency test), full suite 37 green.
 
