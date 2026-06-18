@@ -177,6 +177,10 @@ def send_invoice_email(invoice, *, issuer, to_email=None, body=None):
     message.attach(f"factura-{num_serie}.pdf", pdf, "application/pdf")
     sent = message.send()
     if sent:
+        # Persist the delivery state (T-018, S-6): a confirmed send advances the
+        # invoice to status "sent". Only on a non-zero send — a zero/failed send
+        # leaves sent_at untouched (Requirement 4).
+        invoice.mark_sent()
         # Instrumentation only — NumSerie, no recipient PII (RGPD).
         logger.info("invoice_email_sent num_serie=%s", num_serie)
     return sent

@@ -3,6 +3,8 @@
 Uses Django's in-memory (locmem) email backend so the outbox is inspectable and
 nothing leaves the process.
 """
+from unittest import mock
+
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
@@ -72,3 +74,27 @@ class SendInvoiceEmailTests(TestCase):
         with self.assertRaises(ValidationError):
             send_invoice_email(draft, issuer=ISSUER, to_email="cliente@example.com")
         self.assertEqual(len(mail.outbox), 0)
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class SendPersistsStatusTests(TestCase):
+    """T-018 Requirements 3, 4: a confirmed send advances the invoice to 'sent';
+    a zero/failed send leaves it untouched."""
+
+    def test_successful_send_marks_invoice_sent(self):
+        inv = _issued()
+        self.assertEqual(inv.status, "issued")
+        send_invoice_email(inv, issuer=ISSUER, to_email="cliente@example.com")
+        inv.refresh_from_db()
+        self.assertIsNotNone(inv.sent_at)
+        self.assertEqual(inv.status, "sent")
+
+    def test_zero_send_leaves_invoice_unsent(self):
+        """A send returning 0 (nothing delivered) must not stamp sent_at."""
+        inv = _issued()
+        with mock.patch("documents.services.EmailMessage.send", return_value=0):
+            sent = send_invoice_email(inv, issuer=ISSUER, to_email="cliente@example.com")
+        self.assertEqual(sent, 0)
+        inv.refresh_from_db()
+        self.assertIsNone(inv.sent_at)
+        self.assertEqual(inv.status, "issued")

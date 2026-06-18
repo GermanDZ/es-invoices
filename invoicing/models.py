@@ -91,6 +91,15 @@ class Invoice(models.Model):
     )
     annulled = models.BooleanField(default=False)
 
+    # Delivery state (T-018, S-6) ---------------------------------------------
+    # ``sent_at`` records when the invoice was last successfully emailed to its
+    # recipient (set by ``documents.services.send_invoice_email`` on a confirmed
+    # send). ``None`` means not-yet-sent. Like ``corrected_by``/``annulled`` it is
+    # a post-issuance overlay, so it is deliberately absent from
+    # ``_IMMUTABLE_WHEN_ISSUED``. AEAT submission outcome is *not* tracked here —
+    # that lives in ``submission.SubmissionAttempt`` (T-014).
+    sent_at = models.DateTimeField(null=True, blank=True)
+
     # Tax config + persisted computed totals (filled at issue time) -----------
     irpf_rate = models.DecimalField(
         max_digits=5, decimal_places=2, default=Decimal("0")
@@ -124,6 +133,33 @@ class Invoice(models.Model):
     def compute_totals(self):
         """Recompute totals from the current line items (does not save)."""
         return calc.compute_totals(self.items.all(), irpf_rate=self.irpf_rate)
+
+    @property
+    def status(self):
+        """Derived lifecycle state (T-018, S-6): draft → issued → sent.
+
+        ``issued`` and ``sent_at`` are the persisted facts; this is a read-only
+        view over them, so there is no separate status column to drift. Does not
+        reflect AEAT submission outcome (T-014) or correction/annulment overlays.
+        """
+        if not self.issued:
+            return "draft"
+        if self.sent_at is None:
+            return "issued"
+        return "sent"
+
+    def mark_sent(self, when=None):
+        """Stamp ``sent_at`` and persist just that field (T-018 Requirement 3).
+
+        Called from the delivery path on a confirmed send. ``when`` defaults to
+        now; passing it lets a re-send advance the timestamp deterministically.
+        Writes ``sent_at`` only (``update_fields``) so it cannot trip the
+        issued-identity guard or clobber concurrent writes to other fields.
+        """
+        from django.utils import timezone
+
+        self.sent_at = when or timezone.now()
+        self.save(update_fields=["sent_at"])
 
     def save(self, *args, **kwargs):
         """Reject mutation of identifying fields on an already-issued invoice.

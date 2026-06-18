@@ -158,18 +158,18 @@ delivery point owns the state transition. No new app, no status enum table.
 
 ## Operations
 
-- [ ] Add `sent_at` (nullable `DateTimeField`) and a derived `status` property
+- [x] Add `sent_at` (nullable `DateTimeField`) and a derived `status` property
       to `Invoice`, plus a `mark_sent(when=None)` helper that stamps + saves.
-- [ ] Generate and commit the migration (`python manage.py makemigrations
+- [x] Generate and commit the migration (`python manage.py makemigrations
       invoicing`); confirm it only adds the column.
-- [ ] Wire `send_invoice_email` to call `mark_sent()` after a confirmed non-zero
+- [x] Wire `send_invoice_email` to call `mark_sent()` after a confirmed non-zero
       send (no stamp on zero/raise).
-- [ ] (developer) Add model tests: `status` returns draft/issued/sent across the
+- [x] (developer) Add model tests: `status` returns draft/issued/sent across the
       three field combinations; stamping an issued invoice does not trip the
       immutability guard; re-send advances `sent_at`.
-- [ ] (developer) Add service test: a successful `send_invoice_email` leaves the
+- [x] (developer) Add service test: a successful `send_invoice_email` leaves the
       reloaded invoice `status == "sent"`; a zero-send leaves `sent_at is None`.
-- [ ] (tester) Run `python manage.py test invoicing documents` then the full
+- [x] (tester) Run `python manage.py test invoicing documents` then the full
       suite `python manage.py test`; confirm green and no migration drift.
 
 ## Norms
