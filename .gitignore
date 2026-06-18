@@ -9,6 +9,9 @@ env/
 ENV/
 .venv
 
+# Django local dev database (SQLite fallback when no Postgres configured)
+db.sqlite3
+
 # IDE
 .vscode/
 .idea/

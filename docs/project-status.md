@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 9
-**Iteration Goal**: T-010 — AEAT `preproducción` submission PoC (3 proofs)
-**Status**: completed
-**Current Task**: T-010
+**Iteration**: 10
+**Iteration Goal**: T-011 — Secure user-certificate upload + encrypted storage
+**Status**: in-progress
+**Current Task**: T-011
 **Started**: 2026-06-15
-**Iteration Started**: 2026-06-15
-**Last Updated**: 2026-06-17
-**Updated By**: sync-status.py
+**Iteration Started**: 2026-06-18
+**Last Updated**: 2026-06-18
+**Updated By**: openup-start-iteration
 
 ## Notes
 

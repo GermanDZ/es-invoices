@@ -1,0 +1,5 @@
+# FacturaSimple runtime dependencies (bootstrapped by T-011).
+# Pinned to major ranges; AD-5 (Python/Django), AD-6 (PostgreSQL).
+Django>=5.0,<6.0
+cryptography>=42         # AES-256-GCM at-rest encryption + PKCS#12 loading
+psycopg[binary]>=3.1     # PostgreSQL driver (AD-6); SQLite is the local/test fallback
