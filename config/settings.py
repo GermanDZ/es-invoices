@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "certificates",
     "invoicing",
     "compliance",
+    "submission",
 ]
 
 MIDDLEWARE = [
@@ -99,3 +100,21 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# AEAT SUBMISSION (T-014, AD-3) -------------------------------------------------
+# The submission adapter only calls the AEAT when AEAT_SUBMISSION_ENABLED is truthy
+# — a config-read kill-switch (default OFF) so local/CI never reach the tax
+# authority by accident. AEAT_ENV selects the target; the endpoint defaults to the
+# preproducción (sandbox) address and must be overridden explicitly for production,
+# so production is never the default. See docs/changes/T-014/plan.md §Rollout.
+AEAT_SUBMISSION_ENABLED = _env("AEAT_SUBMISSION_ENABLED", "0") == "1"
+AEAT_ENV = _env("AEAT_ENV", "preproduccion")  # "preproduccion" | "produccion"
+# Preproducción VERI*FACTU sending endpoint (prewww1 — sandbox, no tax effect).
+AEAT_ENDPOINT = _env(
+    "AEAT_ENDPOINT",
+    "https://prewww1.aeat.es/wlpl/TIKE-CONT/ws/SistemaFacturacion/VerifactuSOAP",
+)
+# Bounded transport retries on timeout / connection / HTTP 5xx (not on business
+# rejections). 1 + this many retries are attempted before degrading to "pending".
+AEAT_SUBMISSION_MAX_RETRIES = int(_env("AEAT_SUBMISSION_MAX_RETRIES", "3"))
+AEAT_SUBMISSION_TIMEOUT = int(_env("AEAT_SUBMISSION_TIMEOUT", "45"))

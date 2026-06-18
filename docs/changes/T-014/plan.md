@@ -7,6 +7,7 @@ estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
 depends-on: [T-011, T-013]
 blocks: [T-017, T-018]
+touches: [submission/, config/settings.py, requirements.txt]
 last-synced: ""
 ---
 
@@ -176,27 +177,27 @@ interface without touching call sites — R-03's pre-agreed fallback seam.
 
 ## Operations
 
-- [ ] Scaffold the `submission` app (`__init__`, `apps`), register it in
+- [x] Scaffold the `submission` app (`__init__`, `apps`), register it in
       `config/settings.py`, and add the `AEAT_*` env-read settings
       (`AEAT_ENV` default preproducción, `AEAT_ENDPOINT`, `AEAT_SUBMISSION_ENABLED`
       default off, `AEAT_SUBMISSION_MAX_RETRIES` default 3).
-- [ ] Define the AD-3 boundary in `submission/gateway.py`: a `SubmissionGateway`
+- [x] Define the AD-3 boundary in `submission/gateway.py`: a `SubmissionGateway`
       ABC with `submit(record) -> SubmissionOutcome`, the `SubmissionOutcome`
       dataclass (estado/status, aeat_code, csv, raw), and a status enum
       (accepted / rejected / pending / disabled).
-- [ ] Implement `AeatDirectAdapter` in `submission/aeat_direct.py` — open the
+- [x] Implement `AeatDirectAdapter` in `submission/aeat_direct.py` — open the
       mTLS session from `get_cert_material(owner)`, build the SOAP envelope around
       `record.xml`, POST to the resolved endpoint, and parse estado/code/CSV
       (porting the PoC's envelope + parse).
-- [ ] Add the `SubmissionAttempt` model + migration, then implement
+- [x] Add the `SubmissionAttempt` model + migration, then implement
       `submission/services.submit_record(record)` — short-circuit when the flag is
       off, call the gateway, persist the outcome, and apply the bounded
       transport-retry → `pending` policy (no retry on `Incorrecto`).
-- [ ] (tester) Unit-test the suite with the AEAT transport stubbed: outcome
+- [x] (tester) Unit-test the suite with the AEAT transport stubbed: outcome
       parsing for Correcto/AceptadoConErrores/Incorrecto, retry→pending on
       transport failure, no-retry on rejection, flag-off short-circuit,
       cert-plaintext-only-via-service, and gateway-interface conformance.
-- [ ] (tester) Run `python manage.py makemigrations --check` + the full test
+- [x] (tester) Run `python manage.py makemigrations --check` + the full test
       suite green; provide a cert-gated preproducción smoke path that skips
       cleanly when `AEAT_*` env is absent.
 
