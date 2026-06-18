@@ -4,14 +4,16 @@
 **Phase**: construction
 **Iteration**: 11
 **Iteration Goal**: T-012 — Invoicing core: line items, IVA/IRPF, gap-free numbering
-**Status**: in-progress
+**Status**: completed
 **Current Task**: T-012
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
-**Updated By**: openup-start-iteration
+**Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 11** (2026-06-18): T-012 complete — invoicing core (Django `invoicing` app). Series/Invoice/LineItem models; pure-`Decimal` per-IVA-rate-group calc + invoice-level IRPF (R-02); transactional `issue_invoice` with `select_for_update` + unique `(series,number)` + bounded retry for gap-free, duplicate-free numbering; validation failure rolls back without consuming a number; issued invoices immutable on number/issue-date with recipient snapshot + totals persisted. 15 tests green (Postgres-gated true-concurrency test), full suite 37 green.
 
 - **Iteration 10** (2026-06-18): T-011 complete — secure user-certificate upload + AES-256-GCM encrypted-at-rest storage (Django certificates app). UserCertificate model, PKCS#12 upload/validation flow, single least-privilege accessor for the AD-3 adapter (T-014), replace/delete + account cascade. 22 tests green; all six requirements graded against the diff.
 

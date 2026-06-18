@@ -1,7 +1,7 @@
 ---
 id: T-012
 title: "Invoicing core: line items, IVA/IRPF, gap-free numbering"
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high   # critical | high | medium | low
 estimate: 2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any
