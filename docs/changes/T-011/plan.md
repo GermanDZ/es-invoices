@@ -7,7 +7,7 @@ estimate: 2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any
 depends-on: [T-010]
 blocks: [T-014]
-touches: [certificates, config]
+touches: [certificates, config, manage.py, requirements.txt, .env.example, .gitignore]
 last-synced: ""    # full git SHA of last code↔spec sync (set by /openup-sync-spec)
 ---
 

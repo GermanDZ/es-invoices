@@ -1,2 +1,3 @@
 {"run_id": "T-011-iter10", "event": "iteration_start", "task_id": "T-011", "goal": "T-011 — Secure user-certificate upload + encrypted storage", "branch": "feat/T-011-cert-upload-storage", "phase": "construction", "ts": "2026-06-18T06:14:41Z"}
 {"run_id": "db595c83c3d9433f9d3e8fe051b6112a", "event": "commit", "task_id": "T-011", "branch": "main", "sha": "c33451322a259318b65ba61ef7e2f0c79776befc", "model": null, "session_id": null, "ts": "2026-06-18T06:20:30Z"}
+{"event": "iteration_complete", "task_id": "T-011", "branch": "feat/T-011-cert-upload-storage", "phase": "construction", "ts": "2026-06-18T07:47:19Z"}
