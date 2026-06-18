@@ -49,7 +49,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-011 | Secure user-certificate upload + encrypted storage | completed (2026-06-18) | high | T-010 |
 | T-012 | Invoicing core: line items, IVA/IRPF, gap-free numbering | completed (2026-06-18) | high | T-006 |
 | T-013 | Compliance/Verifactu module: record gen + hash-chain + XAdES | completed (2026-06-18) | high | T-010, T-012 |
-| T-014 | AEAT submission adapter behind AD-3 interface | pending | high | T-011, T-013 |
+| T-014 | AEAT submission adapter behind AD-3 interface | completed (2026-06-18) | high | T-011, T-013 |
 | T-015 | Client/contact management (recipient fiscal data) | pending | medium | T-012 |
 | T-016 | PDF generation + send by email | pending | medium | T-012 |
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | pending | medium | T-013, T-014 |
@@ -89,3 +89,12 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 > autónomo obligation timeline against the *current* AEAT rollout calendar at build
 > time (O-2 — do **not** hard-code dates); complete the pre-launch RGPD checklist
 > (R-06) before beta.
+
+## Maintenance
+
+Deferred debt enqueued by completed tasks (feature-flag removals, follow-ups). The
+**Status** column is derived — do not hand-edit.
+
+| ID | Title | Status | Priority | Depends-on |
+|----|-------|--------|----------|------------|
+| T-019 | Remove feature flag `AEAT_SUBMISSION_ENABLED` (T-014 fully rolled out) | pending | medium | T-014 |
