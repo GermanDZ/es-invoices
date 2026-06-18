@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-019",
+  "iteration": 18,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "refactor/T-019-aeat-submission-kill-switch-rename",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-019",
+  "session_id": null,
+  "started_at": "2026-06-18T12:53:47Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": true,
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}

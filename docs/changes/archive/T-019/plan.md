@@ -1,7 +1,7 @@
 ---
 id: T-019
 title: Reframe AEAT submission kill-switch as permanent control (rename AEAT_SUBMISSION_ENABLED)
-status: ready
+status: done
 priority: medium
 estimate: 0.5 session
 plan: docs/roadmap.md#maintenance
