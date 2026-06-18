@@ -1,9 +1,9 @@
 ---
 id: T-020
-type: iteration-plan
 title: Dev-only local auth shim (seed user + DEBUG-gated login shortcut)
-status: pending
+status: in-progress
 priority: low
+estimate: 1 session
 plan: docs/roadmap.md#construction
 depends-on: [T-011, T-015]
 blocks: []
@@ -18,9 +18,9 @@ touches:
   - devtools/management/__init__.py
   - devtools/management/commands/__init__.py
   - devtools/management/commands/seed_dev_owner.py
+  - devtools/tests/__init__.py
   - devtools/tests/test_dev_login.py
-traces-from: [VIS-001]
-verified-by: []
+  - devtools/tests/urls.py
 last-synced: ""
 ---
 
@@ -403,6 +403,27 @@ All resolved as non-blocking assumptions (vetoable at review):
    view — was rejected as a weaker production guarantee. — vetoable at review.
 4. **Resolved by scope**: multi-user vs single-operator — `scope.md` D-3 /
    N-5 fix this as single-operator, so the shim seeds exactly one owner.
+
+---
+
+## Operations
+
+Execution checklist for the continue-loop (standard track, solo sequential). The
+board derives `next_action`/`hat` from the first unchecked box.
+
+- [x] 1. (developer) Scaffold the `devtools` app: `__init__.py`, `apps.py`,
+  `management/__init__.py`, `management/commands/__init__.py`, `tests/__init__.py`.
+- [x] 2. (developer) Add `devtools/owner.py` — idempotent `get_or_create_dev_owner`.
+- [x] 3. (developer) Add `devtools/views.py` (DEBUG-guarded `dev_login`) + `devtools/urls.py`.
+- [x] 4. (developer) Add `devtools/management/commands/seed_dev_owner.py`.
+- [x] 5. (developer) Wire `config/settings.py` (DEBUG-gated `devtools` in INSTALLED_APPS
+  + `DEV_LOGIN_REDIRECT` / `DEV_OWNER_*`) and `config/urls.py` (DEBUG-gated `/dev/`
+  include + root redirect).
+- [x] 6. (tester) Add `devtools/tests/test_dev_login.py` + `devtools/tests/urls.py` —
+  unblock flow, production-safety view guard, root redirect, landing override, seed
+  idempotency.
+- [x] 7. (tester) Run `python manage.py test`; 129 passed (123 prior + 6 new), 2
+  Postgres-gated skips. Real-`config.urls` wiring smoke-checked under `DEBUG=True`.
 
 ---
 

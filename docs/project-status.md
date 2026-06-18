@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 18
-**Iteration Goal**: T-019 — Remove feature flag `AEAT_SUBMISSION_ENABLED` (T-014 fully rolled out)
-**Status**: completed
-**Current Task**: T-019
+**Iteration**: 19
+**Iteration Goal**: T-020 — Dev-only local auth shim: a DEBUG-gated /dev/login/ shortcut + seed_dev_owner command in a new devtools app, giving local browser access to product pages with zero production auth surface
+**Status**: in-progress
+**Current Task**: T-020
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
-**Updated By**: sync-status.py
+**Updated By**: openup-start-iteration
 
 ## Notes
 
