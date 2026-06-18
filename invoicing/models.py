@@ -58,10 +58,22 @@ class Invoice(models.Model):
     issue_date = models.DateField(null=True, blank=True)
     issued = models.BooleanField(default=False)
 
-    # Recipient fiscal snapshot (denormalised; client management is T-015) ----
+    # Recipient fiscal snapshot (denormalised) — the legal record. The optional
+    # client FK below records provenance only (T-015); the snapshot remains the
+    # source of truth and is never displaced by it.
     recipient_name = models.CharField(max_length=255)
     recipient_taxid = models.CharField(max_length=32)
     recipient_address = models.CharField(max_length=255, blank=True, default="")
+
+    # Provenance: which saved client (if any) this invoice's recipient came from.
+    # Nullable + additive; never read by numbering or the compliance module.
+    client = models.ForeignKey(
+        "clients.Client",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="invoices",
+    )
 
     # Tax config + persisted computed totals (filled at issue time) -----------
     irpf_rate = models.DecimalField(

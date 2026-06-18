@@ -1,7 +1,7 @@
 ---
 id: T-015
 title: "Client/contact management (recipient fiscal data)"
-status: ready   # proposed → ready → in-progress → done → verified
+status: done   # proposed → ready → in-progress → done → verified
 priority: medium   # critical | high | medium | low
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any
@@ -160,12 +160,12 @@ records provenance and is never consulted by numbering or compliance.
 
 ## Operations
 
-- [ ] Scaffold the `clients` app (`apps.py`, register in `config/settings.py`), add `Client` model (owner FK, `client_type`, `tax_id`, fiscal name, address) and its initial migration; run `python3 manage.py check`.
-- [ ] Implement `clients/validation.py` `validate_spanish_taxid` (DNI/NIE/CIF format + control-char checksum) with unit tests for valid + invalid cases.
-- [ ] Implement `clients/forms.py` `ClientForm` enforcing the type-conditional tax-id rule (B2B mandatory+valid; B2C optional, validated when present).
-- [ ] Implement `clients/services.py` `recipient_snapshot(client)` returning the invoice recipient fields, raising `ValidationError` for an unusable B2B client; add `invoicing/models.py` nullable `client` FK + migration.
-- [ ] Implement owner-scoped CRUD views + `urls.py` + templates following the certificates app pattern (`@login_required`, queryset filtered by `owner`); wire into `config/urls.py`.
-- [ ] (tester) Add `clients/tests/` covering requirements 1–6 (persistence+scoping, B2B/B2C validation, snapshot success/failure, auth redirect); run the full suite + `python3 manage.py check` and confirm green.
+- [x] Scaffold the `clients` app (`apps.py`, register in `config/settings.py`), add `Client` model (owner FK, `client_type`, `tax_id`, fiscal name, address) and its initial migration; run `python3 manage.py check`.
+- [x] Implement `clients/validation.py` `validate_spanish_taxid` (DNI/NIE/CIF format + control-char checksum) with unit tests for valid + invalid cases.
+- [x] Implement `clients/forms.py` `ClientForm` enforcing the type-conditional tax-id rule (B2B mandatory+valid; B2C optional, validated when present).
+- [x] Implement `clients/services.py` `recipient_snapshot(client)` returning the invoice recipient fields, raising `ValidationError` for an unusable B2B client; add `invoicing/models.py` nullable `client` FK + migration.
+- [x] Implement owner-scoped CRUD views + `urls.py` + templates following the certificates app pattern (`@login_required`, queryset filtered by `owner`); wire into `config/urls.py`.
+- [x] (tester) Add `clients/tests/` covering requirements 1–6 (persistence+scoping, B2B/B2C validation, snapshot success/failure, auth redirect); run the full suite + `python3 manage.py check` and confirm green.
 
 ## Norms
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Clients</title></head>
+<body>
+  <h1>Clients</h1>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <p><a href="{% url 'clients:create' %}">Add client</a></p>
+  <ul>
+    {% for c in clients %}
+    <li>
+      {{ c.fiscal_name }} — {{ c.tax_id|default:"(sin NIF)" }}
+      [{{ c.get_client_type_display }}]
+      <a href="{% url 'clients:edit' c.pk %}">Edit</a>
+      <a href="{% url 'clients:delete' c.pk %}">Delete</a>
+    </li>
+    {% empty %}
+    <li>No clients yet.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>{% if mode == 'edit' %}Edit client{% else %}Add client{% endif %}</title></head>
+<body>
+  <h1>{% if mode == 'edit' %}Edit client{% else %}Add client{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="{% url 'clients:list' %}">Cancel</a></p>
+</body>
+</html>
