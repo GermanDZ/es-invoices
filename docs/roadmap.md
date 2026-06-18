@@ -97,4 +97,4 @@ Deferred debt enqueued by completed tasks (feature-flag removals, follow-ups). T
 
 | ID | Title | Status | Priority | Depends-on |
 |----|-------|--------|----------|------------|
-| T-019 | Remove feature flag `AEAT_SUBMISSION_ENABLED` (T-014 fully rolled out) | pending | medium | T-014 |
+| T-019 | Reframe AEAT submission kill-switch as permanent control (rename `AEAT_SUBMISSION_ENABLED` → `AEAT_SUBMISSION_LIVE`) | completed (2026-06-18) | medium | T-014 |

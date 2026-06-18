@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 17
-**Iteration Goal**: T-018 — Basic invoice status tracking (issued / sent)
+**Iteration**: 18
+**Iteration Goal**: T-019 — Remove feature flag `AEAT_SUBMISSION_ENABLED` (T-014 fully rolled out)
 **Status**: completed
-**Current Task**: T-018
+**Current Task**: T-019
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 18** (2026-06-18): T-019 complete — reframed the AEAT submission gate as **permanent** safety infrastructure instead of removable rollout debt (the roadmap's "remove flag" premise was false: a default-OFF kill-switch that keeps local/CI from making real tax-authority submissions is never "fully rolled out"). Product-owner decision: repurpose, don't delete. Renamed `AEAT_SUBMISSION_ENABLED` → `AEAT_SUBMISSION_LIVE` across settings, `submit_record`, the `aeat_submit` command, and test overrides (submission + invoicing), keeping truthy=submit + default-OFF semantics unchanged; settings/services docs now state the control is permanent so it is not re-enqueued for removal. No flag-removal follow-up created (by design). Old name gone from all *.py; full suite 123 green (2 Postgres-gated skips). Deploy note: prod must rename the env var `AEAT_SUBMISSION_ENABLED=1` → `AEAT_SUBMISSION_LIVE=1`.
 
 - **Iteration 17** (2026-06-18): T-018 complete — basic invoice status tracking (S-6). `Invoice` gains a nullable `sent_at` timestamp + a derived read-only `status` property (draft → issued → sent) over the existing `issued` flag, plus a `mark_sent(when=None)` helper that persists only `sent_at` (update_fields, so it never trips the issued-identity guard). `documents.services.send_invoice_email` stamps `sent_at` on a confirmed non-zero send; a zero/failed send leaves it untouched. Post-issuance overlay like T-017's `corrected_by`/`annulled` (absent from `_IMMUTABLE_WHEN_ISSUED`). AEAT submission outcome stays in `submission.SubmissionAttempt` (T-014), deliberately not folded into `status`. Not user-facing (no UI/flag); migration-reversible. 7 new tests (status property, immutability-safe stamp, re-send advance, send-persists-sent / zero-send-noop), full suite 123 green (2 Postgres-gated skips).
 

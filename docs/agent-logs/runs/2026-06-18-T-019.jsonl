@@ -1,0 +1,2 @@
+{"run_id": "T-019-iter18", "event": "iteration_start", "task_id": "T-019", "goal": "Reframe AEAT submission kill-switch as permanent control (rename AEAT_SUBMISSION_ENABLED -> AEAT_SUBMISSION_LIVE)", "branch": "refactor/T-019-aeat-submission-kill-switch-rename", "phase": "construction", "ts": "2026-06-18T12:54:37Z"}
+{"event": "iteration_complete", "task_id": "T-019", "branch": "refactor/T-019-aeat-submission-kill-switch-rename", "phase": "construction", "ts": "2026-06-18T12:59:46Z"}
