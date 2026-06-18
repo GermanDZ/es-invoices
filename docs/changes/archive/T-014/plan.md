@@ -1,7 +1,7 @@
 ---
 id: T-014
 title: AEAT submission adapter behind AD-3 interface
-status: ready
+status: done
 priority: high
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
