@@ -32,9 +32,50 @@ the T-014 submission adapter can run unattended (spec Assumption). Both the cert
 bytes and the passphrase are separate encrypted columns on `UserCertificate`,
 each with its own nonce.
 
+## DD5 — Single plaintext path via services.py
+`certificates/services.py` is the sole module that encrypts into or decrypts out
+of `UserCertificate`. The model is pure ciphertext storage; the form parses the
+uploaded P12 (it must, to validate) and hands raw bytes to
+`services.store_certificate`, which encrypts; only `services.get_cert_material`
+decrypts. `tests/test_least_privilege.py` asserts this statically by scanning for
+`decrypt(` call sites outside `crypto.py`/`services.py` (requirement 6 made a
+test, not just a grep).
+
+## DD6 — One active certificate per user (OneToOne + update_or_create)
+`UserCertificate.owner` is a `OneToOneField(..., on_delete=CASCADE)`.
+`store_certificate` uses `update_or_create`, so re-uploading overwrites in place
+(no orphaned material, requirement 4) and account deletion cascades the record
+away (retention boundary, R-06). Upload validation depth = parses as PKCS#12 with
+the passphrase + `not_valid_after_utc` in the future; full CA trust-chain is
+deferred per the spec assumption.
+
+## Completion verification (step 1a — graded against the diff)
+- ✅ **R1** — `forms.py clean()` (PKCS#12 parse + passphrase + `not_valid_after_utc`)
+  + `views.upload`; tests `test_valid_upload_is_accepted_and_persisted`,
+  `test_wrong_passphrase_rejected_and_nothing_persisted`, `test_garbage_file_rejected`,
+  `test_expired_certificate_rejected`.
+- ✅ **R2** — `UserCertificate` ciphertext `BinaryField`s + per-blob nonce;
+  `services.store_certificate` encrypts; `test_stored_material_is_ciphertext`.
+- ✅ **R3** — `services.get_cert_material` (sole accessor) + `CertificateNotConfigured`;
+  `test_get_cert_material_round_trips`, `test_get_cert_material_not_configured_raises`.
+- ✅ **R4** — `OneToOneField(on_delete=CASCADE)` + `update_or_create` + `delete_certificate`;
+  `test_replace_overwrites_previous_material`, `test_account_deletion_cascades`,
+  `test_delete_certificate_removes_record`.
+- ✅ **R5** — `services.certificate_status`; `test_status_configured_and_not`.
+- ✅ **R6** — PostgreSQL (AD-6) with SQLite test fallback (DD2); `test_only_services_decrypts`
+  + grep confirm `decrypt(` is confined to `services.py`/`crypto.py`.
+- **Step 1b (Success Measures):** `n/a` — internal security/onboarding capability, no
+  live funnel/billing surface at this phase; the verification suite is the checkable
+  expectation. No instrumentation owed. Re-visit when onboarding ships to beta.
+- **Step 4a (Rollout):** not flagged → no flag-removal task enqueued.
+- Full suite: `python manage.py test certificates` → **22 passed**; `manage.py check` clean.
+
 ## Progress
-- Operations 1 (scaffold) and 2 (crypto + 10 unit tests) complete and green
-  (`python manage.py test certificates.tests.test_crypto` → 10 passed; `manage.py
-  check` clean).
-- Operations 3–7 (model+migration, upload view/form, services accessor +
-  replace/delete, full test suite, least-privilege grep) remain — see handoff.
+- Operations 1 (scaffold) and 2 (crypto + 10 unit tests) complete and green.
+- Operations 3–7 complete: `UserCertificate` model + `0001_initial` migration,
+  upload/replace/delete views + form (PKCS#12 parse + expiry validation),
+  `services.py` accessor (`get_cert_material`, `certificate_status`,
+  `delete_certificate`), the requirement-by-requirement test suite, and the
+  least-privilege static check. Full suite green: `python manage.py test
+  certificates` → **22 passed**; `manage.py check` clean. `git ls-files` carries
+  no cert/key material; `CERT_ENCRYPTION_KEY` is read from env only.

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Certificado AEAT</title></head>
+<body>
+  <h1>Certificado AEAT</h1>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}<li class="msg">{{ message }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+
+  <p>Status: <strong>{{ status }}</strong></p>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload certificate</button>
+  </form>
+
+  {% if configured %}
+    <form method="post" action="{% url 'certificates:delete' %}">
+      {% csrf_token %}
+      <button type="submit">Delete certificate</button>
+    </form>
+  {% endif %}
+</body>
+</html>

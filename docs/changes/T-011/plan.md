@@ -157,11 +157,11 @@ one `services.py` accessor so least-privilege is structural, not conventional.
 
 - [x] Bootstrap the minimal Django project skeleton (`config/`, `manage.py`, settings reading `CERT_ENCRYPTION_KEY` + Postgres) and the `certificates` app; wire `requirements.txt` and `.env.example`.
 - [x] Implement `certificates/crypto.py` (AES-256-GCM encrypt/decrypt with per-record nonce) and its unit tests, including a wrong-key/tampered-ciphertext failure test.
-- [ ] Implement the `UserCertificate` model + migration: encrypted cert blob, encrypted passphrase, nonce, extracted subject + not-after, owner FK with cascade delete.
-- [ ] Implement the upload form/view: validate P12 parses with passphrase + is unexpired, then encrypt and store; reject invalid uploads with clear errors and persist nothing.
-- [ ] Implement `services.py` accessor (`get_cert_material`, `certificate_status`) as the sole plaintext path, plus replace/delete views.
-- [ ] (tester) Write the test suite covering all six requirements' scenarios — upload accept/reject, encryption-at-rest inspection, accessor (configured + not-configured), replace/delete cascade, and status — and confirm green.
-- [ ] (tester) Grep the code paths to confirm no view/serializer/log/third-party call emits plaintext certificate material (least-privilege check).
+- [x] Implement the `UserCertificate` model + migration: encrypted cert blob, encrypted passphrase, nonce, extracted subject + not-after, owner FK with cascade delete.
+- [x] Implement the upload form/view: validate P12 parses with passphrase + is unexpired, then encrypt and store; reject invalid uploads with clear errors and persist nothing.
+- [x] Implement `services.py` accessor (`get_cert_material`, `certificate_status`) as the sole plaintext path, plus replace/delete views.
+- [x] (tester) Write the test suite covering all six requirements' scenarios — upload accept/reject, encryption-at-rest inspection, accessor (configured + not-configured), replace/delete cascade, and status — and confirm green.
+- [x] (tester) Grep the code paths to confirm no view/serializer/log/third-party call emits plaintext certificate material (least-privilege check).
 
 ## Norms
 
