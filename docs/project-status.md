@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 9
-**Iteration Goal**: T-010 — AEAT `preproducción` submission PoC (3 proofs)
+**Iteration**: 10
+**Iteration Goal**: T-011 — Secure user-certificate upload + encrypted storage
 **Status**: completed
-**Current Task**: T-010
+**Current Task**: T-011
 **Started**: 2026-06-15
-**Iteration Started**: 2026-06-15
-**Last Updated**: 2026-06-17
+**Iteration Started**: 2026-06-18
+**Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 10** (2026-06-18): T-011 complete — secure user-certificate upload + AES-256-GCM encrypted-at-rest storage (Django certificates app). UserCertificate model, PKCS#12 upload/validation flow, single least-privilege accessor for the AD-3 adapter (T-014), replace/delete + account cascade. 22 tests green; all six requirements graded against the diff.
 
 - **Iteration 9** (2026-06-17): T-010 complete — AEAT `preproducción` submission PoC. All three proofs PASS against the live sandbox (prewww1.aeat.es): client-cert mTLS auth accepted; self-built F1 `alta` validated vs XSD and accepted (`Correcto`+CSV); second record hash-chained on the prior `huella` accepted with no encadenamiento error. **AD-3 BUILD-direct confirmed**, gateway-fallback not triggered; residual R-03 high→managed. Throwaway harness; secrets git-ignored.
 
