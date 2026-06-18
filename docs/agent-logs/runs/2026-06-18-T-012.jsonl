@@ -1,0 +1,1 @@
+{"event": "iteration_start", "task_id": "T-012", "goal": "Invoicing core: line items, IVA/IRPF calc, gap-free per-series numbering under a transactional boundary (S-2, UC-001, R-02)", "branch": "feat/T-012-invoicing-core", "phase": "construction", "ts": "2026-06-18T08:59:26Z"}

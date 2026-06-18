@@ -2,14 +2,14 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 10
-**Iteration Goal**: T-011 — Secure user-certificate upload + encrypted storage
-**Status**: completed
-**Current Task**: T-011
+**Iteration**: 11
+**Iteration Goal**: T-012 — Invoicing core: line items, IVA/IRPF, gap-free numbering
+**Status**: in-progress
+**Current Task**: T-012
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
-**Updated By**: sync-status.py
+**Updated By**: openup-start-iteration
 
 ## Notes
 
