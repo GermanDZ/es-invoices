@@ -1,7 +1,7 @@
 ---
 id: T-017
 title: Corrective / cancellation invoices (rectificativa + anulación)
-status: ready
+status: done
 priority: medium
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction

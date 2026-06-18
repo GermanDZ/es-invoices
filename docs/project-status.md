@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 15
-**Iteration Goal**: T-016 — PDF generation + send by email
+**Iteration**: 16
+**Iteration Goal**: T-017 — Corrective / cancellation invoices (rectificativa + anulación)
 **Status**: completed
-**Current Task**: T-016
+**Current Task**: T-017
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 16** (2026-06-18): T-017 complete — corrective/cancellation invoices (S-5, REQ-004, UC-004/UC-005). Built on the shipped compliance/submission machinery: `invoicing` gains `Invoice.corrected_by` (self-FK) + `annulled` and two service orchestrators — `issue_rectificativa` (por sustitución, TipoFactura=R1/TipoRectificativa=S; clones the original, issues gap-free in a dedicated rectificativa series, generates a rectificativa-type alta referencing the original, submits, links `original.corrected_by` on accepted/disabled) and `annul_invoice` (reuses `generate_anulacion`, marks `annulled`, creates no Invoice, refuses when a rectificativa exists — UC-005 2b). `compliance.build_registro_alta`/`generate_alta` extended with rectificativa metadata (FacturasRectificadas + ImporteRectificacion, XSD-conformant); `tipo_factura` now persisted from the param (default F1 unchanged). corrected/annulled gated on the submission outcome; both excluded from the issued-immutability set. UC-004/UC-005 promoted draft→approved. 12 new tests (rectificativa record incl. XSD, issuance/linkage, annulment, guardrail, no-number-burn, post-issue mutation); full suite 116 green (2 Postgres-gated skips). No new feature flag — reaches AEAT via the existing `AEAT_SUBMISSION_ENABLED` kill-switch. Ships dark (no UI caller); acceptance read-back gated on the corrective UI task.
 
 - **Iteration 15** (2026-06-18): T-016 complete — invoice PDF generation + send-by-email (new Django `documents` app, architecture-notebook §4 Document & delivery; S-3 / UC-001 postcondition). Read-only consumer of the invoicing core: `render_invoice_pdf` (WeasyPrint) emits all mandatory legal fields + VERI*FACTU legend + Verifactu verification QR (segno; importe/numserie/fecha sourced from persisted values matching the AEAT record); `send_invoice_email` attaches the PDF via Django's pluggable backend (console dev / SMTP prod), issued-only guard, success-instrumentation log (NumSerie only, no recipient PII / RGPD). Issuer fiscal identity passed in (no new model), mirroring `compliance.generate_alta`; ships dark (no caller wired) — delivery rate read-back gated on T-018/send UI. 12 new tests (PDF text via pypdf, email outbox, guards, read-only, instrumentation), full suite 104 green (2 Postgres-gated skips).
 
