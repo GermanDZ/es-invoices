@@ -1,7 +1,7 @@
 ---
 id: T-011
 title: Secure user-certificate upload + encrypted storage
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high   # critical | high | medium | low
 estimate: 2 sessions
 plan: docs/roadmap.md#construction   # link to originating plan, if any
