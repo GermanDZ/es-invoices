@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 12
-**Iteration Goal**: T-013 — Compliance/Verifactu module: record gen + hash-chain + XAdES
+**Iteration**: 13
+**Iteration Goal**: T-014 — AEAT submission adapter behind AD-3 interface
 **Status**: completed
-**Current Task**: T-013
+**Current Task**: T-014
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 13** (2026-06-18): T-014 complete — AEAT submission adapter behind the AD-3 interface (Django `submission` app). `SubmissionGateway` interface + one direct mTLS-SOAP adapter productionizing the T-010 PoC transport; `SubmissionAttempt` outcome model (accepted+CSV / rejected+code / pending); bounded transport-retry degrading to pending (no retry on business `Incorrecto`); `AEAT_SUBMISSION_ENABLED` kill-switch with preproducción-default endpoint. Cert material only via `certificates.services`; record/invoice never mutated. `aeat_submit` management command as the cert-gated preproducción smoke. 15 submission tests, full suite 69 green. Realizes UC-002.
 
 - **Iteration 12** (2026-06-18): T-013 complete — compliance/Verifactu module (Django `compliance` app, AD-2). Versioned public API (lazy); legal-field validation; `RegistroAlta`/`RegistroAnulacion` builders + AEAT-proven `huella`; per-issuer `IssuerChain` row-lock for fork-safe chaining; XAdES-enveloped signing (signxml) verifying + tamper-failing; full `RegFactu` envelope validates against the vendored AEAT XSDs (single-rate + exempt). 17 compliance tests (1 Postgres-gated), full suite 54 green. Generates/persists signed records; submission is T-014.
 

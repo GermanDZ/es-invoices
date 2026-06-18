@@ -78,3 +78,8 @@ non-disabled submission (`services._persist`) — a `GROUP BY status` count is d
 Read-back: **2 weeks after the submission flag is enabled in beta**.
 
 All requirements ✅ — no gaps.
+
+## Rollout follow-up
+
+- Flag-removal debt enqueued as **T-019** — "Remove feature flag
+  `AEAT_SUBMISSION_ENABLED` (T-014 fully rolled out)" — in the roadmap Maintenance table.

@@ -1,1 +1,2 @@
 {"run_id": "run-77ae5c5-T014", "event": "iteration_start", "task_id": "T-014", "goal": "T-014 \u2014 AEAT submission adapter behind AD-3 interface", "branch": "feat/T-014-aeat-submission-adapter", "phase": "construction", "ts": "2026-06-18T10:46:26Z"}
+{"event": "iteration_complete", "task_id": "T-014", "branch": "feat/T-014-aeat-submission-adapter", "phase": "construction", "ts": "2026-06-18T10:58:22Z"}
