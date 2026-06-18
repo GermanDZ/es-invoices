@@ -51,7 +51,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-013 | Compliance/Verifactu module: record gen + hash-chain + XAdES | completed (2026-06-18) | high | T-010, T-012 |
 | T-014 | AEAT submission adapter behind AD-3 interface | completed (2026-06-18) | high | T-011, T-013 |
 | T-015 | Client/contact management (recipient fiscal data) | completed (2026-06-18) | medium | T-012 |
-| T-016 | PDF generation + send by email | pending | medium | T-012 |
+| T-016 | PDF generation + send by email | completed (2026-06-18) | medium | T-012 |
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | pending | medium | T-013, T-014 |
 | T-018 | Basic invoice status tracking (issued / sent) | pending | low | T-014, T-016 |
 

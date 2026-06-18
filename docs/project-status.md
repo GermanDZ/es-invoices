@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 14
-**Iteration Goal**: T-015 — Client/contact management (recipient fiscal data)
+**Iteration**: 15
+**Iteration Goal**: T-016 — PDF generation + send by email
 **Status**: completed
-**Current Task**: T-015
+**Current Task**: T-016
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-18
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 15** (2026-06-18): T-016 complete — invoice PDF generation + send-by-email (new Django `documents` app, architecture-notebook §4 Document & delivery; S-3 / UC-001 postcondition). Read-only consumer of the invoicing core: `render_invoice_pdf` (WeasyPrint) emits all mandatory legal fields + VERI*FACTU legend + Verifactu verification QR (segno; importe/numserie/fecha sourced from persisted values matching the AEAT record); `send_invoice_email` attaches the PDF via Django's pluggable backend (console dev / SMTP prod), issued-only guard, success-instrumentation log (NumSerie only, no recipient PII / RGPD). Issuer fiscal identity passed in (no new model), mirroring `compliance.generate_alta`; ships dark (no caller wired) — delivery rate read-back gated on T-018/send UI. 12 new tests (PDF text via pypdf, email outbox, guards, read-only, instrumentation), full suite 104 green (2 Postgres-gated skips).
 
 - **Iteration 14** (2026-06-18): T-015 complete — client/contact management (new Django `clients` app, S-1 / UC-003 / REQ-003). Owner-scoped Client model typed B2B/B2C with Spanish DNI/NIE/CIF format+checksum validation (`clients/validation.py`); type-conditional tax-id rule in `Client.clean` (B2B required, B2C optional per D-2); `@login_required` CRUD (list/create/edit/delete) with 404 cross-owner scoping; `recipient_snapshot` bridges a saved client into the invoice recipient snapshot and rejects an unusable B2B client; additive nullable `Invoice.client` provenance FK (never read by numbering/compliance). 23 client tests, full suite 92 green (2 Postgres-gated skips).
 
