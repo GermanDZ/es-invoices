@@ -12,9 +12,6 @@ touches:
   - config/settings.py
   - config/urls.py
 last-synced: ""
-type: work-item
-traces-from: [UC-003]
-verified-by: []
 ---
 
 # T-021 — Product authentication (registration + login + logout + session)
@@ -195,20 +192,20 @@ home (anonymous → login). Leave `devtools` entirely alone.
 
 ## Operations
 
-- [ ] Create the `accounts` app skeleton (`apps.py`, `__init__.py`) and add it to
+- [x] Create the `accounts` app skeleton (`apps.py`, `__init__.py`) and add it to
       `INSTALLED_APPS`; set `LOGIN_URL`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL`,
       and populate `AUTH_PASSWORD_VALIDATORS` with Django's four defaults.
-- [ ] Implement `RegistrationForm` (email + password + confirm; enforces uniqueness,
+- [x] Implement `RegistrationForm` (email + password + confirm; enforces uniqueness,
       match, and `validate_password`) and the `register` view (creates `User` with
       `username=email`, logs in, redirects to landing).
-- [ ] Implement `EmailAuthenticationForm` + wire `LoginView`/`LogoutView`, and add the
+- [x] Implement `EmailAuthenticationForm` + wire `LoginView`/`LogoutView`, and add the
       authenticated landing view; create `accounts/urls.py` and the three templates.
-- [ ] Wire `config/urls.py`: `include("accounts.urls")`, real root landing for all
+- [x] Wire `config/urls.py`: `include("accounts.urls")`, real root landing for all
       environments, and remove the DEBUG-only root redirect to `/dev/login/`.
-- [ ] (tester) Write `accounts/tests/test_auth.py` covering all six requirements
+- [x] (tester) Write `accounts/tests/test_auth.py` covering all six requirements
       (register success/dup/weak, login success/bad, logout, anonymous redirect
       under `DEBUG=False`, landing content) and run `.venv/bin/python manage.py test`.
-- [ ] (tester) Run the full suite to confirm no regression in `devtools`/`clients`
+- [x] (tester) Run the full suite to confirm no regression in `devtools`/`clients`
       tests; fix any fallout from the root-URL change.
 
 ## Norms

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Iniciar sesión · FacturaSimple</title></head>
+<body>
+  <h1>Iniciar sesión</h1>
+  {% if form.errors %}<p class="error">Email o contraseña incorrectos.</p>{% endif %}
+  <form method="post" action="{% url 'accounts:login' %}{% if next %}?next={{ next }}{% endif %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Entrar</button>
+  </form>
+  <p>¿No tienes cuenta? <a href="{% url 'accounts:register' %}">Crear cuenta</a></p>
+</body>
+</html>

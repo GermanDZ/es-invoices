@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Crear cuenta · FacturaSimple</title></head>
+<body>
+  <h1>Crear cuenta</h1>
+  <form method="post" action="{% url 'accounts:register' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Crear cuenta</button>
+  </form>
+  <p>¿Ya tienes cuenta? <a href="{% url 'accounts:login' %}">Inicia sesión</a></p>
+</body>
+</html>

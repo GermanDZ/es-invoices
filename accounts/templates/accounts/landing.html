@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>FacturaSimple</title></head>
+<body>
+  <h1>FacturaSimple</h1>
+  <p>Sesión iniciada como <strong>{{ user.email|default:user.username }}</strong>.</p>
+  <ul>
+    <li><a href="{% url 'clients:list' %}">Clientes</a></li>
+    <li><a href="{% url 'certificates:upload' %}">Certificado</a></li>
+  </ul>
+  <form method="post" action="{% url 'accounts:logout' %}">
+    {% csrf_token %}
+    <button type="submit">Cerrar sesión</button>
+  </form>
+</body>
+</html>

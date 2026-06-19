@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "compliance",
     "submission",
     "documents",
+    "accounts",
 ]
 
 # Dev-only shim (T-020): registered ONLY under DEBUG so its management command and
@@ -105,7 +106,26 @@ else:
         }
     }
 
-AUTH_PASSWORD_VALIDATORS = []
+# AUTHENTICATION (T-021) -------------------------------------------------------
+# Real product auth: email-as-username registration/login (accounts app), session
+# via SessionMiddleware. LOGIN_URL is a named route so @login_required redirects
+# anonymous users to the product login in every environment (the DEBUG-gated
+# devtools shim is a separate dev-loop shortcut, not the gate target).
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "accounts:landing"
+LOGOUT_REDIRECT_URL = "accounts:login"
+
+# Django's four default validators, enabled for account creation (was empty
+# during the engine-only phase; real registration now enforces them).
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation."
+        "UserAttributeSimilarityValidator"
+    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
 
 LANGUAGE_CODE = "es-es"
 TIME_ZONE = "Europe/Madrid"
