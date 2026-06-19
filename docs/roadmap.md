@@ -55,7 +55,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | completed (2026-06-18) | medium | T-013, T-014 |
 | T-018 | Basic invoice status tracking (issued / sent) | completed (2026-06-18) | low | T-014, T-016 |
 | T-020 | Dev-only local auth shim (seed user + DEBUG-gated login shortcut) | completed (2026-06-18) | low | T-011, T-015 |
-| T-021 | Product authentication (registration + login + session) | pending | high | T-011, T-020 |
+| T-021 | Product authentication (registration + login + session) | completed (2026-06-19) | high | T-011, T-020 |
 | T-022 | Invoice issuance UI (create → issue → PDF → email) | pending | high | T-012, T-016, T-021 |
 | T-023 | AEAT submission UI + outcome surfacing | pending | high | T-014, T-022 |
 | T-024 | Corrective & annulment UI (rectificativa + anulación) | pending | medium | T-017, T-023 |

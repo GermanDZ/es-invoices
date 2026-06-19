@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 19
-**Iteration Goal**: T-020 — Dev-only local auth shim (seed user + DEBUG-gated login shortcut)
+**Iteration**: 20
+**Iteration Goal**: T-021 — Product authentication (registration + login + session)
 **Status**: completed
-**Current Task**: T-020
+**Current Task**: T-021
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
-**Last Updated**: 2026-06-18
+**Last Updated**: 2026-06-19
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 20** (2026-06-19): T-021 complete — real product authentication. New `accounts` app wraps Django's built-in auth: email-as-username self-service registration (one account per email, scope D-3/N-5) enforcing Django's four default password validators, email login via a thin `AuthenticationForm` subclass (no custom user model, no models/migrations), POST-only logout (Django 5), and a `@login_required` landing at `/` reachable in every environment. `LOGIN_URL`/redirect settings route anonymous users to the product login, satisfying the "authenticated user" precondition of UC-001/UC-002/UC-003 in production (previously only the DEBUG-gated `/dev/login/` shim existed). The devtools shim is retained untouched for the fast dev loop; the old DEBUG root→/dev/login redirect is replaced by the real landing. Unblocks T-022+. 12 new tests, full suite 141 green (2 Postgres-gated skips).
 
 - **Iteration 19** (2026-06-18): T-020 complete — dev-only local auth shim. New `devtools` app registered **only under DEBUG** so it has zero production auth surface: a `/dev/login/` view get-or-creates the single owner (scope.md D-3/N-5 single-operator) and authenticates the browser session, a DEBUG-gated root redirect points `/` at it, and a `seed_dev_owner` command idempotently seeds the user for shell use. Closes the local-fiddling gap from the no-login exploration **without** building the real product login (that genuine gap stays an explicit out-of-scope follow-up). Notable: Django's test runner forces DEBUG=False at urlconf-load, so the DEBUG-gated routes never register under `manage.py test` — tests swap in a dedicated test urlconf to assert wiring and drive the view's own DEBUG guard separately. 6 new tests, full suite 129 green (2 Postgres-gated skips); no models/migrations.
 
