@@ -55,6 +55,13 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-017 | Corrective / cancellation invoices (rectificativa + anulación) | completed (2026-06-18) | medium | T-013, T-014 |
 | T-018 | Basic invoice status tracking (issued / sent) | completed (2026-06-18) | low | T-014, T-016 |
 | T-020 | Dev-only local auth shim (seed user + DEBUG-gated login shortcut) | completed (2026-06-18) | low | T-011, T-015 |
+| T-021 | Product authentication (registration + login + session) | pending | high | T-011, T-020 |
+| T-022 | Invoice issuance UI (create → issue → PDF → email) | pending | high | T-012, T-016, T-021 |
+| T-023 | AEAT submission UI + outcome surfacing | pending | high | T-014, T-022 |
+| T-024 | Corrective & annulment UI (rectificativa + anulación) | pending | medium | T-017, T-023 |
+| T-025 | Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email) | pending | medium | T-017 |
+| T-026 | RGPD pre-launch checklist (R-06) | pending | high | T-011 |
+| T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | pending | medium | — |
 
 ### Task notes
 
@@ -92,6 +99,43 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
   "fiddling with the product" locally (the no-login exploration showed the UI was
   unreachable in a browser), shortening the inner dev loop. Does **not** close the
   real product-login gap — that remains a recommended future roadmap item.
+
+- **T-021**: Real product authentication — registration, login, logout, session,
+  and `@login_required` landing wired into `config/urls.py` (today only the
+  DEBUG-gated `/dev/login/` shim from T-020 exists). **Value**: gates every product
+  page; without it no use case beyond UC-003 is actor-reachable, so the Vision
+  promise ("a non-accountant sends a valid invoice in minutes") is undeliverable.
+  Closes the acknowledged real-login gap (T-020 note).
+- **T-022**: Invoice issuance UI (UC-001) — views, forms, templates, and URLs that
+  drive the existing `invoicing.services.issue_invoice` engine end to end: build
+  line items, compute IVA/IRPF, issue under gap-free numbering, render the PDF
+  (`documents.services`), and offer send-by-email. **Value**: the core product
+  promise; turns the tested-but-dark issuance engine (T-012/T-016) into something a
+  user can actually do. Highest single increment of end-user value.
+- **T-023**: AEAT submission UI + outcome surfacing (UC-002) — a control to submit
+  an issued invoice's Verifactu record via `submission.services.submit_record` and
+  surface accepted/rejected/pending outcome (from `SubmissionAttempt`) to the user.
+  **Value**: completes the compliance loop the product is differentiated on; the
+  engine + live-sandbox proof already exist (T-013/T-014), only the actor path is
+  missing.
+- **T-024**: Corrective & annulment UI (UC-004/UC-005) — views to issue a
+  *rectificativa* and to *anular* a record, with the spec's step-2 warnings/confirms.
+  **Value**: completes the legally-required correction workflows for end users; depends
+  on the issuance/submission UI being in place first.
+- **T-025**: Close the UC-004/UC-005 behaviour gaps the coverage review surfaced —
+  reachable "por diferencias" path (today `issue_rectificativa` hardcodes
+  `tipo_rectificativa="S"`), rectificativa PDF marking + corrected-invoice reference
+  (UC-004 postcondition, absent from the template), annul-while-pending (UC-005
+  alt-flow 2a cancels the pending submission instead of sending an anulación),
+  active-set exclusion of annulled invoices, and a `Client.email` field so
+  `documents.services` has a real recipient. **Value**: these are acceptance criteria
+  of *approved* use cases that the engine does not yet meet — pure spec-conformance debt.
+- **T-026**: Complete and record the pre-launch RGPD checklist (R-06) — no
+  checklist artifact exists yet. **Value**: a Transition/beta gate (risk-list R-06,
+  arch-notebook Q-3); must be done before exposing real user/certificate data.
+- **T-027**: Verify the autónomo Verifactu obligation timeline against the *current*
+  AEAT rollout calendar and confirm no dates are hard-coded (O-2). **Value**: closes
+  an architecture carry-forward; cheap, prevents shipping a stale/incorrect mandate date.
 
 > **Construction-wide carry-forwards** (architecture notebook §7): verify the
 > autónomo obligation timeline against the *current* AEAT rollout calendar at build
