@@ -138,6 +138,7 @@ commit_synced_changes() {
     [ -n "$f" ] && captured+=("scripts/$f")
   done < <(_process_cli_manifest "$FRAMEWORK_PATH/scripts")
   captured+=("docs/agent-logs/agent-runs.jsonl")
+  captured+=("docs-eng-process/.template-version")
 
   # Stage the written paths ONE AT A TIME (never a blanket `git add -A`). A
   # single multi-pathspec `git add` aborts entirely if any pathspec matches
@@ -187,9 +188,10 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 if [ -z "$FRAMEWORK_PATH" ]; then
   log_info "Auto-detecting framework repository..."
 
-  # Check if we're in the framework repository itself
-  # Framework repo has sync-templates-to-claude.sh script
-  if [ -f "$PROJECT_ROOT/scripts/sync-templates-to-claude.sh" ]; then
+  # Check if we're in the framework repository itself.
+  # The definitive marker is docs-eng-process/.claude-templates/ — only the
+  # framework has the template source tree; consuming projects never do.
+  if [ -d "$PROJECT_ROOT/docs-eng-process/.claude-templates" ]; then
     log_error "You appear to be in the framework repository itself."
     log_error "This script is meant to be run from projects that USE the framework."
     log_error "Use ./scripts/sync-templates-to-claude.sh instead."
@@ -522,7 +524,8 @@ try:
     with open(src_path) as f:
         src = json.load(f)
     with open(dest_path) as f:
-        dest = json.load(f)
+        original_text = f.read()
+    dest = json.loads(original_text)
 
     src_hooks = src.get("hooks", {})
     dest_hooks = dest.get("hooks", {})
@@ -537,9 +540,12 @@ try:
             merged[event] = dest_hooks[event]
 
     dest["hooks"] = merged
+    new_text = json.dumps(dest, indent=2) + "\n"
+    if new_text == original_text:
+        # Exit 2 = success, no change (idempotent)
+        sys.exit(2)
     with open(dest_path, "w") as f:
-        json.dump(dest, f, indent=2)
-        f.write("\n")
+        f.write(new_text)
     print(f"Merged OpenUP hooks into {dest_path} (custom hooks preserved)")
 except Exception as e:
     print(f"Warning: could not merge settings.json: {e}", file=sys.stderr)
@@ -548,6 +554,8 @@ PYEOF
       then
         log_success "Merged OpenUP hooks into settings.json (custom hooks preserved)"
         SYNCED_FILES=$((SYNCED_FILES + 1))
+      elif [ $? -eq 2 ]; then
+        log_verbose "settings.json already up-to-date (no change)"
       else
         log_warn "Could not merge settings.json; restoring backup"
         mv "${SETTINGS_DEST}.bak" "$SETTINGS_DEST"
@@ -564,11 +572,27 @@ if [ ! -d "$DOCS_PROCESS_DIR" ]; then
   log_warn "No docs-eng-process directory found."
   log_warn "To get OpenUP documentation, copy from framework:"
   log_warn "  mkdir -p docs-eng-process"
-  log_warn "  cp -r $FRAMEWORK_PATH/docs-eng-process/openup-knowledge-base docs-eng-process/"
+  log_warn "  cp -r $FRAMEWORK_PATH/openup-knowledge-base ."
   log_warn "  cp -r $FRAMEWORK_PATH/docs-eng-process/templates docs-eng-process/"
   log_warn "  cp $FRAMEWORK_PATH/docs-eng-process/*.md docs-eng-process/"
 else
   log_verbose "Documentation directory exists (not syncing to preserve local changes)"
+
+  # The version marker is NOT free-form local content — it records which
+  # framework revision the synced CLIs/skills came from. The sync overwrites
+  # that content, so the marker must move with it; otherwise it drifts (a
+  # project shows an old version while running current tooling, which
+  # openup-doctor then flags). Mirror the framework's marker on every sync.
+  fw_version_file="$FRAMEWORK_PATH/docs-eng-process/.template-version"
+  if [ -f "$fw_version_file" ]; then
+    if [ "$DRY_RUN" = true ]; then
+      log_info "[DRY-RUN] Would update .template-version to $(cat "$fw_version_file")"
+    elif ! cmp -s "$fw_version_file" "$DOCS_PROCESS_DIR/.template-version"; then
+      cp "$fw_version_file" "$DOCS_PROCESS_DIR/.template-version"
+      log_success "Updated .template-version -> $(cat "$fw_version_file")"
+      SYNCED_FILES=$((SYNCED_FILES + 1))
+    fi
+  fi
 fi
 
 # Sync CLAUDE.md template (but warn about local changes)
@@ -643,6 +667,45 @@ else
     SKIPPED_FILES=$((SKIPPED_FILES + 1))
   fi
 fi
+
+# T-056: Bootstrap — emit .openup-version + patch .gitignore so .claude/settings.json
+# is tracked (the only file a fresh clone needs to trigger the SessionStart hook).
+log_info "Checking web/ephemeral session bootstrap..."
+echo ""
+
+OPENUP_VERSION_FILE="$PROJECT_ROOT/.openup-version"
+GITIGNORE_FILE="$PROJECT_ROOT/.gitignore"
+
+# Emit .openup-version (vendored by default) if absent; never overwrite an
+# existing pin — the project owns this value.
+if [ ! -f "$OPENUP_VERSION_FILE" ]; then
+  if [ "$DRY_RUN" = false ]; then
+    echo "vendored" > "$OPENUP_VERSION_FILE"
+    log_success "Created .openup-version (default: vendored)"
+    SYNCED_FILES=$((SYNCED_FILES + 1))
+  else
+    log_info "[DRY RUN] Would create .openup-version"
+  fi
+else
+  log_verbose ".openup-version already exists ($(cat "$OPENUP_VERSION_FILE")) — skipping"
+fi
+
+# Patch .gitignore: swap the broad /.claude ignore for the settings-only pattern.
+# Idempotent: only runs when the old pattern is present.
+if [ -f "$GITIGNORE_FILE" ] && grep -qxF '/.claude' "$GITIGNORE_FILE"; then
+  if [ "$DRY_RUN" = false ]; then
+    # Replace the bare /.claude line with the two-line pattern
+    sed -i.bak 's|^/\.claude$|/.claude/*\
+!/.claude/settings.json|' "$GITIGNORE_FILE" && rm -f "${GITIGNORE_FILE}.bak"
+    log_success "Patched .gitignore: /.claude → /.claude/* + !/.claude/settings.json"
+    SYNCED_FILES=$((SYNCED_FILES + 1))
+  else
+    log_info "[DRY RUN] Would patch .gitignore (/.claude → /.claude/* + !/.claude/settings.json)"
+  fi
+else
+  log_verbose ".gitignore already has the settings-only pattern (or does not exist) — skipping"
+fi
+echo ""
 
 # Self-commit the tracked files this sync overwrote (T-052) so the working tree
 # is clean on return and on-stop.py never mistakes them for abandoned lane work.
