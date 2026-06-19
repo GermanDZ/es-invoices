@@ -1,7 +1,7 @@
 ---
 id: T-021
 title: Product authentication (registration + login + logout + session)
-status: ready
+status: done
 priority: high
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
