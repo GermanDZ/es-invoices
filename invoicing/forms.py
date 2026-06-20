@@ -81,3 +81,63 @@ class LineItemForm(forms.Form):
 
 
 LineItemFormSet = forms.formset_factory(LineItemForm, extra=3)
+
+
+# Verifactu rectificativa subtypes (``TipoFactura`` R1–R5). Labelled in plain
+# language so a zero-accounting-knowledge user can pick the reason without knowing
+# the LIVA article numbers. The engine only varies the record's ``tipo_factura``;
+# the method stays *por sustitución* (T-024 scope — *por diferencias* is T-025).
+TIPO_RECTIFICATIVA_CHOICES = [
+    ("R1", "R1 — Error en los datos o el importe (rectificación general)"),
+    ("R2", "R2 — Concurso de acreedores del cliente"),
+    ("R3", "R3 — Crédito incobrable"),
+    ("R4", "R4 — Otros motivos"),
+    ("R5", "R5 — Rectificación de factura simplificada"),
+]
+
+
+class RectificativaForm(forms.Form):
+    """Issuer identity + correction reason for a *factura rectificativa* (UC-004).
+
+    Mirrors :class:`IssuanceForm`'s issuer block (entered inline, carried in the
+    session like T-022 DD1) and adds the ``tipo_factura`` reason selector. The
+    corrected line items come from the separate :data:`LineItemFormSet`, pre-filled
+    from the original via :func:`lineitem_initial_from`. It computes no totals and
+    assigns no number — :func:`invoicing.services.issue_rectificativa` does.
+    """
+
+    issuer_name = forms.CharField(max_length=255, label="Nombre/Razón social del emisor")
+    issuer_nif = forms.CharField(max_length=32, label="NIF del emisor")
+    issuer_address = forms.CharField(
+        max_length=255, required=False, label="Dirección del emisor"
+    )
+    issuer_email = forms.EmailField(required=False, label="Email del emisor")
+    tipo_factura = forms.ChoiceField(
+        choices=TIPO_RECTIFICATIVA_CHOICES,
+        initial="R1",
+        label="Motivo de la rectificación",
+    )
+
+
+def lineitem_initial_from(invoice):
+    """Initial rows for the rectificativa :data:`LineItemFormSet` (UC-004 step 3).
+
+    Pre-fills the corrected invoice *por sustitución* from the original's lines so
+    the user edits the corrected figures rather than re-typing the whole invoice.
+    """
+    def _rate_choice(value):
+        # Map the stored Decimal (e.g. 21.00) to the choice string ("21") by
+        # numeric equality, so the pre-filled row selects the right option.
+        return next(
+            (str(r) for r in calc.IVA_RATES if r == value), str(value)
+        )
+
+    return [
+        {
+            "description": item.description,
+            "quantity": item.quantity,
+            "unit_price": item.unit_price,
+            "iva_rate": _rate_choice(item.iva_rate),
+        }
+        for item in invoice.items.all()
+    ]

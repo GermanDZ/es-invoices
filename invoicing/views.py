@@ -21,7 +21,12 @@ from clients.services import recipient_snapshot
 from documents.services import Issuer, render_invoice_pdf, send_invoice_email
 from submission.selectors import latest_alta_record, record_is_accepted
 
-from .forms import IssuanceForm, LineItemFormSet
+from .forms import (
+    IssuanceForm,
+    LineItemFormSet,
+    RectificativaForm,
+    lineitem_initial_from,
+)
 from .models import Invoice, LineItem, Series
 
 _SESSION_ISSUER_KEY = "issuer"
@@ -188,3 +193,125 @@ def invoice_send(request, pk):
         else:
             messages.error(request, "No se pudo enviar el email.")
     return redirect("invoicing:detail", pk=pk)
+
+
+@login_required
+def invoice_rectificar(request, pk):
+    """Issue a *factura rectificativa* correcting an owned, issued invoice (UC-004).
+
+    Owner-scopes the original, pre-fills the corrective from it (*por sustitución*),
+    and on confirm delegates to :func:`invoicing.services.issue_rectificativa` — the
+    sole authority on numbering, the rectificativa record and the AEAT call. The view
+    never numbers or calls the network. A ``ValidationError`` (e.g. no line items,
+    original not issued) rolls the draft back and re-renders without consuming a
+    rectificativa number (Requirement 4).
+    """
+    original = get_object_or_404(_owner_invoices(request.user), pk=pk)
+    if original.corrected_by_id is not None:
+        messages.info(request, "Esta factura ya tiene una rectificativa.")
+        return redirect("invoicing:detail", pk=original.pk)
+
+    if request.method == "POST":
+        form = RectificativaForm(request.POST)
+        formset = LineItemFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            try:
+                rect, outcome = _rectify_from_forms(
+                    request.user, original, form, formset
+                )
+            except ValidationError as exc:
+                messages.error(request, "; ".join(exc.messages))
+            else:
+                request.session[_SESSION_ISSUER_KEY] = {
+                    "name": form.cleaned_data["issuer_name"],
+                    "nif": form.cleaned_data["issuer_nif"],
+                    "address": form.cleaned_data["issuer_address"],
+                    "email": form.cleaned_data["issuer_email"],
+                }
+                messages.success(request, f"Factura rectificativa {rect} emitida.")
+                _surface_request_outcome(request, outcome)
+                return redirect("invoicing:detail", pk=rect.pk)
+    else:
+        form = RectificativaForm(initial=_issuer_initial(request))
+        formset = LineItemFormSet(initial=lineitem_initial_from(original))
+    return render(
+        request,
+        "invoicing/rectificativa_form.html",
+        {"form": form, "formset": formset, "original": original},
+    )
+
+
+def _rectify_from_forms(user, original, form, formset):
+    """Build the draft rectificativa from the original + form, then issue it.
+
+    Issues into a dedicated ``R`` series (gap-free, distinct from the original's so
+    numbers never collide) restating the corrected line items. Raises
+    ``ValidationError`` (rolling everything back) when not issuable. Returns
+    ``(rectificativa, outcome)``.
+    """
+    from .services import issue_rectificativa
+
+    rect_series, _ = Series.objects.get_or_create(owner=user, prefix="R")
+    with transaction.atomic():
+        rect = Invoice.objects.create(
+            series=rect_series,
+            client=original.client,
+            irpf_rate=original.irpf_rate,
+            recipient_name=original.recipient_name,
+            recipient_taxid=original.recipient_taxid,
+            recipient_address=original.recipient_address,
+        )
+        for row in formset:
+            if row.is_filled():
+                LineItem.objects.create(
+                    invoice=rect,
+                    description=row.cleaned_data["description"],
+                    quantity=row.cleaned_data["quantity"],
+                    unit_price=row.cleaned_data["unit_price"],
+                    iva_rate=row.cleaned_data["iva_rate"],
+                )
+        rect, _record, outcome = issue_rectificativa(
+            rect,
+            original,
+            issuer_nif=form.cleaned_data["issuer_nif"],
+            issuer_name=form.cleaned_data["issuer_name"],
+            tipo_factura=form.cleaned_data["tipo_factura"],
+        )
+    return rect, outcome
+
+
+@login_required
+def invoice_annul(request, pk):
+    """Annul an owned, issued invoice's Verifactu record — sent-in-error only (UC-005).
+
+    GET renders the step-2 warning/confirm page; POST delegates to
+    :func:`invoicing.services.annul_invoice`. The engine refuses (raises
+    ``ValidationError``) when the invoice carries a rectificativa — a real sale is
+    corrected, not annulled (UC-005 2b); the view surfaces that as a message, never
+    a 500 (Requirement 7), then returns to the detail page.
+    """
+    invoice = get_object_or_404(_owner_invoices(request.user), pk=pk)
+    if request.method != "POST":
+        return render(
+            request, "invoicing/annul_confirm.html", {"invoice": invoice}
+        )
+
+    issuer = _issuer_from_session(request)
+    from .services import annul_invoice
+
+    try:
+        _record, outcome = annul_invoice(
+            invoice, issuer_name=issuer.name if issuer else None
+        )
+    except ValidationError as exc:
+        messages.error(request, "; ".join(exc.messages))
+    else:
+        _surface_request_outcome(request, outcome)
+    return redirect("invoicing:detail", pk=invoice.pk)
+
+
+def _surface_request_outcome(request, outcome):
+    """Surface a :class:`SubmissionOutcome` as a Django message (reuses T-023 wording)."""
+    from submission.views import _surface_outcome
+
+    _surface_outcome(request, outcome)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Anular factura {{ invoice.series.prefix }}{{ invoice.number }}</title></head>
+<body>
+  <h1>Anular factura {{ invoice.series.prefix }}{{ invoice.number }}</h1>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <p class="warning"><strong>Atención:</strong> la anulación es <em>solo</em> para
+     registros emitidos por error (un duplicado, una factura contra el cliente
+     equivocado o un envío de prueba). Si la factura documenta una venta real, no la
+     anules: emite una <a href="{% url 'invoicing:rectificar' invoice.pk %}">factura
+     rectificativa</a> en su lugar.</p>
+
+  <p>Se generará un registro de anulación Verifactu encadenado y se enviará a la AEAT.
+     La factura quedará marcada como anulada, pero permanecerá en el registro.</p>
+
+  <form method="post" action="{% url 'invoicing:annul' invoice.pk %}">
+    {% csrf_token %}
+    <button type="submit">Confirmar anulación (emitida por error)</button>
+  </form>
+
+  <p><a href="{% url 'invoicing:detail' invoice.pk %}">Cancelar</a></p>
+</body>
+</html>

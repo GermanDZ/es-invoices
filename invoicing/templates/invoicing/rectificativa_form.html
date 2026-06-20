@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Rectificar factura {{ original.series.prefix }}{{ original.number }}</title></head>
+<body>
+  <h1>Emitir factura rectificativa</h1>
+  <p>Corrige la factura
+     <strong>{{ original.series.prefix }}{{ original.number }}</strong>
+     ({{ original.recipient_name }}). La rectificativa restituye la factura
+     corregida completa (<em>por sustitución</em>).</p>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <form method="post" action="{% url 'invoicing:rectificar' original.pk %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <h2>Líneas corregidas</h2>
+    {{ formset.management_form }}
+    <table>
+      <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unit.</th><th>IVA</th></tr></thead>
+      <tbody>
+        {% for row in formset %}
+        <tr>
+          <td>{{ row.description }}</td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.unit_price }}</td>
+          <td>{{ row.iva_rate }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit">Emitir rectificativa</button>
+  </form>
+
+  <p><a href="{% url 'invoicing:detail' original.pk %}">Cancelar</a></p>
+</body>
+</html>

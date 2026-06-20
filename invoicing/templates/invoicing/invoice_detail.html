@@ -20,6 +20,20 @@
 
   <p><a href="{% url 'invoicing:pdf' invoice.pk %}">Descargar PDF</a></p>
 
+  {% if invoice.issued %}
+  <section class="corrections">
+    {% if invoice.annulled %}
+      <p>Esta factura está <strong>anulada</strong> (registro emitido por error).</p>
+    {% elif invoice.corrected_by_id %}
+      <p>Esta factura fue <strong>rectificada</strong> por
+         <a href="{% url 'invoicing:detail' invoice.corrected_by_id %}">la factura rectificativa</a>.</p>
+    {% else %}
+      <p><a href="{% url 'invoicing:rectificar' invoice.pk %}">Rectificar (emitir factura rectificativa)</a></p>
+      <p><a href="{% url 'invoicing:annul' invoice.pk %}">Anular (emitida por error)</a></p>
+    {% endif %}
+  </section>
+  {% endif %}
+
   {% include "submission/_outcome.html" %}
 
   <form method="post" action="{% url 'invoicing:send' invoice.pk %}">
