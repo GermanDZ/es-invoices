@@ -6,6 +6,7 @@ urlpatterns = [
     path("certificate/", include("certificates.urls")),
     path("clients/", include("clients.urls")),
     path("invoices/", include("invoicing.urls")),
+    path("submissions/", include("submission.urls")),
     # Real product auth (T-021): registration, login, logout, and the
     # authenticated landing at "/". Available in every environment.
     path("", include("accounts.urls")),

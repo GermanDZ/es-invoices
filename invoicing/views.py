@@ -19,6 +19,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from clients.services import recipient_snapshot
 from documents.services import Issuer, render_invoice_pdf, send_invoice_email
+from submission.selectors import latest_alta_record, record_is_accepted
 
 from .forms import IssuanceForm, LineItemFormSet
 from .models import Invoice, LineItem, Series
@@ -124,12 +125,25 @@ def _issue_from_forms(user, form, formset):
 
 @login_required
 def invoice_detail(request, pk):
-    """Show an issued (or draft) invoice with PDF + send actions."""
+    """Show an issued (or draft) invoice with PDF, send, and AEAT-submit actions.
+
+    The AEAT submission panel (T-023) surfaces the latest ``alta`` record's
+    attempts and whether a submit is still available; the submit itself POSTs to
+    ``submission:submit`` (the engine owns the call).
+    """
     invoice = get_object_or_404(_owner_invoices(request.user), pk=pk)
+    record = latest_alta_record(invoice)
+    attempts = list(record.submission_attempts.order_by("-id")) if record else []
     return render(
         request,
         "invoicing/invoice_detail.html",
-        {"invoice": invoice, "totals": invoice.compute_totals()},
+        {
+            "invoice": invoice,
+            "totals": invoice.compute_totals(),
+            "submission_record": record,
+            "submission_attempts": attempts,
+            "submission_can_submit": record is not None and not record_is_accepted(record),
+        },
     )
 
 

@@ -20,6 +20,8 @@
 
   <p><a href="{% url 'invoicing:pdf' invoice.pk %}">Descargar PDF</a></p>
 
+  {% include "submission/_outcome.html" %}
+
   <form method="post" action="{% url 'invoicing:send' invoice.pk %}">
     {% csrf_token %}
     <label>Enviar por email a: <input type="email" name="to_email" required></label>

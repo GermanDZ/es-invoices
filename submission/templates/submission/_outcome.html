@@ -1,0 +1,37 @@
+{% comment %}
+AEAT submission panel for an invoice's latest alta record (T-023, UC-002).
+Context: submission_record, submission_attempts (newest first), submission_can_submit.
+Included by invoicing/invoice_detail.html.
+{% endcomment %}
+<section class="submission">
+  <h2>Envío a la AEAT (Verifactu)</h2>
+
+  {% if not submission_record %}
+    <p>Esta factura aún no tiene un registro Verifactu que enviar.</p>
+  {% else %}
+    {% if submission_attempts %}
+      <dl class="submission-outcome">
+        {% for attempt in submission_attempts %}
+          <dt>{{ attempt.get_status_display }}</dt>
+          <dd>
+            {% if attempt.csv %}CSV: {{ attempt.csv }}{% endif %}
+            {% if attempt.aeat_code %}Código: {{ attempt.aeat_code }}{% endif %}
+            {% if attempt.aeat_message %}— {{ attempt.aeat_message }}{% endif %}
+            <small>({{ attempt.created_at }})</small>
+          </dd>
+        {% endfor %}
+      </dl>
+    {% else %}
+      <p>Sin envíos todavía.</p>
+    {% endif %}
+
+    {% if submission_can_submit %}
+      <form method="post" action="{% url 'submission:submit' submission_record.invoice_id %}">
+        {% csrf_token %}
+        <button type="submit">Enviar a la AEAT</button>
+      </form>
+    {% else %}
+      <p>El registro ya fue aceptado por la AEAT.</p>
+    {% endif %}
+  {% endif %}
+</section>

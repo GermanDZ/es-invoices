@@ -176,11 +176,11 @@ every environment.
 
 ## Operations
 
-- [ ] Add `submission/urls.py` (`app_name="submission"`, the `submit` route) and mount it in `config/urls.py` under `submissions/`.
-- [ ] Implement `submission_submit` in `submission/views.py`: `@login_required`, owner-scope the invoice (404 otherwise), select latest `alta` record, guard already-accepted and the `AEAT_SUBMISSION_LIVE` kill-switch, call `submit_record`, map the outcome to a `messages` call, redirect to `invoicing:detail`.
-- [ ] Extend `invoice_detail` in `invoicing/views.py` to load the latest `alta` record's `submission_attempts` and a `can_submit` flag; add the `submission/templates/submission/_outcome.html` partial and wire the submit control + outcome panel into `invoice_detail.html`.
-- [ ] (tester) Add `submission/tests/test_views.py` with a stubbed `SubmissionGateway`: assert accepted/rejected/pending/disabled surfacing, already-accepted + kill-switch guards, owner-scope 404, and login-required redirect.
-- [ ] (tester) Run `python manage.py test submission invoicing` and confirm green; fix any regressions in the touched surface only.
+- [x] Add `submission/urls.py` (`app_name="submission"`, the `submit` route) and mount it in `config/urls.py` under `submissions/`.
+- [x] Implement `submission_submit` in `submission/views.py`: `@login_required`, owner-scope the invoice (404 otherwise), select latest `alta` record, guard already-accepted and the `AEAT_SUBMISSION_LIVE` kill-switch, call `submit_record`, map the outcome to a `messages` call, redirect to `invoicing:detail`.
+- [x] Extend `invoice_detail` in `invoicing/views.py` to load the latest `alta` record's `submission_attempts` and a `can_submit` flag; add the `submission/templates/submission/_outcome.html` partial and wire the submit control + outcome panel into `invoice_detail.html`.
+- [x] (tester) Add `submission/tests/test_views.py` with a stubbed `SubmissionGateway`: assert accepted/rejected/pending/disabled surfacing, already-accepted + kill-switch guards, owner-scope 404, and login-required redirect.
+- [x] (tester) Run `python manage.py test submission invoicing` and confirm green; fix any regressions in the touched surface only.
 
 ## Norms
 
