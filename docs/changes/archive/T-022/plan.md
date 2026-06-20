@@ -1,7 +1,7 @@
 ---
 id: T-022
 title: Invoice issuance UI (create → issue → PDF → email)
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: high
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
