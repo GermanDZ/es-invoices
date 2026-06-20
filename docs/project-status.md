@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 22
-**Iteration Goal**: T-023 — AEAT submission UI + outcome surfacing
+**Iteration**: 23
+**Iteration Goal**: T-024 — Corrective & annulment UI (rectificativa + anulación)
 **Status**: completed
-**Current Task**: T-023
+**Current Task**: T-024
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-20
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 23** (2026-06-20): T-024 complete — corrective & annulment UI (UC-004/UC-005). New owner-scoped browser paths in the `invoicing` app over the shipped T-017 engine verbs (no engine/compliance/submission logic changed): `invoice_rectificar` pre-fills a `RectificativaForm` (R1–R5 reason selector + restated line items *por sustitución*) from the original and drives `issue_rectificativa` into a dedicated `R` series, linking the original and surfacing the AEAT outcome; `invoice_annul` shows the UC-005 step-2 warning/confirm page and drives `annul_invoice`, surfacing the 2b real-sale refusal as a message (never a 500). Two routes, two templates, state-gated 'Rectificar'/'Anular' actions on the invoice detail page, outcome wording reused from T-023. Numbering/records/AEAT stay the engine's job — the views never number or call the network; a rolled-back draft burns no series number. Per-diff verification graded all 8 requirements ✅. Scope held to the engine's current capability — *por diferencias*, rectificativa PDF marking, annul-while-pending, active-set exclusion and `Client.email` remain T-025. 11 new view tests, full suite 172 green (2 Postgres-gated skips); no new model/migration, no new flag.
 
 - **Iteration 22** (2026-06-20): T-023 complete — AEAT submission UI + outcome surfacing (UC-002). New owner-scoped `submission` browser surface over the existing T-013/T-014 engine: a "Submit to AEAT" control on the invoice detail page drives the invoice's latest `alta` VerifactuRecord through `submission.services.submit_record` (the engine still owns retry/pending/persist and the permanent `AEAT_SUBMISSION_LIVE` kill-switch — the view never calls the network or writes an attempt), surfacing accepted/rejected/pending/disabled with the AEAT message + acceptance CSV. `submission_submit` view + `submission/urls.py` mounted at `/submissions/`, a `_outcome.html` partial included by `invoice_detail`, and a new `submission/selectors.py` (latest-alta + already-accepted helpers) shared by both apps so `services.py` stays untouched. Guards: GET redirects, already-accepted records are not re-submittable (no second live call), DISABLED uses the returned outcome since no attempt is persisted. Realizes UC-002 as a user-triggered submit (vs its auto-on-issuance framing); no new model/migration, no new flag (reuses the T-019 permanent kill-switch). 12 new view tests, full suite 161 green (2 Postgres-gated skips). Unblocks T-024.
 
