@@ -72,6 +72,15 @@ class AnnulViewTests(TestCase):
         self.invoice.refresh_from_db()
         self.assertFalse(self.invoice.annulled)
 
+    def test_annulled_invoice_detail_still_loads(self):
+        # T-025 R4: exclusion from the active set is from *listings*, not record
+        # access — an annulled invoice's detail page stays reachable.
+        self.client.post(reverse("invoicing:annul", args=[self.invoice.pk]))
+        self.invoice.refresh_from_db()
+        self.assertTrue(self.invoice.annulled)
+        resp = self.client.get(reverse("invoicing:detail", args=[self.invoice.pk]))
+        self.assertEqual(resp.status_code, 200)
+
     def test_cross_owner_is_404(self):
         # Requirement 8 — another owner's invoice is a 404 on GET and POST.
         other = make_user()

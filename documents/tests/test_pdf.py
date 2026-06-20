@@ -11,9 +11,13 @@ import pypdf
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 
+import compliance
+from compliance.tests.factories import ISSUER_NAME, ISSUER_NIF, issued_invoice
 from documents.services import Issuer, build_qr_url, render_invoice_pdf
-from invoicing.services import issue_invoice
+from invoicing.services import issue_invoice, issue_rectificativa
 from invoicing.tests.factories import make_invoice, make_series
+
+FECHA_HORA = "2026-06-20T12:00:00+02:00"
 
 ISSUER = Issuer(
     name="Ana Autónoma",
@@ -38,6 +42,38 @@ def _issued(prefix="FRA-", irpf="0", lines=None):
         lines=lines or [(2, "50.00", "21"), (1, "100.00", "10")],
     )
     return issue_invoice(inv)
+
+
+class RectificativaMarkingTests(TestCase):
+    """T-025 R2 / UC-004 postcondition — the rectificativa PDF is marked and cites
+    the corrected invoice's NumSerie; an ordinary invoice carries no marking."""
+
+    def _rectificativa_and_original(self):
+        original = issued_invoice(lines=[(1, "100.00", "21")])
+        compliance.generate_alta(
+            original, issuer_nif=ISSUER_NIF, issuer_name=ISSUER_NAME,
+            fecha_hora=FECHA_HORA,
+        )
+        rect = make_invoice(
+            series=make_series(owner=original.series.owner, prefix="R"),
+            lines=[(1, "80.00", "21")],
+        )
+        issue_rectificativa(
+            rect, original, issuer_nif=ISSUER_NIF, issuer_name=ISSUER_NAME,
+            fecha_hora=FECHA_HORA,
+        )
+        rect.refresh_from_db()
+        return rect, original
+
+    def test_rectificativa_pdf_is_marked_and_cites_corrected_numserie(self):
+        rect, original = self._rectificativa_and_original()
+        text = _pdf_text(render_invoice_pdf(rect, issuer=ISSUER))
+        self.assertIn("RECTIFICATIVA", text.upper())
+        self.assertIn(f"{original.series.prefix}{original.number}", text)
+
+    def test_ordinary_invoice_has_no_rectificativa_marking(self):
+        text = _pdf_text(render_invoice_pdf(_issued(), issuer=ISSUER))
+        self.assertNotIn("RECTIFICATIVA", text.upper())
 
 
 class RenderInvoicePdfTests(TestCase):

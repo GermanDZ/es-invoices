@@ -1,0 +1,1 @@
+{"event": "iteration_start", "task_id": "T-025", "goal": "Close UC-004/UC-005 behaviour gaps (R1-R5): por-diferencias method, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email", "branch": "feat/T-025-uc004-uc005-gaps", "phase": "construction", "ts": "2026-06-20T07:17:10Z"}

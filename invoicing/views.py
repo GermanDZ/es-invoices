@@ -276,6 +276,7 @@ def _rectify_from_forms(user, original, form, formset):
             issuer_nif=form.cleaned_data["issuer_nif"],
             issuer_name=form.cleaned_data["issuer_name"],
             tipo_factura=form.cleaned_data["tipo_factura"],
+            method=form.cleaned_data["metodo"],
         )
     return rect, outcome
 
@@ -306,7 +307,15 @@ def invoice_annul(request, pk):
     except ValidationError as exc:
         messages.error(request, "; ".join(exc.messages))
     else:
-        _surface_request_outcome(request, outcome)
+        if outcome is None:
+            # UC-005 2a: the pending submission was cancelled — no anulación was
+            # sent. The invoice is annulled locally.
+            messages.success(
+                request,
+                "Envío pendiente cancelado; la factura se ha anulado localmente.",
+            )
+        else:
+            _surface_request_outcome(request, outcome)
     return redirect("invoicing:detail", pk=invoice.pk)
 
 

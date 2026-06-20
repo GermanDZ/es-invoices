@@ -117,6 +117,18 @@ class RectificativaForm(forms.Form):
         initial="R1",
         label="Motivo de la rectificación",
     )
+    # Rectificativa method (T-025 R1). "S" sustitución restates the full corrected
+    # invoice (default, today's behaviour); "I" por diferencias records only the
+    # delta — the engine omits ImporteRectificacion for "I". The line-item form is
+    # the same either way; the selector only switches TipoRectificativa.
+    metodo = forms.ChoiceField(
+        choices=[
+            ("S", "Por sustitución (factura corregida completa)"),
+            ("I", "Por diferencias (solo el importe rectificado)"),
+        ],
+        initial="S",
+        label="Método de rectificación",
+    )
 
 
 def lineitem_initial_from(invoice):

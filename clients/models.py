@@ -38,6 +38,10 @@ class Client(models.Model):
     )
     tax_id = models.CharField(max_length=32, blank=True, default="")
     address = models.CharField(max_length=255, blank=True, default="")
+    # Optional for both B2B and B2C (T-025 R5): when present it is the default
+    # recipient address for `documents.send_invoice_email`; validated as an email
+    # when set, never required. Resolution stays in `documents.services`.
+    email = models.EmailField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

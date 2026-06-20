@@ -18,11 +18,17 @@ class SubmissionAttempt(models.Model):
     REJECTED = "rejected"
     PENDING = "pending"
     DISABLED = "disabled"
+    # A pending attempt that was locally cancelled before AEAT returned a verdict
+    # (T-025 R3 / UC-005 alt-flow 2a): annulling a still-pending invoice cancels
+    # the in-flight submission instead of sending an anulación. Terminal — owned
+    # by submission's vocabulary so callers never invent the string.
+    CANCELLED = "cancelled"
     STATUSES = [
         (ACCEPTED, "Accepted"),
         (REJECTED, "Rejected"),
         (PENDING, "Pending"),
         (DISABLED, "Disabled"),
+        (CANCELLED, "Cancelled"),
     ]
 
     record = models.ForeignKey(

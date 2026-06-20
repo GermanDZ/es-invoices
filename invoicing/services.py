@@ -99,18 +99,24 @@ def _original_alta(invoice):
 
 
 def issue_rectificativa(rectificativa, original, *, issuer_nif, issuer_name,
-                        tipo_factura="R1", fecha_hora=None, signer=None,
-                        gateway=None):
-    """Issue a draft ``rectificativa`` *por sustitución* correcting ``original`` (UC-004).
+                        tipo_factura="R1", method="S", fecha_hora=None,
+                        signer=None, gateway=None):
+    """Issue a draft ``rectificativa`` correcting ``original`` (UC-004).
 
     The caller builds the draft ``rectificativa`` like any invoice — its own
     (corrected, fully-restated) line items, recipient snapshot and a dedicated
     rectificativa ``series``. This verb then: issues it gap-free
     (:func:`issue_invoice`), generates a rectificativa-type *alta*
-    (``TipoFactura=R1``, ``TipoRectificativa=S``) referencing ``original``'s alta
-    record, submits it via the AD-3 gateway, and — on an **accepted or disabled**
-    outcome — links ``original.corrected_by = rectificativa`` (a rejection leaves
-    the original untouched; UC-004 9a). Returns ``(rectificativa, record, outcome)``.
+    (``TipoFactura=R1``) referencing ``original``'s alta record, submits it via
+    the AD-3 gateway, and — on an **accepted or disabled** outcome — links
+    ``original.corrected_by = rectificativa`` (a rejection leaves the original
+    untouched; UC-004 9a). Returns ``(rectificativa, record, outcome)``.
+
+    ``method`` selects the rectificativa type (UC-004 alt-flow 3a): ``"S"``
+    *por sustitución* (default, today's behaviour — the record carries
+    ``ImporteRectificacion``) or ``"I"`` *por diferencias* — the record carries
+    ``TipoRectificativa="I"`` and emits no ``ImporteRectificacion``. The value
+    flows straight to ``compliance.generate_alta`` which already supports both.
     """
     import compliance
     from submission.gateway import SubmissionStatus
@@ -133,7 +139,7 @@ def issue_rectificativa(rectificativa, original, *, issuer_nif, issuer_name,
         fecha_hora=fecha_hora,
         signer=signer,
         tipo_factura=tipo_factura,
-        tipo_rectificativa="S",
+        tipo_rectificativa=method,
         rectifies=original_record,
     )
     outcome = submit_record(record, gateway=gateway)
@@ -150,13 +156,24 @@ def annul_invoice(invoice, *, issuer_name=None, fecha_hora=None, signer=None,
     Reserved for records that should never have existed: **refuses** when the
     invoice already carries a rectificativa (``corrected_by`` set) — a real-sale
     correction belongs to :func:`issue_rectificativa` (UC-005 exception 2b).
-    Reuses the shipped :func:`compliance.generate_anulacion` + the AD-3 gateway;
-    on an **accepted or disabled** outcome marks ``invoice.annulled`` (a rejection
-    leaves the prior state; UC-005 5a). Creates **no** new Invoice and consumes no
-    series number. Returns ``(record, outcome)``.
+
+    Two branches on the alta's submission state (UC-005):
+
+    * **Pending** (alt-flow 2a) — the alta's latest :class:`SubmissionAttempt` is
+      still ``pending`` at the AEAT: there is nothing registered to anul, so this
+      **cancels the pending submission** (stamps that attempt ``cancelled``),
+      marks the invoice ``annulled`` locally, generates **no** anulación record
+      and sends nothing. Returns ``(None, None)``.
+    * **Accepted / disabled** (the default) — reuses the shipped
+      :func:`compliance.generate_anulacion` + the AD-3 gateway; on an accepted or
+      disabled outcome marks ``invoice.annulled`` (a rejection leaves the prior
+      state; UC-005 5a). Returns ``(record, outcome)``.
+
+    Creates **no** new Invoice and consumes no series number in either branch.
     """
     import compliance
     from submission.gateway import SubmissionStatus
+    from submission.models import SubmissionAttempt
     from submission.services import submit_record
 
     if not invoice.issued:
@@ -169,6 +186,18 @@ def annul_invoice(invoice, *, issuer_name=None, fecha_hora=None, signer=None,
     original_record = _original_alta(invoice)
     if original_record is None:
         raise ValidationError("Invoice has no alta record to annul.")
+
+    # UC-005 alt-flow 2a: the alta is still pending at the AEAT — cancel the
+    # in-flight submission instead of registering an anulación for a record that
+    # was never accepted. Submission is synchronous today, so there is no external
+    # queue to dequeue: stamping the latest pending attempt cancelled is the cancel.
+    latest_attempt = original_record.submission_attempts.order_by("-id").first()
+    if latest_attempt is not None and latest_attempt.status == SubmissionAttempt.PENDING:
+        latest_attempt.status = SubmissionAttempt.CANCELLED
+        latest_attempt.save(update_fields=["status"])
+        invoice.annulled = True
+        invoice.save(update_fields=["annulled"])
+        return None, None
 
     record = compliance.generate_anulacion(
         original_record, issuer_name=issuer_name, fecha_hora=fecha_hora,

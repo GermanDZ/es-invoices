@@ -119,6 +119,11 @@ def render_invoice_pdf(invoice, *, issuer) -> bytes:
     _require_issued(invoice)
     totals = invoice.compute_totals()
     qr_url = build_qr_url(invoice, issuer)
+    # T-025 R2 / UC-004 postcondition: a rectificativa (its `corrects` reverse
+    # manager is non-empty) is marked as such and cites the corrected invoice's
+    # NumSerie. Read-only: the documents module never writes to any invoice.
+    corrected = invoice.corrects.order_by("number").first()
+    corrected_num_serie = _num_serie(corrected) if corrected is not None else ""
     lines = [
         {
             "description": item.description,
@@ -139,6 +144,8 @@ def render_invoice_pdf(invoice, *, issuer) -> bytes:
             "num_serie": _num_serie(invoice),
             "fecha_exp": _fecha_exp(invoice),
             "qr_data_uri": _qr_data_uri(qr_url),
+            "is_rectificativa": corrected is not None,
+            "corrected_num_serie": corrected_num_serie,
         },
     )
     return HTML(string=html).write_pdf()

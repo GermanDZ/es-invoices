@@ -9,6 +9,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 
+from clients.tests.factories import make_client
 from documents.services import Issuer, send_invoice_email
 from invoicing.services import issue_invoice
 from invoicing.tests.factories import make_invoice, make_series
@@ -74,6 +75,25 @@ class SendInvoiceEmailTests(TestCase):
         with self.assertRaises(ValidationError):
             send_invoice_email(draft, issuer=ISSUER, to_email="cliente@example.com")
         self.assertEqual(len(mail.outbox), 0)
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class ResolvesClientEmailTests(TestCase):
+    """T-025 R5 (resolution half) — ``send_invoice_email`` uses the saved client's
+    email when ``to_email`` is omitted."""
+
+    def test_resolves_saved_client_email_when_to_email_omitted(self):
+        inv = _issued()
+        client = make_client(owner=inv.series.owner)
+        client.email = "saved@cliente.es"
+        client.save(update_fields=["email"])
+        inv.client = client
+        inv.save(update_fields=["client"])
+
+        sent = send_invoice_email(inv, issuer=ISSUER)  # no to_email
+
+        self.assertEqual(sent, 1)
+        self.assertEqual(mail.outbox[0].to, ["saved@cliente.es"])
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")

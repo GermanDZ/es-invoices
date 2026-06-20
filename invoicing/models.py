@@ -47,8 +47,24 @@ class Series(models.Model):
         return f"{self.prefix or '(default)'} @ {self.last_number}"
 
 
+class InvoiceQuerySet(models.QuerySet):
+    """Custom queryset exposing the *active set* selector (T-025 R4)."""
+
+    def active(self):
+        """Invoices in the active set — annulled records excluded (UC-005).
+
+        An annulled invoice is never deleted (its Verifactu record is permanent);
+        it is only dropped from listings. Direct record access (detail/pdf) stays
+        reachable via the default manager — the exclusion is from *listings*, not
+        from record access.
+        """
+        return self.filter(annulled=False)
+
+
 class Invoice(models.Model):
     """An invoice header. Draft until issued; immutable on identity once issued."""
+
+    objects = InvoiceQuerySet.as_manager()
 
     # Identifying / numbering -------------------------------------------------
     series = models.ForeignKey(

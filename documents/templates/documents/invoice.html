@@ -28,6 +28,11 @@
   .verifactu img { width: 96px; height: 96px; }
   .legend { font-size: 10px; color: #444; }
   .legend strong { letter-spacing: 1px; }
+  .rectificativa { margin: 10px 0 4px; padding: 6px 10px; border: 1.5px solid #b00;
+                   color: #b00; font-weight: bold; font-size: 12px;
+                   text-transform: uppercase; letter-spacing: .5px; }
+  .rectificativa .ref { display: block; font-weight: normal; text-transform: none;
+                        letter-spacing: 0; color: #444; margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -42,6 +47,13 @@
       {% if issuer.address %}{{ issuer.address }}{% endif %}
     </div>
   </div>
+
+  {% if is_rectificativa %}
+  <div class="rectificativa">
+    Factura rectificativa
+    <span class="ref">Rectifica a la factura {{ corrected_num_serie }}</span>
+  </div>
+  {% endif %}
 
   <div class="parties">
     <div class="party">

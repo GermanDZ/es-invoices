@@ -8,17 +8,24 @@ by default (kill-switch off → DISABLED) and a scripted gateway for the
 accepted/rejected paths.
 """
 from decimal import Decimal
+from xml.etree import ElementTree as ET
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
 
 import compliance
 from compliance.models import VerifactuRecord
+from compliance.records import SF
 from compliance.tests.factories import ISSUER_NAME, ISSUER_NIF, issued_invoice
 from invoicing.models import Invoice
 from invoicing.services import annul_invoice, issue_rectificativa
-from invoicing.tests.factories import make_invoice, make_series
+from invoicing.tests.factories import make_invoice, make_series, make_user
 from submission.gateway import SubmissionGateway, SubmissionOutcome, SubmissionStatus
+from submission.models import SubmissionAttempt
+
+
+def _find(elem, tag):
+    return elem.find(f".//{{{SF}}}{tag}")
 
 FECHA_HORA = "2026-06-18T12:00:00+02:00"
 ENABLED = dict(AEAT_SUBMISSION_LIVE=True, AEAT_SUBMISSION_MAX_RETRIES=3,
@@ -80,6 +87,29 @@ class RectificativaIssuanceTests(TestCase):
         # manager (`corrects` = invoices this rectificativa corrects).
         self.assertEqual(rect.corrects.get().id, self.original.id)
 
+    def test_method_por_diferencias_sets_tipo_rectificativa_I_no_importe(self):
+        # T-025 R1 / UC-004 alt-flow 3a: método "I" → TipoRectificativa="I" and no
+        # ImporteRectificacion block on the generated alta record.
+        rect = self._draft_rectificativa()
+        _r, record, _o = issue_rectificativa(
+            rect, self.original, issuer_nif=ISSUER_NIF, issuer_name=ISSUER_NAME,
+            fecha_hora=FECHA_HORA, method="I",
+        )
+        root = ET.fromstring(record.xml)
+        self.assertEqual(_find(root, "TipoRectificativa").text, "I")
+        self.assertIsNone(_find(root, "ImporteRectificacion"))
+
+    def test_default_method_is_sustitucion_S(self):
+        # T-025 R1: the default (no method change) keeps today's behaviour — "S".
+        rect = self._draft_rectificativa()
+        _r, record, _o = issue_rectificativa(
+            rect, self.original, issuer_nif=ISSUER_NIF, issuer_name=ISSUER_NAME,
+            fecha_hora=FECHA_HORA,
+        )
+        root = ET.fromstring(record.xml)
+        self.assertEqual(_find(root, "TipoRectificativa").text, "S")
+        self.assertIsNotNone(_find(root, "ImporteRectificacion"))
+
     @override_settings(**ENABLED)
     def test_accepted_marks_original_corrected(self):
         rect = self._draft_rectificativa()
@@ -133,6 +163,41 @@ class AnnulmentTests(TestCase):
         self.assertTrue(self.invoice.annulled)
         self.assertEqual(Invoice.objects.count(), before, "no new Invoice")
 
+    def test_annul_while_pending_cancels_attempt_and_sends_no_anulacion(self):
+        # T-025 R3 / UC-005 alt-flow 2a: the alta's latest submission is still
+        # pending → cancel it, mark the invoice annulled locally, generate no
+        # anulación, send nothing.
+        alta = self.invoice.verifactu_records.get(record_type=VerifactuRecord.ALTA)
+        attempt = SubmissionAttempt.objects.create(
+            record=alta, status=SubmissionAttempt.PENDING
+        )
+        record, outcome = annul_invoice(self.invoice, fecha_hora=FECHA_HORA)
+        self.assertIsNone(record)
+        self.assertIsNone(outcome)
+        attempt.refresh_from_db()
+        self.assertEqual(attempt.status, SubmissionAttempt.CANCELLED)
+        self.invoice.refresh_from_db()
+        self.assertTrue(self.invoice.annulled)
+        self.assertFalse(
+            self.invoice.verifactu_records.filter(
+                record_type=VerifactuRecord.ANULACION).exists(),
+            "no anulación record is generated for a pending alta",
+        )
+
+    def test_annul_when_accepted_generates_anulacion(self):
+        # T-025 R3 (other branch): an accepted/disabled alta still annuls by
+        # generating an anulación record (today's behaviour, unchanged). The latest
+        # attempt is accepted, so the pending-cancel branch is not taken.
+        alta = self.invoice.verifactu_records.get(record_type=VerifactuRecord.ALTA)
+        SubmissionAttempt.objects.create(
+            record=alta, status=SubmissionAttempt.ACCEPTED, csv="CSV-1"
+        )
+        record, _outcome = annul_invoice(self.invoice, fecha_hora=FECHA_HORA)
+        self.assertIsNotNone(record)
+        self.assertEqual(record.record_type, VerifactuRecord.ANULACION)
+        self.invoice.refresh_from_db()
+        self.assertTrue(self.invoice.annulled)
+
     @override_settings(**ENABLED)
     def test_rejected_annulment_leaves_invoice_not_annulled(self):
         gw = _ScriptedGateway(
@@ -184,3 +249,21 @@ class InvariantTests(TestCase):
         inv.save()  # must not raise (series/number/issue_date unchanged)
         inv.refresh_from_db()
         self.assertTrue(inv.annulled)
+
+
+class ActiveSetTests(TestCase):
+    """T-025 R4 / UC-005 postcondition — annulled invoices drop out of the active set."""
+
+    def test_active_excludes_annulled_invoices(self):
+        owner = make_user()
+        live = make_invoice(
+            series=make_series(owner=owner, prefix="A"), lines=[(1, "10.00", "21")]
+        )
+        annulled = make_invoice(
+            series=make_series(owner=owner, prefix="B"), lines=[(1, "10.00", "21")]
+        )
+        annulled.annulled = True
+        annulled.save()
+        active = list(Invoice.objects.active())
+        self.assertIn(live, active)
+        self.assertNotIn(annulled, active)

@@ -23,6 +23,8 @@ touches:
   - clients/services.py
   - clients/migrations/
   - clients/tests/
+  - submission/models.py
+  - submission/migrations/
   - docs/changes/T-025/
 ---
 
@@ -200,12 +202,12 @@ rule behind its module — no cross-module reach-through.
 
 ## Operations
 
-- [ ] Add `Client.email` (optional `EmailField`) + `email` to `ClientForm.fields`; run `makemigrations clients` and `migrate` using the **`.venv`** python (see Safeguards); add a clients test for valid/invalid/empty email (R5 form half).
-- [ ] Thread the rectificativa **método** ("S"/"I") through `RectificativaForm` → `_rectify_from_forms` → `issue_rectificativa(method=...)` → `generate_alta(tipo_rectificativa=...)`, defaulting to "S"; add an invoicing test asserting both `TipoRectificativa` values on the generated record (R1).
-- [ ] Make `annul_invoice` pending-aware: when the original alta's latest `SubmissionAttempt` is `pending` (not accepted), mark that attempt cancelled, mark the invoice `annulled` locally, and generate **no** anulación; keep the accepted/disabled path generating an anulación; add invoicing tests for both branches (R3).
-- [ ] Add `Invoice.objects.active()` excluding `annulled=True`; add a test that it returns only the non-annulled invoice and that an annulled invoice's detail page still loads (R4).
-- [ ] Mark the rectificativa PDF: pass an `is_rectificativa` flag + corrected NumSerie from `render_invoice_pdf` (read-only) and render a *FACTURA RECTIFICATIVA* + corrected-invoice reference in `invoice.html`; add a documents test asserting the marking appears for a rectificativa and is absent for an ordinary invoice, and that `send_invoice_email` resolves the client email when `to_email` is omitted (R2 + R5 resolution half).
-- [ ] (tester) Run the full suite in `.venv` (`python manage.py test`), confirm all five requirements green, and record results in `docs/changes/T-025/test-notes.md`.
+- [x] Add `Client.email` (optional `EmailField`) + `email` to `ClientForm.fields`; run `makemigrations clients` and `migrate` using the **`.venv`** python (see Safeguards); add a clients test for valid/invalid/empty email (R5 form half).
+- [x] Thread the rectificativa **método** ("S"/"I") through `RectificativaForm` → `_rectify_from_forms` → `issue_rectificativa(method=...)` → `generate_alta(tipo_rectificativa=...)`, defaulting to "S"; add an invoicing test asserting both `TipoRectificativa` values on the generated record (R1).
+- [x] Make `annul_invoice` pending-aware: when the original alta's latest `SubmissionAttempt` is `pending` (not accepted), mark that attempt cancelled, mark the invoice `annulled` locally, and generate **no** anulación; keep the accepted/disabled path generating an anulación; add invoicing tests for both branches (R3).
+- [x] Add `Invoice.objects.active()` excluding `annulled=True`; add a test that it returns only the non-annulled invoice and that an annulled invoice's detail page still loads (R4).
+- [x] Mark the rectificativa PDF: pass an `is_rectificativa` flag + corrected NumSerie from `render_invoice_pdf` (read-only) and render a *FACTURA RECTIFICATIVA* + corrected-invoice reference in `invoice.html`; add a documents test asserting the marking appears for a rectificativa and is absent for an ordinary invoice, and that `send_invoice_email` resolves the client email when `to_email` is omitted (R2 + R5 resolution half).
+- [x] (tester) Run the full suite in `.venv` (`python manage.py test`), confirm all five requirements green, and record results in `docs/changes/T-025/test-notes.md`.
 
 ## Norms
 
