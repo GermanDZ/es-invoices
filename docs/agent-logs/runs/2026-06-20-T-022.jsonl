@@ -1,0 +1,1 @@
+{"run_id": "run-T-022-21", "event": "iteration_start", "task_id": "T-022", "goal": "T-022 \u2014 Invoice issuance UI (create \u2192 issue \u2192 PDF \u2192 email)", "branch": "feat/T-022-issuance-ui", "phase": "construction", "ts": "2026-06-20T06:10:52Z"}

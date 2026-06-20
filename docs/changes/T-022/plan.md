@@ -7,6 +7,10 @@ estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
 depends-on: [T-012, T-016, T-021]
 blocks: [T-023, T-024]
+touches:
+  - invoicing
+  - config/urls.py
+  - accounts/templates/accounts/landing.html
 last-synced: ""
 ---
 
@@ -175,27 +179,27 @@ validation logic leaks out of the services.
 
 ## Operations
 
-- [ ] Add `invoicing/forms.py`: an issuance form with issuer fields (NIF, name,
+- [x] Add `invoicing/forms.py`: an issuance form with issuer fields (NIF, name,
       address), recipient via owner-scoped client select that prefills the
       editable recipient snapshot, an optional IRPF rate, and a `LineItem`
       formset requiring ≥1 row.
-- [ ] Add `invoicing/views.py`: `invoice_create` (build draft + render form),
+- [x] Add `invoicing/views.py`: `invoice_create` (build draft + render form),
       `invoice_issue` (POST → `issue_invoice`; catch `ValidationError` →
       re-render with the message, number not consumed), `invoice_detail`,
       `invoice_pdf` (build `Issuer`, `render_invoice_pdf` → `application/pdf`
       response), `invoice_send` (POST → `send_invoice_email` with `to_email`).
       All `@login_required` and filtered to `request.user`.
-- [ ] Prefill the issuer fields from the user's most recently issued invoice and
+- [x] Prefill the issuer fields from the user's most recently issued invoice and
       get-or-create the owner's default (blank-prefix) series for new drafts.
-- [ ] Add `invoicing/urls.py` + the two templates; mount `invoicing.urls` at
+- [x] Add `invoicing/urls.py` + the two templates; mount `invoicing.urls` at
       `invoices/` in `config/urls.py`; add the issuance link to the accounts
       landing template.
-- [ ] (tester) Add `invoicing/tests/test_views.py`: happy path (create → issue →
+- [x] (tester) Add `invoicing/tests/test_views.py`: happy path (create → issue →
       PDF is `application/pdf` → send marks sent), alt-2a (no line items
       blocked), alt-6a (missing recipient field blocked, `last_number`
       unchanged), IRPF-off path, and login-required + owner-scoping (cross-owner
       access → 404).
-- [ ] Run `python manage.py test` (full suite) and a manual browser smoke (login
+- [x] Run `python manage.py test` (full suite) and a manual browser smoke (login
       → create → add items → issue → open PDF → send via the console email
       backend); confirm two consecutive issues receive consecutive gap-free
       numbers.
