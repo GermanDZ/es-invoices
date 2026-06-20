@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 20
-**Iteration Goal**: T-021 — Product authentication (registration + login + session)
+**Iteration**: 21
+**Iteration Goal**: T-022 — Invoice issuance UI (create → issue → PDF → email)
 **Status**: completed
-**Current Task**: T-021
+**Current Task**: T-022
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
-**Last Updated**: 2026-06-19
+**Last Updated**: 2026-06-20
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 21** (2026-06-20): T-022 complete — invoice issuance UI (UC-001). New `invoicing` app browser surface (it previously had only models/services/calc): owner-scoped views (`series__owner`-scoped, 404 cross-owner) for create → issue → PDF → send, an issuance form + line-item formset, and two templates mounted at `/invoices/`, linked from the auth landing. Drives the existing `issue_invoice` engine (numbering/validation stay the single source — the view never numbers) and `documents.services` render/send. Issuer fiscal identity entered inline and carried in the session (no new model, per product-owner decision); recipient comes from a saved client via the T-015 snapshot bridge, which realizes both guard flows (no-line-items 2a; B2C blank-NIF → missing-field 6a). Draft+issue run in one atomic block so a rejected issue leaves no orphan draft and the series number is unconsumed. IRPF optional. 9 new view tests (incl. template-render smoke), full suite 149 green (2 PG skips). Unblocks T-023/T-024.
 
 - **Iteration 20** (2026-06-19): T-021 complete — real product authentication. New `accounts` app wraps Django's built-in auth: email-as-username self-service registration (one account per email, scope D-3/N-5) enforcing Django's four default password validators, email login via a thin `AuthenticationForm` subclass (no custom user model, no models/migrations), POST-only logout (Django 5), and a `@login_required` landing at `/` reachable in every environment. `LOGIN_URL`/redirect settings route anonymous users to the product login, satisfying the "authenticated user" precondition of UC-001/UC-002/UC-003 in production (previously only the DEBUG-gated `/dev/login/` shim existed). The devtools shim is retained untouched for the fast dev loop; the old DEBUG root→/dev/login redirect is replaced by the real landing. Unblocks T-022+. 12 new tests, full suite 141 green (2 Postgres-gated skips).
 
