@@ -1,7 +1,7 @@
 ---
 id: T-024
 title: Corrective & annulment UI (rectificativa + anulación)
-status: ready   # proposed → ready → in-progress → done → verified
+status: done
 priority: medium   # critical | high | medium | low
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
