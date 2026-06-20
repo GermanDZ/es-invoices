@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 23
-**Iteration Goal**: T-024 — Corrective & annulment UI (rectificativa + anulación)
+**Iteration**: 24
+**Iteration Goal**: T-025 — Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email)
 **Status**: completed
-**Current Task**: T-024
+**Current Task**: T-025
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-20
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 24** (2026-06-20): T-025 complete — closed five UC-004/UC-005 conformance gaps over the shipped T-017 engine (no numbering/hash-chain/signing/adapter changes). R1: a *método* selector ('S' sustitución / 'I' diferencias) threads `RectificativaForm` → `_rectify_from_forms` → `issue_rectificativa(method=...)` → `generate_alta(tipo_rectificativa=...)`, so *por diferencias* is reachable (record carries `TipoRectificativa="I"`, no `ImporteRectificacion`); default stays 'S'. R2: the rectificativa PDF is marked *Factura rectificativa* and cites the corrected invoice's NumSerie, computed read-only in `documents.services` (a rectificativa = its `corrects` reverse manager is non-empty). R3: `annul_invoice` is pending-aware — when the alta's latest `SubmissionAttempt` is `pending` it cancels that attempt (new `SubmissionAttempt.CANCELLED`), marks the invoice annulled locally and generates NO anulación; the accepted/disabled path is unchanged. R4: `Invoice.objects.active()` (new `InvoiceQuerySet`) excludes annulled records from listings while detail/pdf access stays reachable. R5: optional `Client.email` (validated when present, never required) is resolved by `send_invoice_email` when `to_email` is omitted (resolution code was already forward-compatible via `getattr`). Two migrations (clients.0002 field, submission.0002 choices-only). 13 new tests, full suite 185 green (2 Postgres-gated skips); no new flag (existing `AEAT_SUBMISSION_LIVE` kill-switch unchanged).
 
 - **Iteration 23** (2026-06-20): T-024 complete — corrective & annulment UI (UC-004/UC-005). New owner-scoped browser paths in the `invoicing` app over the shipped T-017 engine verbs (no engine/compliance/submission logic changed): `invoice_rectificar` pre-fills a `RectificativaForm` (R1–R5 reason selector + restated line items *por sustitución*) from the original and drives `issue_rectificativa` into a dedicated `R` series, linking the original and surfacing the AEAT outcome; `invoice_annul` shows the UC-005 step-2 warning/confirm page and drives `annul_invoice`, surfacing the 2b real-sale refusal as a message (never a 500). Two routes, two templates, state-gated 'Rectificar'/'Anular' actions on the invoice detail page, outcome wording reused from T-023. Numbering/records/AEAT stay the engine's job — the views never number or call the network; a rolled-back draft burns no series number. Per-diff verification graded all 8 requirements ✅. Scope held to the engine's current capability — *por diferencias*, rectificativa PDF marking, annul-while-pending, active-set exclusion and `Client.email` remain T-025. 11 new view tests, full suite 172 green (2 Postgres-gated skips); no new model/migration, no new flag.
 
