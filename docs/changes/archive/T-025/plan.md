@@ -1,7 +1,7 @@
 ---
 id: T-025
 title: Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email)
-status: ready
+status: done
 priority: medium
 estimate: 1–2 sessions
 plan: docs/roadmap.md#construction
