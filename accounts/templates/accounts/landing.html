@@ -5,6 +5,7 @@
   <h1>FacturaSimple</h1>
   <p>Sesión iniciada como <strong>{{ user.email|default:user.username }}</strong>.</p>
   <ul>
+    <li><a href="{% url 'invoicing:create' %}">Nueva factura</a></li>
     <li><a href="{% url 'clients:list' %}">Clientes</a></li>
     <li><a href="{% url 'certificates:upload' %}">Certificado</a></li>
   </ul>

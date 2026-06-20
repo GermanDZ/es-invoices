@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Nueva factura</title></head>
+<body>
+  <h1>Nueva factura</h1>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <fieldset>
+      <legend>Emisor y destinatario</legend>
+      {{ form.as_p }}
+    </fieldset>
+    <fieldset>
+      <legend>Líneas</legend>
+      {{ formset.management_form }}
+      <table>
+        <thead>
+          <tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>IVA</th></tr>
+        </thead>
+        <tbody>
+          {% for row in formset %}
+          <tr>
+            <td>{{ row.description }}{{ row.description.errors }}</td>
+            <td>{{ row.quantity }}{{ row.quantity.errors }}</td>
+            <td>{{ row.unit_price }}{{ row.unit_price.errors }}</td>
+            <td>{{ row.iva_rate }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </fieldset>
+    <button type="submit">Emitir factura</button>
+  </form>
+  <p><a href="{% url 'accounts:landing' %}">Cancelar</a></p>
+</body>
+</html>

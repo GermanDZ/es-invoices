@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Factura {{ invoice.series.prefix }}{{ invoice.number }}</title></head>
+<body>
+  <h1>Factura {{ invoice.series.prefix }}{{ invoice.number }}</h1>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+  <dl>
+    <dt>Destinatario</dt><dd>{{ invoice.recipient_name }} — {{ invoice.recipient_taxid }}</dd>
+    <dt>Fecha</dt><dd>{{ invoice.issue_date }}</dd>
+    <dt>Estado</dt><dd>{{ invoice.status }}</dd>
+    <dt>Base imponible</dt><dd>{{ totals.taxable_base }} €</dd>
+    <dt>IVA</dt><dd>{{ totals.iva_total }} €</dd>
+    <dt>Retención IRPF</dt><dd>{{ totals.irpf_retention }} €</dd>
+    <dt>Total</dt><dd>{{ totals.grand_total }} €</dd>
+  </dl>
+
+  <p><a href="{% url 'invoicing:pdf' invoice.pk %}">Descargar PDF</a></p>
+
+  <form method="post" action="{% url 'invoicing:send' invoice.pk %}">
+    {% csrf_token %}
+    <label>Enviar por email a: <input type="email" name="to_email" required></label>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <p><a href="{% url 'accounts:landing' %}">Volver</a></p>
+</body>
+</html>
