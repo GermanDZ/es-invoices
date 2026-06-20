@@ -1,7 +1,7 @@
 ---
 id: T-023
 title: AEAT submission UI + outcome surfacing
-status: ready
+status: done
 priority: high
 estimate: 1 session
 plan: docs/roadmap.md#construction

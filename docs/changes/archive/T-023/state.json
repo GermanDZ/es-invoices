@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-023",
+  "iteration": 22,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "feat/T-023-aeat-submission-ui",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-023",
+  "session_id": null,
+  "started_at": "2026-06-20T06:34:36Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": "docs/changes/T-023/plan.md",
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}
