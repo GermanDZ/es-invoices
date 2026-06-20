@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 21
-**Iteration Goal**: T-022 — Invoice issuance UI (create → issue → PDF → email)
+**Iteration**: 22
+**Iteration Goal**: T-023 — AEAT submission UI + outcome surfacing
 **Status**: completed
-**Current Task**: T-022
+**Current Task**: T-023
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-20
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 22** (2026-06-20): T-023 complete — AEAT submission UI + outcome surfacing (UC-002). New owner-scoped `submission` browser surface over the existing T-013/T-014 engine: a "Submit to AEAT" control on the invoice detail page drives the invoice's latest `alta` VerifactuRecord through `submission.services.submit_record` (the engine still owns retry/pending/persist and the permanent `AEAT_SUBMISSION_LIVE` kill-switch — the view never calls the network or writes an attempt), surfacing accepted/rejected/pending/disabled with the AEAT message + acceptance CSV. `submission_submit` view + `submission/urls.py` mounted at `/submissions/`, a `_outcome.html` partial included by `invoice_detail`, and a new `submission/selectors.py` (latest-alta + already-accepted helpers) shared by both apps so `services.py` stays untouched. Guards: GET redirects, already-accepted records are not re-submittable (no second live call), DISABLED uses the returned outcome since no attempt is persisted. Realizes UC-002 as a user-triggered submit (vs its auto-on-issuance framing); no new model/migration, no new flag (reuses the T-019 permanent kill-switch). 12 new view tests, full suite 161 green (2 Postgres-gated skips). Unblocks T-024.
 
 - **Iteration 21** (2026-06-20): T-022 complete — invoice issuance UI (UC-001). New `invoicing` app browser surface (it previously had only models/services/calc): owner-scoped views (`series__owner`-scoped, 404 cross-owner) for create → issue → PDF → send, an issuance form + line-item formset, and two templates mounted at `/invoices/`, linked from the auth landing. Drives the existing `issue_invoice` engine (numbering/validation stay the single source — the view never numbers) and `documents.services` render/send. Issuer fiscal identity entered inline and carried in the session (no new model, per product-owner decision); recipient comes from a saved client via the T-015 snapshot bridge, which realizes both guard flows (no-line-items 2a; B2C blank-NIF → missing-field 6a). Draft+issue run in one atomic block so a rejected issue leaves no orphan draft and the series number is unconsumed. IRPF optional. 9 new view tests (incl. template-render smoke), full suite 149 green (2 PG skips). Unblocks T-023/T-024.
 
