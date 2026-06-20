@@ -1,2 +1,3 @@
 {"run_id": "run-null", "event": "iteration_start", "task_id": "T-023", "goal": "T-023 \u2014 AEAT submission UI + outcome surfacing (UC-002)", "branch": "feat/T-023-aeat-submission-ui", "phase": "construction", "ts": "2026-06-20T06:34:50Z"}
 {"event": "iteration_complete", "task_id": "T-023", "branch": "feat/T-023-aeat-submission-ui", "phase": "construction", "ts": "2026-06-20T06:42:07Z"}
+{"run_id": "9a25058cb099441989803e26b978b366", "event": "commit", "task_id": "T-023", "branch": "main", "sha": "e284d7ab90e4146efa01c2687039e72a6b152d3d", "model": null, "session_id": null, "ts": "2026-06-20T06:41:28Z"}
