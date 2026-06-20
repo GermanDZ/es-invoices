@@ -211,12 +211,12 @@ compliance, or submission *logic* is touched.
 
 ## Operations
 
-- [ ] Add `RectificativaForm` to `invoicing/forms.py` — a `tipo_factura` choice field (R1–R5 with plain-language labels) reusing `LineItemFormSet`; add a helper to pre-fill the formset from an original invoice's line items.
-- [ ] Add `invoice_rectificar(request, pk)` to `invoicing/views.py`: owner-scope the original, GET pre-fills the form from it; POST builds the draft rectificativa in the `R` series (`get_or_create`) and calls `issue_rectificativa`, catching `ValidationError` to re-render, surfacing the outcome, and redirecting to the rectificativa's detail on success.
-- [ ] Add `invoice_annul(request, pk)` to `invoicing/views.py`: owner-scope the invoice, GET renders the UC-005 step-2 warning page, POST calls `annul_invoice` catching `ValidationError` (UC-005 2b) and surfacing the outcome, then redirects to detail.
-- [ ] Add `rectificar` and `annul` routes to `invoicing/urls.py`; add `rectificativa_form.html` and `annul_confirm.html` templates and the two action links (state-gated) to `invoice_detail.html`.
-- [ ] (tester) Write `test_rectificativa_view.py` and `test_annul_view.py` covering Requirements 1–8: pre-fill, happy-path link/redirect, engine-`ValidationError` rollback, the UC-005 2b refusal message, and the cross-owner 404 — using the in-memory/disabled gateway so no live AEAT call is made.
-- [ ] (tester) Run the full `invoicing` + `submission` test suites and confirm green; record results in `docs/changes/T-024/design.md`.
+- [x] Add `RectificativaForm` to `invoicing/forms.py` — a `tipo_factura` choice field (R1–R5 with plain-language labels) reusing `LineItemFormSet`; add a helper to pre-fill the formset from an original invoice's line items.
+- [x] Add `invoice_rectificar(request, pk)` to `invoicing/views.py`: owner-scope the original, GET pre-fills the form from it; POST builds the draft rectificativa in the `R` series (`get_or_create`) and calls `issue_rectificativa`, catching `ValidationError` to re-render, surfacing the outcome, and redirecting to the rectificativa's detail on success.
+- [x] Add `invoice_annul(request, pk)` to `invoicing/views.py`: owner-scope the invoice, GET renders the UC-005 step-2 warning page, POST calls `annul_invoice` catching `ValidationError` (UC-005 2b) and surfacing the outcome, then redirects to detail.
+- [x] Add `rectificar` and `annul` routes to `invoicing/urls.py`; add `rectificativa_form.html` and `annul_confirm.html` templates and the two action links (state-gated) to `invoice_detail.html`.
+- [x] (tester) Write `test_rectificativa_view.py` and `test_annul_view.py` covering Requirements 1–8: pre-fill, happy-path link/redirect, engine-`ValidationError` rollback, the UC-005 2b refusal message, and the cross-owner 404 — using the in-memory/disabled gateway so no live AEAT call is made.
+- [x] (tester) Run the full `invoicing` + `submission` test suites and confirm green; record results in `docs/changes/T-024/design.md`.
 
 ## Norms
 
