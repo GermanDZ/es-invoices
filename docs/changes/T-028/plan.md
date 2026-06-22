@@ -1,13 +1,14 @@
 ---
-type: work-item
 id: T-028
 title: Automated data retention enforcement (scheduled deletion)
-status: pending
-phase: construction
-track: standard
-touches: [invoicing/, clients/, accounts/, submission/]
+status: ready
+priority: medium
+estimate: 2 sessions
+plan: docs/roadmap.md#T-028
 depends-on: [T-030]
-traces-from: [RGPD-001]
+blocks: [T-029]
+touches: ["accounts/", "invoicing/", "clients/", "submission/"]
+last-synced: ""
 ---
 
 # T-028 — Automated Data Retention Enforcement
