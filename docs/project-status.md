@@ -2,10 +2,10 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 27
-**Iteration Goal**: T-031 — OCM sign-off + beta readiness documentation (test evidence, go/no-go)
-**Status**: completed
-**Current Task**: T-031
+**Iteration**: 28
+**Iteration Goal**: T-028 — Automated data retention enforcement / scheduled deletion (RGPD Art. 17)
+**Status**: in-progress
+**Current Task**: T-028
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-22
@@ -16,6 +16,8 @@
 - **Iteration 27** (2026-06-22): T-031 complete (co-delivered with T-030) — docs/phase-reviews/construction-ocm.md authored: 185-green test evidence summary, UC-001..UC-005 conformance verification, R-01..R-08 risk status, and founder GO decision to proceed to beta. All three OCM criteria gaps closed.
 
 - **Iteration 27** (2026-06-22): T-030/T-031 complete — closed all three OCM gaps. docs/deployment-runbook.md: full operator runbook (prereqs, env vars, DB least-privilege, TLS, smoke test). docs/phase-reviews/construction-ocm.md: 185-green test evidence, UC-001..UC-005 conformance, risk summary, founder GO decision to proceed to beta. T-028 (automated deletion) and T-029 (self-service deletion) added to backlog.
+
+- **Iteration 28** (2026-06-22): T-028 complete — RGPD Art.17 automated data retention. New `accounts.DeletionRequest` model (OneToOne with User, `requested_at` timestamp) + `purge_expired_data` management command in the `accounts` app. Command purges: issued invoices older than 5 years (+ LineItem/compliance/submission cascades), orphaned clients with no surviving invoices, and user accounts with a DeletionRequest past the 30-day grace period. Supports `--dry-run`, `--invoice-retention-years`, `--account-grace-days`. Idempotent. 19 new tests, full suite 204 green (2 postgres-gated skips). Key design: explicit invoice pre-delete before User cascade to avoid Invoice.series PROTECT constraint. Unblocks T-029 (self-service deletion UI).
 
 - **Iteration 26** (2026-06-22): T-027 complete — AEAT/Verifactu obligation timeline verified (O-2 closed). RDL 15/2025 (BOE-A-2025-24446) confirmed: autónomos → 1 Jul 2027, sociedades → 1 Jan 2027; 2026 is a voluntary testing period. No hard-coded obligation dates in production code. Evidence: docs/changes/T-027/aeat-timeline.md. docs/risk-list.md §R-01 updated with verified dates.
 
