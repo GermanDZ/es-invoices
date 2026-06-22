@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 24
-**Iteration Goal**: T-025 — Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email)
-**Status**: completed
-**Current Task**: T-025
+**Iteration**: 25
+**Iteration Goal**: T-026 — RGPD pre-launch checklist (R-06)
+**Status**: in-progress
+**Current Task**: T-026
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
-**Last Updated**: 2026-06-20
+**Last Updated**: 2026-06-22
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 25** (2026-06-22): T-026 complete — RGPD pre-launch checklist (R-06 mitigation actioned). docs/rgpd-checklist.md created with five sections: EU residency, encryption in transit, encryption at rest, least-privilege, retention policy. All items ✅ or ⚠️ (none ❌); ⚠️ items document operator runbook steps or post-launch tasks (T-028 automated deletion, T-029 self-service deletion). config/settings.py gains SECURE_SSL_REDIRECT, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE, SECURE_HSTS_SECONDS under if-not-DEBUG guard; manage.py check --deploy → 0 critical warnings. docs/risk-list.md §R-06 updated to reference checklist as verifiable evidence.
 
 - **Iteration 24** (2026-06-20): T-025 complete — closed five UC-004/UC-005 conformance gaps over the shipped T-017 engine (no numbering/hash-chain/signing/adapter changes). R1: a *método* selector ('S' sustitución / 'I' diferencias) threads `RectificativaForm` → `_rectify_from_forms` → `issue_rectificativa(method=...)` → `generate_alta(tipo_rectificativa=...)`, so *por diferencias* is reachable (record carries `TipoRectificativa="I"`, no `ImporteRectificacion`); default stays 'S'. R2: the rectificativa PDF is marked *Factura rectificativa* and cites the corrected invoice's NumSerie, computed read-only in `documents.services` (a rectificativa = its `corrects` reverse manager is non-empty). R3: `annul_invoice` is pending-aware — when the alta's latest `SubmissionAttempt` is `pending` it cancels that attempt (new `SubmissionAttempt.CANCELLED`), marks the invoice annulled locally and generates NO anulación; the accepted/disabled path is unchanged. R4: `Invoice.objects.active()` (new `InvoiceQuerySet`) excludes annulled records from listings while detail/pdf access stays reachable. R5: optional `Client.email` (validated when present, never required) is resolved by `send_invoice_email` when `to_email` is omitted (resolution code was already forward-compatible via `getattr`). Two migrations (clients.0002 field, submission.0002 choices-only). 13 new tests, full suite 185 green (2 Postgres-gated skips); no new flag (existing `AEAT_SUBMISSION_LIVE` kill-switch unchanged).
 

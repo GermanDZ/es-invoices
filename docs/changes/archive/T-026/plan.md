@@ -1,7 +1,7 @@
 ---
 id: T-026
 title: RGPD pre-launch checklist (R-06)
-status: ready
+status: done
 priority: high
 estimate: 1 session
 plan: docs/roadmap.md#T-026
