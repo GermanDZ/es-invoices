@@ -135,6 +135,16 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# PRODUCTION SECURITY (T-026, RGPD/R-06) ----------------------------------------
+# These settings enforce HTTPS and secure cookies in non-debug environments.
+# All four are gated on `not DEBUG` so local development is unaffected.
+# Kill-switch: remove or comment out these lines and redeploy (no data migration).
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True          # Redirect all HTTP → HTTPS
+    SESSION_COOKIE_SECURE = True        # Session cookies sent over HTTPS only
+    CSRF_COOKIE_SECURE = True           # CSRF token cookies sent over HTTPS only
+    SECURE_HSTS_SECONDS = 31536000      # 1-year HSTS (enables HTTPS preloading)
+
 # AEAT SUBMISSION (T-014, AD-3) -------------------------------------------------
 # The submission adapter only calls the AEAT when AEAT_SUBMISSION_LIVE is truthy
 # — a config-read kill-switch (default OFF) so local/CI never reach the tax

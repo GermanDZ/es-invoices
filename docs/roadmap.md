@@ -60,7 +60,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-023 | AEAT submission UI + outcome surfacing | completed (2026-06-20) | high | T-014, T-022 |
 | T-024 | Corrective & annulment UI (rectificativa + anulación) | completed (2026-06-20) | medium | T-017, T-023 |
 | T-025 | Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email) | completed (2026-06-20) | medium | T-017 |
-| T-026 | RGPD pre-launch checklist (R-06) | pending | high | T-011 |
+| T-026 | RGPD pre-launch checklist (R-06) | in-progress | high | T-011 |
 | T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | pending | medium | — |
 
 ### Task notes
