@@ -99,6 +99,11 @@ Assumptions, §7 Risks).
 - **Mitigation**: EU data residency; encryption at rest/in transit; least-privilege
   access; a data-protection review before launch; documented retention policy.
   *Verifiable:* a pre-launch RGPD checklist is completed and recorded.
+  **Status (T-026):** Mitigation actioned — checklist completed at `docs/rgpd-checklist.md`.
+  Code-side controls implemented: AES-256-GCM certificate encryption (T-011),
+  production HTTPS/HSTS settings (T-026), owner-scoped data access (T-021+).
+  Operator-side controls (EU hosting confirmation, DB SSL, least-privilege DB user)
+  documented as runbook steps in the checklist. No ❌ items at launch gate.
 - **Owner**: Product Owner / Developer.
 
 ### R-07 — Scope creep vs. small-team capacity

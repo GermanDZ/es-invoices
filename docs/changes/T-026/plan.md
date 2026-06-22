@@ -152,13 +152,13 @@ documented as operator responsibility or a named follow-up task.
 
 ## Operations
 
-- [ ] (developer) Create `docs/changes/T-026/` folder (done) and draft `docs/rgpd-checklist.md` with all five R-06 sections (EU residency, encryption in transit, encryption at rest, least-privilege, retention policy) using a table format (Item | Status | Notes/Follow-up).
-- [ ] (developer) Audit each checklist section against `docs/architecture-notebook.md`, `config/settings.py`, and the `certificates` app; fill in ✅ / ⚠️ status and notes.
-- [ ] (developer) Add production HTTPS/security settings to `config/settings.py` under `if not DEBUG:`: `SECURE_SSL_REDIRECT = True`, `SESSION_COOKIE_SECURE = True`, `CSRF_COOKIE_SECURE = True`, `SECURE_HSTS_SECONDS = 31536000`.
-- [ ] (developer) Write the retention policy statement inside `docs/rgpd-checklist.md §5` covering: data categories, retention periods, deletion approach, and legal basis.
-- [ ] (developer) Update `docs/risk-list.md §R-06` mitigation paragraph to reference the completed checklist.
-- [ ] (tester) Run `python manage.py check --deploy` (with `DEBUG=0` and a dummy `SECRET_KEY`) and confirm no critical security warnings; record the output in the checklist's Evidence section.
-- [ ] (tester) Verify all checklist items resolve to ✅ or ⚠️ (none remain ❌); verify the four `SECURE_*` settings are present in `config/settings.py` and absent-when-DEBUG by reading the file; mark task ready for `/openup-complete-task`.
+- [x] (developer) Create `docs/changes/T-026/` folder (done) and draft `docs/rgpd-checklist.md` with all five R-06 sections (EU residency, encryption in transit, encryption at rest, least-privilege, retention policy) using a table format (Item | Status | Notes/Follow-up).
+- [x] (developer) Audit each checklist section against `docs/architecture-notebook.md`, `config/settings.py`, and the `certificates` app; fill in ✅ / ⚠️ status and notes.
+- [x] (developer) Add production HTTPS/security settings to `config/settings.py` under `if not DEBUG:`: `SECURE_SSL_REDIRECT = True`, `SESSION_COOKIE_SECURE = True`, `CSRF_COOKIE_SECURE = True`, `SECURE_HSTS_SECONDS = 31536000`.
+- [x] (developer) Write the retention policy statement inside `docs/rgpd-checklist.md §5` covering: data categories, retention periods, deletion approach, and legal basis.
+- [x] (developer) Update `docs/risk-list.md §R-06` mitigation paragraph to reference the completed checklist.
+- [x] (tester) Run `python manage.py check --deploy` (with `DEBUG=0` and a dummy `SECRET_KEY`) and confirm no critical security warnings; record the output in the checklist's Evidence section.
+- [x] (tester) Verify all checklist items resolve to ✅ or ⚠️ (none remain ❌); verify the four `SECURE_*` settings are present in `config/settings.py` and absent-when-DEBUG by reading the file; mark task ready for `/openup-complete-task`.
 
 ## Norms
 
