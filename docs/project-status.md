@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 25
-**Iteration Goal**: T-026 — RGPD pre-launch checklist (R-06)
+**Iteration**: 27
+**Iteration Goal**: T-030 — Deployment operator runbook (OCM gap: no standalone runbook)
 **Status**: completed
-**Current Task**: T-026
+**Current Task**: T-030
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-22
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 27** (2026-06-22): T-030/T-031 complete — closed all three OCM gaps. docs/deployment-runbook.md: full operator runbook (prereqs, env vars, DB least-privilege, TLS, smoke test). docs/phase-reviews/construction-ocm.md: 185-green test evidence, UC-001..UC-005 conformance, risk summary, founder GO decision to proceed to beta. T-028 (automated deletion) and T-029 (self-service deletion) added to backlog.
 
 - **Iteration 26** (2026-06-22): T-027 complete — AEAT/Verifactu obligation timeline verified (O-2 closed). RDL 15/2025 (BOE-A-2025-24446) confirmed: autónomos → 1 Jul 2027, sociedades → 1 Jan 2027; 2026 is a voluntary testing period. No hard-coded obligation dates in production code. Evidence: docs/changes/T-027/aeat-timeline.md. docs/risk-list.md §R-01 updated with verified dates.
 

@@ -1,7 +1,7 @@
 ---
 id: T-030
 title: Deployment operator runbook
-status: in-progress
+status: done
 priority: high
 estimate: 1 session
 plan: docs/roadmap.md#T-030
