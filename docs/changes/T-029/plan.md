@@ -35,9 +35,9 @@ command (T-028) handles the automated backend; this task adds the user-facing UI
 
 ## Operations Checklist
 
-- [ ] Add `deletion_requested_at` field to `accounts.User` (or via T-028 model)
-- [ ] Add account settings / deletion views + templates
-- [ ] Wire routes in `accounts/urls.py`
-- [ ] Write tests
-- [ ] Run full suite — all green
+- [x] Add `deletion_requested_at` field to `accounts.User` (or via T-028 model)
+- [x] Add account settings / deletion views + templates
+- [x] Wire routes in `accounts/urls.py`
+- [x] Write tests
+- [x] Run full suite — all green
 - [ ] Commit to task branch

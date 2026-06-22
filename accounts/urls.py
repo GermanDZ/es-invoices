@@ -25,4 +25,15 @@ urlpatterns = [
     ),
     # Django 5 disallows GET logout — the landing template POSTs to this route.
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    # T-029 — RGPD Art. 17 self-service account deletion.
+    path(
+        "delete/",
+        views.delete_account_confirm,
+        name="delete_account_confirm",
+    ),
+    path(
+        "delete/done/",
+        views.delete_account_done,
+        name="delete_account_done",
+    ),
 ]
