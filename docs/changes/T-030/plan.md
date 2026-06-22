@@ -1,13 +1,14 @@
 ---
-type: work-item
 id: T-030
 title: Deployment operator runbook
 status: in-progress
-phase: construction
-track: quick
-touches: [docs/deployment-runbook.md]
+priority: high
+estimate: 1 session
+plan: docs/roadmap.md#T-030
 depends-on: [T-026]
-traces-from: [RGPD-001]
+blocks: [T-031]
+touches: ["docs/deployment-runbook.md"]
+last-synced: ""
 ---
 
 # T-030 — Deployment Operator Runbook
@@ -33,6 +34,6 @@ adequate documentation before handing the product to a beta operator.
 
 ## Operations Checklist
 
-- [ ] Write `docs/deployment-runbook.md`
-- [ ] Run `python3 scripts/check-docs.py` — 0 failures
+- [x] Write `docs/deployment-runbook.md`
+- [x] Run `python3 scripts/check-docs.py` — 0 failures
 - [ ] Commit to task branch

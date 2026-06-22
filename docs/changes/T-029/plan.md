@@ -1,13 +1,14 @@
 ---
-type: work-item
 id: T-029
 title: Self-service account + data deletion UI
-status: pending
-phase: construction
-track: standard
-touches: [accounts/]
+status: ready
+priority: medium
+estimate: 2 sessions
+plan: docs/roadmap.md#T-029
 depends-on: [T-028]
-traces-from: [RGPD-001]
+blocks: []
+touches: ["accounts/"]
+last-synced: ""
 ---
 
 # T-029 — Self-Service Account + Data Deletion UI

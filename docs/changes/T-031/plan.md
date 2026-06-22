@@ -1,13 +1,14 @@
 ---
-type: work-item
 id: T-031
 title: OCM sign-off + beta readiness documentation
-status: pending
-phase: construction
-track: quick
-touches: [docs/phase-reviews/construction-ocm.md]
+status: ready
+priority: high
+estimate: 1 session
+plan: docs/roadmap.md#T-031
 depends-on: [T-030]
-traces-from: [UC-001, UC-002, UC-003, UC-004, UC-005]
+blocks: []
+touches: ["docs/phase-reviews/construction-ocm.md"]
+last-synced: ""
 ---
 
 # T-031 — OCM Sign-Off + Beta Readiness Documentation
@@ -33,7 +34,7 @@ The phase review identified two gaps blocking the formal Operational Capability 
 
 ## Operations Checklist
 
-- [ ] Create `docs/phase-reviews/` directory
-- [ ] Write `docs/phase-reviews/construction-ocm.md`
-- [ ] Run `python3 scripts/check-docs.py` — 0 failures
+- [x] Create `docs/phase-reviews/` directory
+- [x] Write `docs/phase-reviews/construction-ocm.md`
+- [x] Run `python3 scripts/check-docs.py` — 0 failures
 - [ ] Commit to task branch
