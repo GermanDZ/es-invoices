@@ -1,8 +1,6 @@
 ---
 id: T-027
 title: "Verify AEAT obligation timeline vs current rollout calendar (O-2)"
-type: work-item
-status: in-progress
 track: quick
 hat: developer
 touches: ["docs/"]

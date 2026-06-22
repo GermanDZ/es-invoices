@@ -1,9 +1,8 @@
 ---
 id: T-027-aeat-timeline
 type: decision
-status: accepted
-verified: 2026-06-22
-traces-from: T-027
+status: approved
+traces-from: [VIS-001]
 ---
 
 # AEAT / Verifactu Obligation Timeline — Verified 2026-06-22
