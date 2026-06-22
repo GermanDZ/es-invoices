@@ -40,4 +40,4 @@ command (T-028) handles the automated backend; this task adds the user-facing UI
 - [x] Wire routes in `accounts/urls.py`
 - [x] Write tests
 - [x] Run full suite — all green
-- [ ] Commit to task branch
+- [x] Commit to task branch
