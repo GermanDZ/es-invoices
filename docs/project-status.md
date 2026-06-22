@@ -2,10 +2,10 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 26
-**Iteration Goal**: T-027 — Verify AEAT obligation timeline vs current rollout calendar (O-2)
+**Iteration**: 25
+**Iteration Goal**: T-026 — RGPD pre-launch checklist (R-06)
 **Status**: completed
-**Current Task**: T-027
+**Current Task**: T-026
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-22
