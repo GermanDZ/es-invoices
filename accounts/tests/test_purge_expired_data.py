@@ -4,9 +4,12 @@ Covers:
 - Dry-run mode: logs counts but performs no writes
 - Actual deletion of expired invoices (> 5 years old)
 - Retention boundary: invoice exactly at cutoff is NOT deleted (5yr - 1 day kept)
-- Orphaned client purge: client with all invoices gone is deleted; client with a
-  surviving invoice is retained
-- Account purge: account past grace period is deleted; within-grace account is kept
+- Orphaned client purge: only clients linked to deleted invoices are candidates;
+  clients with no invoices (never invoiced) are NOT deleted; clients with a
+  surviving invoice are retained
+- Account purge: account past grace period with all-expired invoices is deleted;
+  account with recent invoices is SKIPPED despite expired DeletionRequest (fiscal
+  retention law); within-grace account is kept
 - Idempotency: running twice produces the same result as running once
 """
 import datetime
@@ -33,7 +36,7 @@ def _make_series(owner):
     return Series.objects.create(owner=owner, prefix="T")
 
 
-def _make_invoice(series, issue_date, *, issued=True):
+def _make_invoice(series, issue_date, *, issued=True, client=None):
     """Create a minimal issued invoice on the given date."""
     inv = Invoice.objects.create(
         series=series,
@@ -43,6 +46,7 @@ def _make_invoice(series, issue_date, *, issued=True):
         recipient_name="Test Recipient",
         recipient_taxid="B12345678",
         recipient_address="Calle Mayor 1",
+        client=client,
     )
     LineItem.objects.create(
         invoice=inv,
@@ -53,9 +57,9 @@ def _make_invoice(series, issue_date, *, issued=True):
     )
     if issued:
         # assign a number manually so the model's immutability guard is satisfied
-        inv.number = Invoice.objects.filter(series=series).count()
-        # bypass the immutability guard since we're setting number in the same op
-        Invoice.objects.filter(pk=inv.pk).update(number=inv.number)
+        Invoice.objects.filter(pk=inv.pk).update(
+            number=Invoice.objects.filter(series=series).count()
+        )
     return inv
 
 
@@ -149,7 +153,7 @@ class InvoicePurgeTests(TestCase):
 
 
 class ClientPurgeTests(TestCase):
-    """Orphaned clients are deleted; clients with surviving invoices are retained."""
+    """Client purge is scoped to clients linked to deleted invoices."""
 
     def setUp(self):
         self.user = _make_user()
@@ -165,9 +169,7 @@ class ClientPurgeTests(TestCase):
 
     def test_client_with_all_invoices_expired_is_deleted(self):
         client = self._make_client()
-        inv = _make_invoice(self.series, _years_ago(6))
-        inv.client = client
-        Invoice.objects.filter(pk=inv.pk).update(client=client)
+        _make_invoice(self.series, _years_ago(6), client=client)
 
         call_command("purge_expired_data", verbosity=0)
 
@@ -175,20 +177,27 @@ class ClientPurgeTests(TestCase):
 
     def test_client_with_surviving_invoice_is_retained(self):
         client = self._make_client()
-        old_inv = _make_invoice(self.series, _years_ago(6))
-        Invoice.objects.filter(pk=old_inv.pk).update(client=client)
-        recent_inv = _make_invoice(self.series, timezone.now().date())
-        Invoice.objects.filter(pk=recent_inv.pk).update(client=client)
+        _make_invoice(self.series, _years_ago(6), client=client)
+        _make_invoice(self.series, timezone.now().date(), client=client)
 
         call_command("purge_expired_data", verbosity=0)
 
         self.assertTrue(Client.objects.filter(pk=client.pk).exists())
 
-    def test_client_with_no_invoices_is_deleted(self):
-        # A client that was never linked to any invoice is orphaned.
+    def test_client_with_no_invoices_is_not_deleted(self):
+        # A client that was never linked to any invoice must NOT be deleted —
+        # it may be a newly created client not yet invoiced.
         client = self._make_client()
         call_command("purge_expired_data", verbosity=0)
-        self.assertFalse(Client.objects.filter(pk=client.pk).exists())
+        # Client with no invoices should be kept (never invoiced ≠ orphaned).
+        self.assertTrue(Client.objects.filter(pk=client.pk).exists())
+
+    def test_client_not_linked_to_purged_invoices_is_not_deleted(self):
+        # A client linked only to a recent (non-purged) invoice must not be deleted.
+        client = self._make_client()
+        _make_invoice(self.series, timezone.now().date(), client=client)
+        call_command("purge_expired_data", verbosity=0)
+        self.assertTrue(Client.objects.filter(pk=client.pk).exists())
 
 
 class AccountPurgeTests(TestCase):
@@ -210,7 +219,7 @@ class AccountPurgeTests(TestCase):
 
         self.assertTrue(User.objects.filter(pk=user.pk).exists())
 
-    def test_account_exactly_29_days_old_is_kept(self):
+    def test_account_29_days_old_is_kept(self):
         user = _make_user("exact@example.com")
         # 29 days old — inside the 30-day grace window, must not be deleted.
         DeletionRequest.objects.create(user=user, requested_at=_days_ago(29))
@@ -225,16 +234,49 @@ class AccountPurgeTests(TestCase):
         call_command("purge_expired_data", verbosity=0)
         self.assertTrue(User.objects.filter(pk=user.pk).exists())
 
-    def test_account_deletion_cascades_invoices_and_clients(self):
+    def test_account_deletion_cascades_invoices_and_series(self):
         user = _make_user("cascade@example.com")
         DeletionRequest.objects.create(user=user, requested_at=_days_ago(60))
         series = _make_series(user)
-        _make_invoice(series, timezone.now().date())
+        # All invoices are expired (6 years old)
+        _make_invoice(series, _years_ago(6))
 
         call_command("purge_expired_data", verbosity=0)
 
         self.assertFalse(User.objects.filter(pk=user.pk).exists())
         self.assertFalse(Series.objects.filter(owner=user).exists())
+
+    def test_account_with_recent_invoice_is_skipped(self):
+        """Fiscal retention law: account with a recent invoice must NOT be deleted.
+
+        Even if the DeletionRequest is past the grace period, if the user has any
+        invoice within the 5-year retention window the account purge is skipped.
+        The DeletionRequest is left in place for the next purge run.
+        """
+        user = _make_user("blocked@example.com")
+        DeletionRequest.objects.create(user=user, requested_at=_days_ago(60))
+        series = _make_series(user)
+        # Recent invoice — still within 5-year retention window
+        _make_invoice(series, timezone.now().date())
+
+        call_command("purge_expired_data", verbosity=0)
+
+        # Account must survive — fiscal retention obligation
+        self.assertTrue(User.objects.filter(pk=user.pk).exists())
+        # DeletionRequest must still be present for the next purge run
+        self.assertTrue(DeletionRequest.objects.filter(user=user).exists())
+
+    def test_account_with_only_expired_invoices_is_deleted(self):
+        """Account whose invoices are all past retention window IS deleted."""
+        user = _make_user("eligible@example.com")
+        DeletionRequest.objects.create(user=user, requested_at=_days_ago(60))
+        series = _make_series(user)
+        # All invoices are 7 years old — past the 5-year window
+        _make_invoice(series, _years_ago(7))
+
+        call_command("purge_expired_data", verbosity=0)
+
+        self.assertFalse(User.objects.filter(pk=user.pk).exists())
 
     def test_idempotent_second_run_no_error(self):
         user = _make_user("idem@example.com")
