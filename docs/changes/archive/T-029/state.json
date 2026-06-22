@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-029",
+  "iteration": 29,
+  "phase": "construction",
+  "track": "standard",
+  "branch": "feature/T-029-self-service-account-deletion",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-029",
+  "session_id": null,
+  "started_at": "2026-06-22T10:35:39Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": "docs/changes/T-029/plan.md",
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}
