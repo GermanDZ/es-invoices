@@ -1,7 +1,7 @@
 ---
 id: T-029
 title: Self-service account + data deletion UI
-status: ready
+status: done
 priority: medium
 estimate: 2 sessions
 plan: docs/roadmap.md#T-029
