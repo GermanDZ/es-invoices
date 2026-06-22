@@ -7,7 +7,7 @@ estimate: 1 session
 plan: docs/roadmap.md#T-030
 depends-on: [T-026]
 blocks: [T-031]
-touches: ["docs/deployment-runbook.md"]
+touches: ["docs/deployment-runbook.md", "docs/phase-reviews/construction-ocm.md", "docs/changes/T-028/plan.md", "docs/changes/T-029/plan.md", "docs/changes/T-031/plan.md"]
 last-synced: ""
 ---
 
