@@ -40,6 +40,11 @@ Assumptions, §7 Risks).
   keep a thin abstraction over the submission format. *Verifiable:* compliance
   module is a separate, versioned component; a dated monitoring log exists.
 - **Owner**: Product Owner (with compliance advisor when engaged).
+- **Timeline verified (T-027, 2026-06-22)**: Current obligation dates per
+  RDL 15/2025 (BOE-A-2025-24446): **IS/sociedades → 1 Jan 2027; autónomos →
+  1 Jul 2027**. No hard-coded dates in production code. 2026 is a voluntary
+  testing period. Source: AEAT sede + BOE.
+  See `docs/changes/T-027/aeat-timeline.md` for full evidence.
 
 ### R-02 — Non-compliant invoice bug
 - **Description**: A defect (wrong IVA/IRPF, broken sequential numbering, malformed

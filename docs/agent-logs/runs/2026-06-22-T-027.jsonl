@@ -1,0 +1,2 @@
+{"run_id": "openup-next-T-027", "event": "iteration_start", "task_id": "T-027", "goal": "Verify AEAT obligation timeline vs current rollout calendar (O-2)", "branch": "docs/T-027-aeat-obligation-timeline", "phase": "construction", "ts": "2026-06-22T07:23:54Z"}
+{"event": "iteration_complete", "task_id": "T-027", "branch": "docs/T-027-aeat-obligation-timeline", "phase": "construction", "ts": "2026-06-22T07:30:22Z"}

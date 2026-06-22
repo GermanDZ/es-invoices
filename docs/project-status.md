@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 25
-**Iteration Goal**: T-026 — RGPD pre-launch checklist (R-06)
-**Status**: in-progress
-**Current Task**: T-026
+**Iteration**: 26
+**Iteration Goal**: T-027 — Verify AEAT obligation timeline vs current rollout calendar (O-2)
+**Status**: completed
+**Current Task**: T-027
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-22
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 26** (2026-06-22): T-027 complete — AEAT/Verifactu obligation timeline verified (O-2 closed). RDL 15/2025 (BOE-A-2025-24446) confirmed: autónomos → 1 Jul 2027, sociedades → 1 Jan 2027; 2026 is a voluntary testing period. No hard-coded obligation dates in production code. Evidence: docs/changes/T-027/aeat-timeline.md. docs/risk-list.md §R-01 updated with verified dates.
 
 - **Iteration 25** (2026-06-22): T-026 complete — RGPD pre-launch checklist (R-06 mitigation actioned). docs/rgpd-checklist.md created with five sections: EU residency, encryption in transit, encryption at rest, least-privilege, retention policy. All items ✅ or ⚠️ (none ❌); ⚠️ items document operator runbook steps or post-launch tasks (T-028 automated deletion, T-029 self-service deletion). config/settings.py gains SECURE_SSL_REDIRECT, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE, SECURE_HSTS_SECONDS under if-not-DEBUG guard; manage.py check --deploy → 0 critical warnings. docs/risk-list.md §R-06 updated to reference checklist as verifiable evidence.
 

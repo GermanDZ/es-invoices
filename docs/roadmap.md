@@ -61,7 +61,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-024 | Corrective & annulment UI (rectificativa + anulación) | completed (2026-06-20) | medium | T-017, T-023 |
 | T-025 | Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email) | completed (2026-06-20) | medium | T-017 |
 | T-026 | RGPD pre-launch checklist (R-06) | in-progress | high | T-011 |
-| T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | pending | medium | — |
+| T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | completed (2026-06-22) | medium | — |
 
 ### Task notes
 
