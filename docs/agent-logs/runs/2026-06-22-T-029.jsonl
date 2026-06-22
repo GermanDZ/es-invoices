@@ -1,2 +1,3 @@
 {"run_id": "T-029-start", "event": "iteration_start", "task_id": "T-029", "goal": "Add self-service account + data deletion UI (RGPD Art. 17 right-to-erasure)", "branch": "feature/T-029-self-service-account-deletion", "phase": "construction", "ts": "2026-06-22T10:38:57Z"}
 {"event": "iteration_complete", "task_id": "T-029", "branch": "feature/T-029-self-service-account-deletion", "phase": "construction", "ts": "2026-06-22T10:46:54Z"}
+{"run_id": "5b80500bf49c43928dadde0fb57d37ba", "event": "commit", "task_id": "T-029", "branch": "main", "sha": "4b5fc3089518519dcdad893cbe4551c3f7a52030", "model": null, "session_id": null, "ts": "2026-06-22T10:44:52Z"}
