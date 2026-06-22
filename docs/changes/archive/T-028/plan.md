@@ -1,7 +1,7 @@
 ---
 id: T-028
 title: Automated data retention enforcement (scheduled deletion)
-status: ready
+status: done
 priority: medium
 estimate: 2 sessions
 plan: docs/roadmap.md#T-028
@@ -27,17 +27,17 @@ the system needs a reliable way to purge expired data:
 
 - [ ] `purge_expired_data` management command in the `accounts` app
 - [ ] Deletes invoices/line items issued > 5 years ago (configurable)
-- [ ] Deletes client records when their last associated invoice is > 5 years ago
-- [ ] Handles accounts in soft-delete / deletion-requested state > 30 days
+- [ ] Deletes client records **only when they were linked to invoices that were deleted in the same purge run** (not all clients with no invoices — that would destroy clients that simply have not been invoiced yet)
+- [ ] Handles accounts in soft-delete / deletion-requested state > 30 days; **only deletes invoices that are also past the 5-year retention window** — invoices still within the retention window are never deleted, and the account purge is blocked (DeletionRequest is left pending) until all the user's invoices have aged out
 - [ ] Dry-run mode (`--dry-run`) logs what would be deleted without mutating
 - [ ] Command is idempotent (safe to run multiple times)
-- [ ] Tests cover: dry-run, actual deletion, retention boundary (5yr - 1 day = kept)
+- [ ] Tests cover: dry-run, actual deletion, retention boundary (5yr - 1 day = kept), account with recent invoices is not purged despite expired DeletionRequest
 - [ ] `python3 scripts/check-docs.py` passes
 
 ## Operations Checklist
 
-- [ ] Author `purge_expired_data` management command
-- [ ] Add `DeletionRequest` model or flag to `accounts.User` (soft-delete)
-- [ ] Write tests
-- [ ] Run full suite — all green
-- [ ] Commit to task branch
+- [x] Author `purge_expired_data` management command
+- [x] Add `DeletionRequest` model or flag to `accounts.User` (soft-delete)
+- [x] Write tests
+- [x] Run full suite — all green
+- [x] Commit to task branch
