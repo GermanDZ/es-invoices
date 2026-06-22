@@ -13,6 +13,8 @@
 
 ## Notes
 
+- **Iteration 29 retrospective** (2026-06-22): Complete — `docs/iteration-retrospectives/iteration-29-retrospective.md`. T-029 delivered user-facing RGPD Art.17 self-service deletion UI (13 new tests, 220 green). No gaps at completion review.
+
 - **Iteration 27** (2026-06-22): T-031 complete (co-delivered with T-030) — docs/phase-reviews/construction-ocm.md authored: 185-green test evidence summary, UC-001..UC-005 conformance verification, R-01..R-08 risk status, and founder GO decision to proceed to beta. All three OCM criteria gaps closed.
 
 - **Iteration 27** (2026-06-22): T-030/T-031 complete — closed all three OCM gaps. docs/deployment-runbook.md: full operator runbook (prereqs, env vars, DB least-privilege, TLS, smoke test). docs/phase-reviews/construction-ocm.md: 185-green test evidence, UC-001..UC-005 conformance, risk summary, founder GO decision to proceed to beta. T-028 (automated deletion) and T-029 (self-service deletion) added to backlog.
