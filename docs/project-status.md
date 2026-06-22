@@ -4,7 +4,7 @@
 **Phase**: construction
 **Iteration**: 28
 **Iteration Goal**: T-028 — Automated data retention enforcement / scheduled deletion (RGPD Art. 17)
-**Status**: in-progress
+**Status**: completed
 **Current Task**: T-028
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18

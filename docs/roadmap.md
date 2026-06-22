@@ -64,7 +64,7 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | completed (2026-06-22) | medium | — |
 | T-030 | Deployment operator runbook (OCM gap: no standalone runbook) | completed (2026-06-22) | high | T-026 |
 | T-031 | OCM sign-off + beta readiness documentation (test evidence, go/no-go) | completed (2026-06-22) | high | T-030 |
-| T-028 | Automated data retention enforcement / scheduled deletion (RGPD Art. 17) | in-progress | medium | T-030 |
+| T-028 | Automated data retention enforcement / scheduled deletion (RGPD Art. 17) | completed (2026-06-22) | medium | T-030 |
 | T-029 | Self-service account + data deletion UI (RGPD Art. 17) | pending | medium | T-028 |
 
 ### Task notes

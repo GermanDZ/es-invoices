@@ -7,7 +7,7 @@
   "branch": "feature/T-028-automated-data-retention",
   "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-028",
   "session_id": null,
-  "started_at": "2026-06-22T09:16:42Z",
+  "started_at": "2026-06-22T09:28:49Z",
   "gates": {
     "team_deployed": false,
     "plan_persisted": true,
@@ -15,5 +15,5 @@
     "roadmap_synced": true,
     "retro_due": false
   },
-  "iterations_since_retro": 0
+  "iterations_since_retro": 1
 }
