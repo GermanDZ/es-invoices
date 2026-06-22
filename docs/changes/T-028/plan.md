@@ -36,8 +36,8 @@ the system needs a reliable way to purge expired data:
 
 ## Operations Checklist
 
-- [ ] Author `purge_expired_data` management command
-- [ ] Add `DeletionRequest` model or flag to `accounts.User` (soft-delete)
-- [ ] Write tests
-- [ ] Run full suite — all green
-- [ ] Commit to task branch
+- [x] Author `purge_expired_data` management command
+- [x] Add `DeletionRequest` model or flag to `accounts.User` (soft-delete)
+- [x] Write tests
+- [x] Run full suite — all green
+- [x] Commit to task branch
