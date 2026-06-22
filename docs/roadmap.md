@@ -62,6 +62,10 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-025 | Close UC-004/UC-005 behaviour gaps (por-diferencias, rectificativa PDF marking, annul-while-pending, active-set exclusion, recipient email) | completed (2026-06-20) | medium | T-017 |
 | T-026 | RGPD pre-launch checklist (R-06) | completed (2026-06-22) | high | T-011 |
 | T-027 | Verify AEAT obligation timeline vs current rollout calendar (O-2) | completed (2026-06-22) | medium | — |
+| T-030 | Deployment operator runbook (OCM gap: no standalone runbook) | pending | high | T-026 |
+| T-031 | OCM sign-off + beta readiness documentation (test evidence, go/no-go) | pending | high | T-030 |
+| T-028 | Automated data retention enforcement / scheduled deletion (RGPD Art. 17) | pending | medium | T-030 |
+| T-029 | Self-service account + data deletion UI (RGPD Art. 17) | pending | medium | T-028 |
 
 ### Task notes
 
@@ -136,6 +140,24 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 - **T-027**: Verify the autónomo Verifactu obligation timeline against the *current*
   AEAT rollout calendar and confirm no dates are hard-coded (O-2). **Value**: closes
   an architecture carry-forward; cheap, prevents shipping a stale/incorrect mandate date.
+- **T-030**: Write `docs/deployment-runbook.md` — consolidate the operator steps
+  scattered across the RGPD checklist §6 into a standalone, ordered runbook: env vars,
+  TLS setup, DB user grants, email TLS, `manage.py check --deploy`, first-run seed.
+  **Value**: the OCM criterion "user documentation is adequate" requires a deployment
+  guide; without it the product cannot be handed to a beta operator. Closes OCM gap #1.
+- **T-031**: Author `docs/phase-reviews/construction-ocm.md` — summarise the
+  Construction-phase test evidence (185-green suite, use-case conformance, RGPD ✅) and
+  record the founder go/no-go decision to proceed to beta (Transition). **Value**: closes
+  OCM gaps #2 (alpha test results) and #3 (stakeholder sign-off); the OCM document is the
+  milestone gate for exiting Construction.
+- **T-028**: Implement a scheduled management command (`purge_expired_data`) that
+  enforces the retention policy from `docs/rgpd-checklist.md §5`: delete invoice records
+  and client personal data older than 5 years, user accounts 30 days post-deletion-request.
+  **Value**: closes RGPD Art. 17 automated-deletion follow-up; necessary before scale.
+- **T-029**: Add a self-service account + data deletion UI: a "Delete my account" flow in
+  the `accounts` app that marks the account for deletion (soft-delete + 30-day grace),
+  triggers certificate cascade delete (T-011), and queues data for T-028 purge.
+  **Value**: RGPD Art. 17 right-to-erasure self-service; required before broad beta.
 
 > **Construction-wide carry-forwards** (architecture notebook §7): verify the
 > autónomo obligation timeline against the *current* AEAT rollout calendar at build
