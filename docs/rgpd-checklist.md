@@ -1,9 +1,9 @@
 ---
 type: work-item
 id: RGPD-001
-status: active
-traces-from: [T-026, R-06]
-verified-by: [T-026]
+status: approved
+traces-from: [REQ-001]
+verified-by: []
 ---
 
 # RGPD Pre-Launch Checklist — FacturaSimple
