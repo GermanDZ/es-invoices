@@ -25,8 +25,8 @@ stale or hard-coded date would mislead users and potentially require an emergenc
 
 ## Operations
 
-- [ ] (developer) Search codebase for hard-coded obligation dates.
-- [ ] (developer) Research current AEAT/Verifactu rollout calendar.
-- [ ] (developer) Author `docs/changes/T-027/aeat-timeline.md` with verified dates and source.
-- [ ] (developer) Update `docs/risk-list.md` §R-02 with current timeline evidence.
+- [x] (developer) Search codebase for hard-coded obligation dates.
+- [x] (developer) Research current AEAT/Verifactu rollout calendar.
+- [x] (developer) Author `docs/changes/T-027/aeat-timeline.md` with verified dates and source.
+- [x] (developer) Update `docs/risk-list.md` §R-01 with current timeline evidence.
 - [ ] (developer) Commit changes.
