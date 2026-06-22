@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-027",
+  "iteration": 26,
+  "phase": "construction",
+  "track": "quick",
+  "branch": "docs/T-027-aeat-obligation-timeline",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices-T-027",
+  "session_id": null,
+  "started_at": "2026-06-22T07:23:21Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": false,
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}
