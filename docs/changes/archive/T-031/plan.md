@@ -1,7 +1,7 @@
 ---
 id: T-031
 title: OCM sign-off + beta readiness documentation
-status: ready
+status: done
 priority: high
 estimate: 1 session
 plan: docs/roadmap.md#T-031

@@ -3,15 +3,17 @@
 **Project**: FacturaSimple
 **Phase**: construction
 **Iteration**: 27
-**Iteration Goal**: T-030 — Deployment operator runbook (OCM gap: no standalone runbook)
+**Iteration Goal**: T-031 — OCM sign-off + beta readiness documentation (test evidence, go/no-go)
 **Status**: completed
-**Current Task**: T-030
+**Current Task**: T-031
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-22
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 27** (2026-06-22): T-031 complete (co-delivered with T-030) — docs/phase-reviews/construction-ocm.md authored: 185-green test evidence summary, UC-001..UC-005 conformance verification, R-01..R-08 risk status, and founder GO decision to proceed to beta. All three OCM criteria gaps closed.
 
 - **Iteration 27** (2026-06-22): T-030/T-031 complete — closed all three OCM gaps. docs/deployment-runbook.md: full operator runbook (prereqs, env vars, DB least-privilege, TLS, smoke test). docs/phase-reviews/construction-ocm.md: 185-green test evidence, UC-001..UC-005 conformance, risk summary, founder GO decision to proceed to beta. T-028 (automated deletion) and T-029 (self-service deletion) added to backlog.
 
