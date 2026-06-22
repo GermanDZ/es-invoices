@@ -1,7 +1,7 @@
 ---
 id: T-028
 title: Automated data retention enforcement (scheduled deletion)
-status: ready
+status: done
 priority: medium
 estimate: 2 sessions
 plan: docs/roadmap.md#T-028
