@@ -1,47 +1,74 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Factura {{ invoice.series.prefix }}{{ invoice.number }}</title></head>
-<body>
-  <h1>Factura {{ invoice.series.prefix }}{{ invoice.number }}</h1>
-  {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-  </ul>
+{% extends "base.html" %}
+{% load submission_tags %}
+
+{% block title %}Factura {{ invoice.series.prefix }}{{ invoice.number }} — FacturaSimple{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h1 class="mb-0">Factura {{ invoice.series.prefix }}{{ invoice.number }}</h1>
+      <p class="text-muted">{{ invoice.issue_date|date:"d \d\e F \d\e Y" }}</p>
+    </div>
+    {% get_submission_badge invoice as badge %}
+    <span class="badge bg-{{ badge.color }}">{{ badge.text }}</span>
+  </div>
+</div>
+
+<div class="row mb-4">
+  <div class="col-md-6">
+    <h6 class="text-muted">Destinatario</h6>
+    <p class="mb-0">{{ invoice.recipient_name }}</p>
+    {% if invoice.recipient_taxid %}<p class="text-muted">{{ invoice.recipient_taxid }}</p>{% endif %}
+    {% if invoice.recipient_address %}<p class="text-muted">{{ invoice.recipient_address }}</p>{% endif %}
+  </div>
+  <div class="col-md-6">
+    <h6 class="text-muted">Totales</h6>
+    <dl class="row mb-0">
+      <dt class="col-6">Base imponible:</dt><dd class="col-6 text-end">{{ totals.taxable_base }} €</dd>
+      <dt class="col-6">IVA:</dt><dd class="col-6 text-end">{{ totals.iva_total }} €</dd>
+      <dt class="col-6">IRPF:</dt><dd class="col-6 text-end">{{ totals.irpf_retention }} €</dd>
+      <dt class="col-6"><strong>Total:</strong></dt><dd class="col-6 text-end"><strong>{{ totals.grand_total }} €</strong></dd>
+    </dl>
+  </div>
+</div>
+
+<div class="alert alert-info mb-4" role="alert">
+  <h6 class="alert-heading">Código QR Verifactu</h6>
+  <p class="mb-0">El código QR en el PDF apunta al portal de verificación de la AEAT. Aparecerá como «no registrado» hasta que el registro Verifactu sea enviado y aceptado.</p>
+</div>
+
+<div class="mb-4">
+  <div class="btn-group" role="group">
+    <a href="{% url 'invoicing:pdf' invoice.pk %}" class="btn btn-outline-secondary">Descargar PDF</a>
+    <form method="post" action="{% url 'invoicing:send' invoice.pk %}" class="d-inline">
+      {% csrf_token %}
+      <input type="email" name="to_email" placeholder="email@ejemplo.es" class="form-control d-inline-block" style="width: auto; margin-right: 0.25rem;" required>
+      <button type="submit" class="btn btn-outline-secondary">Enviar por email</button>
+    </form>
+  </div>
+</div>
+
+{% if invoice.issued %}
+<section class="mb-4">
+  {% if invoice.annulled %}
+    <div class="alert alert-danger">
+      <strong>Esta factura está anulada</strong> — se emitió por error.
+    </div>
+  {% elif invoice.corrected_by_id %}
+    <div class="alert alert-warning">
+      <strong>Esta factura fue rectificada</strong> por <a href="{% url 'invoicing:detail' invoice.corrected_by_id %}">la factura rectificativa {{ invoice.corrected_by.series.prefix }}{{ invoice.corrected_by.number }}</a>.
+    </div>
+  {% else %}
+    <div class="d-flex gap-2">
+      <a href="{% url 'invoicing:rectificar' invoice.pk %}" class="btn btn-outline-warning">Rectificar</a>
+      <a href="{% url 'invoicing:annul' invoice.pk %}" class="btn btn-outline-danger">Anular (error)</a>
+    </div>
   {% endif %}
-  <dl>
-    <dt>Destinatario</dt><dd>{{ invoice.recipient_name }} — {{ invoice.recipient_taxid }}</dd>
-    <dt>Fecha</dt><dd>{{ invoice.issue_date }}</dd>
-    <dt>Estado</dt><dd>{{ invoice.status }}</dd>
-    <dt>Base imponible</dt><dd>{{ totals.taxable_base }} €</dd>
-    <dt>IVA</dt><dd>{{ totals.iva_total }} €</dd>
-    <dt>Retención IRPF</dt><dd>{{ totals.irpf_retention }} €</dd>
-    <dt>Total</dt><dd>{{ totals.grand_total }} €</dd>
-  </dl>
+</section>
+{% endif %}
 
-  <p><a href="{% url 'invoicing:pdf' invoice.pk %}">Descargar PDF</a></p>
+{% include "submission/_outcome.html" %}
 
-  {% if invoice.issued %}
-  <section class="corrections">
-    {% if invoice.annulled %}
-      <p>Esta factura está <strong>anulada</strong> (registro emitido por error).</p>
-    {% elif invoice.corrected_by_id %}
-      <p>Esta factura fue <strong>rectificada</strong> por
-         <a href="{% url 'invoicing:detail' invoice.corrected_by_id %}">la factura rectificativa</a>.</p>
-    {% else %}
-      <p><a href="{% url 'invoicing:rectificar' invoice.pk %}">Rectificar (emitir factura rectificativa)</a></p>
-      <p><a href="{% url 'invoicing:annul' invoice.pk %}">Anular (emitida por error)</a></p>
-    {% endif %}
-  </section>
-  {% endif %}
-
-  {% include "submission/_outcome.html" %}
-
-  <form method="post" action="{% url 'invoicing:send' invoice.pk %}">
-    {% csrf_token %}
-    <label>Enviar por email a: <input type="email" name="to_email" required></label>
-    <button type="submit">Enviar</button>
-  </form>
-
-  <p><a href="{% url 'accounts:landing' %}">Volver</a></p>
-</body>
-</html>
+<p class="mt-4"><a href="{% url 'invoicing:list' %}" class="text-decoration-none">← Volver a facturas</a></p>
+{% endblock %}

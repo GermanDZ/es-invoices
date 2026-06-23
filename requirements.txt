@@ -9,3 +9,4 @@ requests-pkcs12>=1.24    # PKCS#12 mutual-TLS session to the AEAT (T-014, AD-3)
 weasyprint>=60           # HTML/CSS -> PDF invoice rendering (T-016, S-3, AD Document & delivery)
 segno>=1.6               # pure-Python Verifactu QR (no Pillow/native deps) (T-016)
 pypdf>=4                 # test-only: extract PDF text layer to assert rendered content (T-016)
+python-dotenv>=1.0       # load .env file into os.environ at settings import time

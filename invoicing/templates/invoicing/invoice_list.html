@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Facturas — FacturaSimple{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Mis Facturas</h1>
+  <a href="{% url 'invoicing:create' %}" class="btn btn-primary">Nueva factura</a>
+</div>
+
+{% if invoices %}
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Número</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Base imponible</th>
+          <th>Total</th>
+          <th>Estado Verifactu</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for invoice in invoices %}
+          <tr>
+            <td>
+              <a href="{% url 'invoicing:detail' pk=invoice.pk %}">
+                {{ invoice.series.prefix }}{{ invoice.number }}
+              </a>
+            </td>
+            <td>{{ invoice.issue_date|date:"d/m/Y" }}</td>
+            <td>{{ invoice.recipient_name }}</td>
+            <td>{{ invoice.compute_totals.base_imponible }}</td>
+            <td>{{ invoice.compute_totals.total }}</td>
+            <td>
+              {% load submission_tags %}
+              {% get_submission_badge invoice as badge %}
+              <span class="badge bg-{{ badge.color }}">{{ badge.text }}</span>
+            </td>
+            <td class="text-end">
+              <a href="{% url 'invoicing:detail' pk=invoice.pk %}" class="btn btn-sm btn-outline-secondary">Ver</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="alert alert-info" role="alert">
+    <h5 class="alert-heading">No hay facturas aún</h5>
+    <p>Empieza creando tu primera factura para registrar tus ventas.</p>
+    <a href="{% url 'invoicing:create' %}" class="btn btn-primary">Nueva factura</a>
+  </div>
+{% endif %}
+{% endblock %}

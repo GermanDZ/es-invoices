@@ -324,3 +324,16 @@ def _surface_request_outcome(request, outcome):
     from submission.views import _surface_outcome
 
     _surface_outcome(request, outcome)
+
+
+@login_required
+def invoice_list(request):
+    """List all issued, non-annulled invoices for the logged-in owner (T-032)."""
+    invoices = (
+        Invoice.objects
+        .filter(series__owner=request.user, issued=True)
+        .exclude(annulled=True)
+        .select_related("series", "client")
+        .order_by("-issue_date", "-number")
+    )
+    return render(request, "invoicing/invoice_list.html", {"invoices": invoices})

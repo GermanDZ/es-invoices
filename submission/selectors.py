@@ -27,6 +27,13 @@ def latest_alta_record(invoice):
     )
 
 
+def latest_submission_attempt(record):
+    """The most recent :class:`SubmissionAttempt` for ``record``, or ``None``."""
+    if record is None:
+        return None
+    return record.submission_attempts.order_by("-id").first()
+
+
 def record_is_accepted(record) -> bool:
     """True when ``record`` already has an accepted submission attempt."""
     if record is None:

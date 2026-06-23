@@ -193,9 +193,10 @@ class LandingDeleteLinkTests(TestCase):
 
     def test_landing_has_delete_account_link(self):
         self.client.force_login(self.user)
-        resp = self.client.get(reverse("accounts:landing"))
+        resp = self.client.get(reverse("accounts:landing"), follow=True)
+        # Landing now redirects to invoicing:list; check the navbar has the delete account link
         self.assertContains(
             resp,
             reverse("accounts:delete_account_confirm"),
-            msg_prefix="Landing page must include a link to the deletion confirmation page.",
+            msg_prefix="Landing redirect (invoicing:list) must include a link to the deletion confirmation page in the navbar.",
         )

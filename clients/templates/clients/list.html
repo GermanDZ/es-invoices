@@ -1,25 +1,44 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Clients</title></head>
-<body>
-  <h1>Clients</h1>
-  {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-  </ul>
-  {% endif %}
-  <p><a href="{% url 'clients:create' %}">Add client</a></p>
-  <ul>
-    {% for c in clients %}
-    <li>
-      {{ c.fiscal_name }} — {{ c.tax_id|default:"(sin NIF)" }}
-      [{{ c.get_client_type_display }}]
-      <a href="{% url 'clients:edit' c.pk %}">Edit</a>
-      <a href="{% url 'clients:delete' c.pk %}">Delete</a>
-    </li>
-    {% empty %}
-    <li>No clients yet.</li>
-    {% endfor %}
-  </ul>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Clientes — FacturaSimple{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Clientes</h1>
+  <a href="{% url 'clients:create' %}" class="btn btn-primary">Nuevo cliente</a>
+</div>
+
+{% if clients %}
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>NIF/CIF</th>
+          <th>Tipo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clients %}
+          <tr>
+            <td>{{ c.fiscal_name }}</td>
+            <td>{{ c.tax_id|default:"—" }}</td>
+            <td><span class="badge bg-light text-dark">{{ c.get_client_type_display }}</span></td>
+            <td class="text-end">
+              <a href="{% url 'clients:edit' c.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+              <a href="{% url 'clients:delete' c.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="alert alert-info" role="alert">
+    <h5 class="alert-heading">No hay clientes aún</h5>
+    <p>Crea clientes para registrar los destinatarios de tus facturas (B2B con NIF/CIF, o B2C sin datos fiscales).</p>
+    <a href="{% url 'clients:create' %}" class="btn btn-primary">Nuevo cliente</a>
+  </div>
+{% endif %}
+{% endblock %}

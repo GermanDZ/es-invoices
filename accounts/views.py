@@ -38,7 +38,7 @@ def register(request):
 
 @login_required
 def landing(request):
-    return render(request, "accounts/landing.html")
+    return redirect("invoicing:list")
 
 
 @login_required

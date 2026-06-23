@@ -1,40 +1,74 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Nueva factura</title></head>
-<body>
-  <h1>Nueva factura</h1>
-  {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-  </ul>
-  {% endif %}
-  <form method="post">
-    {% csrf_token %}
-    <fieldset>
-      <legend>Emisor y destinatario</legend>
-      {{ form.as_p }}
-    </fieldset>
-    <fieldset>
-      <legend>Líneas</legend>
-      {{ formset.management_form }}
-      <table>
-        <thead>
-          <tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>IVA</th></tr>
-        </thead>
-        <tbody>
-          {% for row in formset %}
+{% extends "base.html" %}
+
+{% block title %}Nueva factura — FacturaSimple{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Nueva factura</h1>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+
+  <div class="row mb-5">
+    <div class="col-md-6">
+      <h5 class="mb-3">Emisor</h5>
+      {% for field in form %}
+        {% if "issuer" in field.name %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="col-md-6">
+      <h5 class="mb-3">Destinatario</h5>
+      {% for field in form %}
+        {% if "client" in field.name or "irpf" in field.name %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <h5 class="mb-3">Líneas de factura</h5>
+  <div class="table-responsive mb-4">
+    {{ formset.management_form }}
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Descripción</th>
+          <th style="width: 12%;">Cantidad</th>
+          <th style="width: 12%;">Precio</th>
+          <th style="width: 10%;">IVA</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in formset %}
           <tr>
-            <td>{{ row.description }}{{ row.description.errors }}</td>
-            <td>{{ row.quantity }}{{ row.quantity.errors }}</td>
-            <td>{{ row.unit_price }}{{ row.unit_price.errors }}</td>
+            <td>{{ row.description }}{% if row.description.errors %}<div class="invalid-feedback d-block">{{ row.description.errors.0 }}</div>{% endif %}</td>
+            <td>{{ row.quantity }}{% if row.quantity.errors %}<div class="invalid-feedback d-block">{{ row.quantity.errors.0 }}</div>{% endif %}</td>
+            <td>{{ row.unit_price }}{% if row.unit_price.errors %}<div class="invalid-feedback d-block">{{ row.unit_price.errors.0 }}</div>{% endif %}</td>
             <td>{{ row.iva_rate }}</td>
           </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </fieldset>
-    <button type="submit">Emitir factura</button>
-  </form>
-  <p><a href="{% url 'accounts:landing' %}">Cancelar</a></p>
-</body>
-</html>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Emitir factura</button>
+    <a href="{% url 'invoicing:list' %}" class="btn btn-outline-secondary">Cancelar</a>
+  </div>
+</form>
+
+<style>
+  input[type="text"], input[type="number"], input[type="email"], select, textarea {
+    width: 100%;
+  }
+</style>
+{% endblock %}

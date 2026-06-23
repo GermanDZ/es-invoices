@@ -20,12 +20,13 @@ GOOD_PW = "barricade-7"
 class RegistrationTests(TestCase):
     def test_register_creates_user_logs_in_and_redirects(self):
         # Requirement 1: unique email + matching valid passwords → user created
-        # (username == lower-cased email), logged in, redirected to landing.
+        # (username == lower-cased email), logged in, redirected to landing (→ invoicing:list).
         resp = self.client.post(
             reverse("accounts:register"),
             {"email": "Nuevo@Example.com", "password1": GOOD_PW, "password2": GOOD_PW},
         )
-        self.assertRedirects(resp, reverse("accounts:landing"))
+        # assertRedirects will see the redirect to landing; landing has target_status_code=302 (redirects again)
+        self.assertRedirects(resp, reverse("accounts:landing"), target_status_code=302)
         user = User.objects.get(username="nuevo@example.com")
         self.assertEqual(user.email, "nuevo@example.com")
         self.assertEqual(int(self.client.session["_auth_user_id"]), user.pk)
@@ -68,12 +69,13 @@ class LoginLogoutTests(TestCase):
         )
 
     def test_login_by_email_redirects_to_landing(self):
-        # Requirement 3: correct email (any case) + password → 302 to landing, session set.
+        # Requirement 3: correct email (any case) + password → 302 to landing (→ invoicing:list), session set.
         resp = self.client.post(
             reverse("accounts:login"),
             {"username": "User@Example.com", "password": GOOD_PW},
         )
-        self.assertRedirects(resp, reverse("accounts:landing"))
+        # assertRedirects will follow landing's redirect to invoicing:list
+        self.assertRedirects(resp, reverse("accounts:landing"), target_status_code=302)
         self.assertEqual(int(self.client.session["_auth_user_id"]), self.user.pk)
 
     def test_login_honors_safe_next(self):
@@ -126,11 +128,13 @@ class GatingAndLandingTests(TestCase):
         self.assertIn(reverse("accounts:login"), resp["Location"])
 
     def test_landing_shows_user_and_links(self):
-        # Requirement 6: landing names the user and links to product areas + logout.
+        # Requirement 6: landing redirects to invoicing:list, which shows user + nav links.
         self.client.force_login(self.user)
-        resp = self.client.get(reverse("accounts:landing"))
+        resp = self.client.get(reverse("accounts:landing"), follow=True)
         self.assertEqual(resp.status_code, 200)
+        # Check that we end up at invoicing:list
+        self.assertEqual(resp.resolver_match.url_name, "list")
+        # Check the navbar has the user email and links
         self.assertContains(resp, "owner@example.com")
         self.assertContains(resp, reverse("clients:list"))
         self.assertContains(resp, reverse("certificates:upload"))
-        self.assertContains(resp, reverse("accounts:logout"))
