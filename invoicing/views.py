@@ -157,6 +157,7 @@ def invoice_detail(request, pk):
             "submission_record": record,
             "submission_attempts": attempts,
             "submission_can_submit": record is not None and not record_is_accepted(record),
+            "issuer": _issuer_from_session(request),
         },
     )
 
@@ -368,18 +369,26 @@ def invoice_register_verifactu(request, pk):
         messages.info(request, "Esta factura ya tiene un registro Verifactu.")
         return redirect("invoicing:detail", pk=pk)
 
-    issuer = _issuer_from_session(request)
-    if issuer is None:
-        messages.warning(
-            request,
-            "Introduce los datos del emisor descargando el PDF primero — "
-            "los datos quedan guardados en la sesión.",
-        )
+    issuer_nif = request.POST.get("issuer_nif", "").strip()
+    issuer_name = request.POST.get("issuer_name", "").strip()
+    if not issuer_nif or not issuer_name:
+        issuer = _issuer_from_session(request)
+        if issuer:
+            issuer_nif = issuer.nif
+            issuer_name = issuer.name
+
+    if not issuer_nif or not issuer_name:
+        messages.error(request, "Introduce tu NIF y nombre de emisor para generar el registro.")
         return redirect("invoicing:detail", pk=pk)
 
     import compliance
     try:
-        compliance.generate_alta(invoice, issuer_nif=issuer.nif, issuer_name=issuer.name)
+        compliance.generate_alta(invoice, issuer_nif=issuer_nif, issuer_name=issuer_name)
+        request.session[_SESSION_ISSUER_KEY] = {
+            **({k: v for k, v in request.session.get(_SESSION_ISSUER_KEY, {}).items()}),
+            "nif": issuer_nif,
+            "name": issuer_name,
+        }
         messages.success(request, "Registro Verifactu generado. Ya puedes enviarlo a la AEAT.")
     except Exception as exc:
         messages.error(request, f"No se pudo generar el registro: {exc}")

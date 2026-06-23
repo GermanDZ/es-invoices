@@ -7,12 +7,26 @@ Included by invoicing/invoice_detail.html.
   <h5 class="mb-3">Envío Verifactu a la AEAT</h5>
 
   {% if not submission_record %}
-    <div class="alert alert-info d-flex justify-content-between align-items-center">
-      <p class="mb-0">Esta factura aún no tiene un registro Verifactu que enviar.</p>
+    <div class="alert alert-info">
+      <p class="mb-2">Esta factura aún no tiene un registro Verifactu que enviar.</p>
       {% if invoice.issued %}
-      <form method="post" action="{% url 'invoicing:register_verifactu' invoice.pk %}" class="ms-3">
+      <form method="post" action="{% url 'invoicing:register_verifactu' invoice.pk %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-primary">Generar registro Verifactu</button>
+        <div class="row g-2 align-items-end">
+          <div class="col-auto">
+            <label class="form-label mb-1 small">NIF emisor</label>
+            <input type="text" name="issuer_nif" value="{{ issuer.nif|default:'' }}"
+                   class="form-control form-control-sm" placeholder="12345678Z" required>
+          </div>
+          <div class="col">
+            <label class="form-label mb-1 small">Nombre / razón social emisor</label>
+            <input type="text" name="issuer_name" value="{{ issuer.name|default:'' }}"
+                   class="form-control form-control-sm" placeholder="Ana Autónoma" required>
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-sm btn-primary">Generar registro Verifactu</button>
+          </div>
+        </div>
       </form>
       {% endif %}
     </div>
