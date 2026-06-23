@@ -159,6 +159,23 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
   triggers certificate cascade delete (T-011), and queues data for T-028 purge.
   **Value**: RGPD Art. 17 right-to-erasure self-service; required before broad beta.
 
+---
+
+## T-032: UI Overhaul — Invoice List, Global Nav, Submission Status, Bootstrap Polish
+**Status**: pending
+**Priority**: high
+**Value**: First-time users (autónomos evaluating the beta) can navigate the product, find their invoices, and understand Verifactu submission state without external guidance — directly improving the "< 5 min to first invoice" north-star metric.
+**Description**: Four tightly coupled UI improvements delivered together: (A) invoice list view so users can find past invoices, (B) shared Bootstrap 5 base template with global nav bar, (C) Verifactu submission status badge + QR explanation on invoice detail, (D) Bootstrap polish across all existing templates.
+- Shared `templates/base.html` with Bootstrap 5.3.3 (SRI-pinned CDN); all templates extend it
+- New `GET /invoices/` list view scoped to the logged-in owner, with empty state
+- Submission status badge on invoice detail (5 states: no record → pending → sent → accepted → rejected)
+- QR callout explaining the record must be submitted before AEAT verification shows it
+- Bootstrap form/table/button components across all product templates
+
+**Dependencies**: T-022, T-023, T-025
+
+**See**: `docs/changes/T-032/plan.md`
+
 > **Construction-wide carry-forwards** (architecture notebook §7): verify the
 > autónomo obligation timeline against the *current* AEAT rollout calendar at build
 > time (O-2 — do **not** hard-code dates); complete the pre-launch RGPD checklist
