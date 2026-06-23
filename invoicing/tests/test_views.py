@@ -15,6 +15,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from clients.models import Client
+from compliance.models import VerifactuRecord
 from invoicing.models import Invoice, Series
 
 User = get_user_model()
@@ -156,6 +157,34 @@ class IssuanceFlowTests(TestCase):
         inv.refresh_from_db()
         self.assertIsNotNone(inv.sent_at)
         self.assertEqual(inv.status, "sent")
+
+
+class VerifactuRecordGenerationTests(TestCase):
+    """T-033 — invoice creation auto-generates an alta VerifactuRecord."""
+
+    def setUp(self):
+        self.user = make_user()
+        self.client.force_login(self.user)
+        self.recipient = make_client(self.user)
+
+    def test_create_generates_alta_record(self):
+        self.client.post(reverse("invoicing:create"), issuance_payload(self.recipient))
+        inv = Invoice.objects.get()
+        self.assertEqual(
+            inv.verifactu_records.filter(record_type=VerifactuRecord.ALTA).count(), 1
+        )
+
+    def test_detail_shows_submit_button_after_create(self):
+        self.client.post(reverse("invoicing:create"), issuance_payload(self.recipient))
+        inv = Invoice.objects.get()
+        resp = self.client.get(reverse("invoicing:detail", args=[inv.pk]))
+        self.assertTrue(resp.context["submission_can_submit"])
+
+    def test_record_carries_issuer_from_form(self):
+        self.client.post(reverse("invoicing:create"), issuance_payload(self.recipient))
+        record = VerifactuRecord.objects.get(record_type=VerifactuRecord.ALTA)
+        self.assertEqual(record.issuer_nif, "12345678Z")
+        self.assertEqual(record.issuer_name, "Ana Autónoma")
 
 
 class AuthAndScopingTests(TestCase):
