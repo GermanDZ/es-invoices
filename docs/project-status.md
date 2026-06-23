@@ -2,18 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 29
+**Iteration**: 30
 **Iteration Goal**: T-029 — Self-service account + data deletion UI (RGPD Art. 17)
-**Status**: completed
-**Current Task**: T-029
+**Status**: in-progress
+**Current Task**: T-032
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
-**Last Updated**: 2026-06-22
+**Last Updated**: 2026-06-23
 **Updated By**: sync-status.py
 
 ## Notes
 
-- **Iteration 29 retrospective** (2026-06-22): Complete — `docs/iteration-retrospectives/iteration-29-retrospective.md`. T-029 delivered user-facing RGPD Art.17 self-service deletion UI (13 new tests, 220 green). No gaps at completion review.
+- **Iteration 30** (2026-06-23): T-032 UI overhaul complete — Bootstrap 5 base template, global navbar, invoice list view (owner-scoped, with empty state), Verifactu status badge (5 states) on invoice detail, QR explanation callout. All 15 product templates converted to extend base.html with Bootstrap components. 228/228 tests pass (2 postgres-gated skips); zero regressions.
 
 - **Iteration 27** (2026-06-22): T-031 complete (co-delivered with T-030) — docs/phase-reviews/construction-ocm.md authored: 185-green test evidence summary, UC-001..UC-005 conformance verification, R-01..R-08 risk status, and founder GO decision to proceed to beta. All three OCM criteria gaps closed.
 

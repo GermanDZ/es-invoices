@@ -1,7 +1,7 @@
 ---
 id: T-032
 title: "UI overhaul — invoice list, global nav, submission status UX, Bootstrap polish"
-status: pending
+status: done
 priority: high
 track: standard
 phase: construction
