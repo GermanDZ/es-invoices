@@ -1,0 +1,2 @@
+{"event": "iteration_start", "task_id": "T-033", "goal": "Wire compliance.generate_alta into invoice issuance so the detail page submit button is active immediately after invoice creation", "branch": "feature/T-033-wire-generate-alta", "phase": "construction", "ts": "2026-06-23T08:10:13Z"}
+{"event": "iteration_complete", "task_id": "T-033", "branch": "feature/T-033-wire-generate-alta", "phase": "construction", "ts": "2026-06-23T08:18:46Z"}

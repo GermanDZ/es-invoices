@@ -63,7 +63,11 @@ def invoice_create(request):
         formset = LineItemFormSet(request.POST)
         if form.is_valid() and formset.is_valid():
             try:
-                invoice = _issue_from_forms(request.user, form, formset)
+                invoice = _issue_from_forms(
+                    request.user, form, formset,
+                    issuer_nif=form.cleaned_data["issuer_nif"],
+                    issuer_name=form.cleaned_data["issuer_name"],
+                )
             except ValidationError as exc:
                 messages.error(request, "; ".join(exc.messages))
             else:
@@ -99,12 +103,15 @@ def _issuer_initial(request):
     }
 
 
-def _issue_from_forms(user, form, formset):
-    """Create the draft + line items and issue, all within one transaction.
+def _issue_from_forms(user, form, formset, *, issuer_nif, issuer_name):
+    """Create the draft + line items, issue, and generate the alta Verifactu record.
 
-    Raises ``ValidationError`` (rolling everything back) when the draft is not
-    issuable. Returns the issued invoice.
+    All three steps run inside one atomic block so a failure at any point rolls
+    back the invoice number assignment and leaves no dangling record. Returns the
+    issued invoice.
     """
+    import compliance
+
     series, _ = Series.objects.get_or_create(owner=user, prefix="")
     client = form.cleaned_data["client"]
     with transaction.atomic():
@@ -125,7 +132,9 @@ def _issue_from_forms(user, form, formset):
                 )
         from .services import issue_invoice
 
-        return issue_invoice(invoice)
+        invoice = issue_invoice(invoice)
+        compliance.generate_alta(invoice, issuer_nif=issuer_nif, issuer_name=issuer_name)
+        return invoice
 
 
 @login_required
