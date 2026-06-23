@@ -1,410 +1,214 @@
-# OpenUP Project Template
+# FacturaSimple
 
-This repository is a **project template** that provides a structured engineering process based on OpenUP (Open Unified Process) for AI-agent-driven development.
+**Simple, Verifactu-compliant electronic invoicing for Spanish freelancers (*autónomos*) and micro-businesses.**
 
-## Template Structure
+FacturaSimple lets you issue legally valid invoices and submit them directly to the Spanish
+tax authority (AEAT) — without being a tax or technical expert. All the Verifactu plumbing
+(hash-chaining, XAdES signing, mTLS submission) is hidden behind an experience designed to
+get you from sign-up to your first invoice in **under 5 minutes**.
 
-This template organizes documentation into two distinct areas:
-
-- **`docs-eng-process/`** - Strict engineering process and agent workflows. This directory contains the authoritative process documentation that AI agents must follow. **Do not modify files in `docs-eng-process/` during project tasks.**
-- **`docs/`** - Project-specific artifacts only (no instructions). This directory contains project planning, tracking, decisions, and deliverables. Created and expanded during development.
-
-### For AI Agents
-
-**Start here**: [AGENTS.md](AGENTS.md) → [docs-eng-process/README.md](docs-eng-process/README.md)
-
-- **Running agents via CLI**: See [RUNNING-AGENTS.md](RUNNING-AGENTS.md) for instructions on using Cursor CLI or Claude Code to execute tasks following the OpenUP process.
-- **Complete agent workflow**: The full operating procedures are documented in [docs-eng-process/agent-workflow.md](docs-eng-process/agent-workflow.md).
-
-### For Users - Getting Started
-
-**📘 NEW: Comprehensive User Guide**
-
-- **[USER-GUIDE.md](docs-eng-process/USER-GUIDE.md)** - Complete guide for using OpenUP with Claude Code
-  - Getting started with new projects
-  - Core concepts (phases, roles, artifacts)
-  - Common workflows (quick reference + detailed)
-  - Skills and teams reference
-  - Configuration and troubleshooting
-
-- **[QUICK-REFERENCE.md](docs-eng-process/QUICK-REFERENCE.md)** - One-page cheat sheet for essential commands
-
-**Recommended: Start with the [User Guide](docs-eng-process/USER-GUIDE.md)** for a complete introduction to using OpenUP with Claude Code.
-
-### For Project Initialization
-
-- **Agent-driven initialization**: See [docs-eng-process/init-prompts.md](docs-eng-process/init-prompts.md) for copy/paste prompts that guide an AI agent through a two-run setup (technical preparation + Vision Q&A). This is the recommended approach for new projects.
-- **Manual initialization**: See [docs-eng-process/getting-started.md](docs-eng-process/getting-started.md) for step-by-step manual setup instructions.
+> Built with Django 5 + PostgreSQL · 231 tests green · RGPD-by-design
 
 ---
 
-## OpenUP HTML to Markdown Converter
+## Why
 
-This repository also includes a Python-based converter that transforms Eclipse Process Framework (EPF) OpenUP HTML documentation into a clean, well-structured Markdown knowledge base with AI-agent-friendly indexing.
+From **2027**, Spanish law (*Ley Crea y Crece* / Verifactu) requires businesses and freelancers
+to issue **tamper-evident, hash-chained invoices that are reportable to the AEAT** — companies
+from **1 January 2027** and freelancers from **1 July 2027**. Most existing software is complex,
+expensive, or built for accounting firms rather than for the professional who just needs to
+**issue a correct invoice, fast**.
+
+FacturaSimple targets that gap:
+
+- **Primary users:** *autónomos* and small businesses who issue invoices.
+- **Context:** Spain, EUR, direct AEAT integration.
+- **Differentiator:** end-to-end Verifactu compliance with zero friction.
+
+---
 
 ## Features
 
-✨ **Complete Conversion Pipeline**
-- Discovers and converts 960+ HTML files to Markdown
-- Preserves UMA (Unified Method Architecture) metadata
-- Extracts and structures relationships between documents
-- Converts images (GIF → PNG)
-- Generates comprehensive `manifest.json` index
+### 👤 Accounts & access
+- Self-service email registration and session-based authentication.
+- Django password validators; secure POST-only logout.
+- Self-service account deletion with a **30-day grace period** (RGPD art. 17).
+- Automated data purge: invoices after 5 years, accounts after the grace period.
 
-✨ **Clean Output**
-- Humanized folder structure (removes Java-style package naming)
-- Working internal links (transformed to relative `.md` paths)
-- YAML frontmatter with complete metadata
-- Proper image path resolution
+### 📇 Client management
+- Create, edit, and delete clients, **strictly owner-scoped** (no data leakage across users).
+- **B2B** clients (NIF/CIF required) and **B2C** clients (NIF/CIF optional).
+- Spanish tax-ID validation (DNI, NIE, CIF) with checksum verification.
+- Recipient fiscal data is **frozen onto the invoice** at issuance (immutable snapshot).
 
-✨ **AI-Optimized**
-- `manifest.json` with 3 indexes (by_type, by_keyword, by_slug)
-- Structured relationship data in frontmatter
-- 347 indexed keywords
-- 31 content types categorized
+### 🧾 Invoice issuance
+- Multi-line builder: description, quantity, price, **per-line VAT** (0 / 4 / 10 / 21 %).
+- Optional invoice-level **IRPF** withholding (1 / 2 / 3 %) and inline issuer identity.
+- Tax computation with `Decimal` precision, grouped by VAT rate.
+- **Gap-free sequential numbering** per series, enforced by a transactional row lock
+  (`select_for_update`) and a unique `(series, number)` constraint under concurrency.
+- **Atomic issuance**: draft, validation, and issue run in a single transaction; the invoice
+  becomes immutable on its identity and auto-generates its Verifactu record.
+- Multiple series support (e.g. a standard series and an `R` series for corrective invoices).
 
-## Quick Start
+### ✅ Verifactu compliance
+- Generates **alta** (registration), **anulación** (cancellation), and **rectificativa** records.
+- Legal-field validation (issuer/recipient data, invoice type F1/R1).
+- **Per-issuer hash chain**: each SHA-256 *huella* folds in the previous record's hash, making
+  any tampering detectable; serialized via a row lock.
+- **XAdES (XML-DSig) signing** with verification; the compliance module is **versioned and
+  isolated** so future regulatory changes don't ripple through the rest of the app.
 
-### Creating a New Project
+### 🏛️ AEAT submission
+- **Direct integration** over **mTLS** with a qualified certificate (PKCS#12) and SOAP/XML
+  validated against the official **XSDs**; supports **pre-production and production** endpoints.
+- Certificate management with **AES-256-GCM encryption at rest** and least-privilege access;
+  format, passphrase, and expiry are validated on upload.
+- Submission flow with bounded retries and outcome capture: **accepted** (with CSV receipt),
+  **rejected** (with AEAT error code), or **pending** — attempts are stored append-only,
+  never mutating the invoice or record.
+- **Kill switch** (`AEAT_SUBMISSION_LIVE`) that blocks live submissions in dev/CI.
+- **Verifactu QR code** on the PDF for invoice verification against the AEAT.
 
-```bash
-# Bootstrap a new project
-./scripts/bootstrap-project.sh my-awesome-project --base-dir ~/projects
+### 🔁 Corrective & cancellation invoices
+- **Rectificativa** (UC-004): corrects a valid issued invoice in its own `R` series, references
+  the original, supports **substitution** or **by-differences** methods, with its own record and
+  automatic submission.
+- **Anulación** (UC-005): generates a cancellation record without creating a new invoice;
+  pending-submission aware (cancels the in-flight attempt when applicable) and refused if a
+  rectificativa already exists.
+- **Rectificar** and **Anular** actions on the invoice detail, with a safety confirmation step.
 
-# The new project includes:
-# - docs-eng-process/ (engineering process and agent workflows)
-# - docs/ (empty, ready for project artifacts)
-# - .claude/ (agent team configuration, automatically set up)
-```
+### 📄 PDF & email delivery
+- **PDF** generation with **WeasyPrint** including all mandatory legal fields, tax summary,
+  Verifactu legend, and QR code.
+- **Email** delivery of the PDF (pluggable backend), recipient taken from the form or the client;
+  `sent_at` timestamp and PII-free instrumentation.
 
-### Installing Into an Existing App
+### 📊 Tracking, listing & dashboard
+- Invoice states: **draft → issued → sent**, via a derived status property.
+- Owner-scoped listing (issued, non-annulled only) and a **detail view** with a submission-status
+  badge (no record / pending / sent / accepted / rejected) and attempt history.
+- Bootstrap 5 dashboard with navigation, quick actions, and an authenticated landing page.
 
-If you already started building an app and want to add OpenUP on top, do a first-time install instead of using the update flow.
+---
 
-```bash
-# In your existing app repo
-FRAMEWORK="/path/to/open-up-for-ai-agents"
-APP="/path/to/your-existing-app"
+## Tech stack
 
-mkdir -p "$APP/scripts" "$APP/docs" "$APP/docs-eng-process"
+| Layer | Choice |
+|---|---|
+| Language | Python 3.13 |
+| Framework | Django 5 |
+| Database | PostgreSQL (SQLite fallback for local/tests) |
+| Crypto | `cryptography` — AES-256-GCM at rest, PKCS#12 loading |
+| Verifactu XML | `lxml` (build/validate), `signxml` (XAdES XML-DSig) |
+| AEAT transport | `requests-pkcs12` (mutual-TLS SOAP) |
+| PDF / QR | `weasyprint`, `segno` |
+| Config | `python-dotenv` |
 
-# Copy the OpenUP process docs and templates
-rsync -av "$FRAMEWORK/docs-eng-process/" "$APP/docs-eng-process/"
+---
 
-# Copy the sync script, then install skills, teammates, teams, and CLAUDE.openup.md
-cp "$FRAMEWORK/scripts/sync-from-framework.sh" "$APP/scripts/"
-chmod +x "$APP/scripts/sync-from-framework.sh"
-
-cd "$APP"
-./scripts/sync-from-framework.sh --framework-path "$FRAMEWORK"
-```
-
-This installs:
-
-- `docs-eng-process/` - OpenUP process docs and templates
-- `.claude/skills/` - OpenUP skills
-- `.claude/teammates/` - OpenUP role instructions
-- `.claude/teams/` - OpenUP team definitions
-- `.claude/CLAUDE.openup.md` - shared OpenUP instructions
-
-Then initialize the project-owned docs in `docs/` by following [docs-eng-process/getting-started.md](docs-eng-process/getting-started.md) or by using the prompts in [docs-eng-process/init-prompts.md](docs-eng-process/init-prompts.md).
-
-### Updating Existing Projects
-
-If OpenUP is already installed in your project and you just need the latest framework changes, see [docs-eng-process/updating.md](docs-eng-process/updating.md) for update options.
-
-**Recommended approach**: Add the framework as a git submodule:
-
-```bash
-# In your project directory
-git submodule add https://github.com/GermanDZ/open-up-for-ai-agents.git .openup-template
-
-# Create convenience update script
-cat > scripts/update-openup.sh << 'EOF'
-#!/bin/bash
-TEMPLATE_DIR="$(git rev-parse --show-toplevel)/.openup-template"
-bash "$TEMPLATE_DIR/scripts/update-from-template.sh" --template-dir "$TEMPLATE_DIR" "$@"
-EOF
-chmod +x scripts/update-openup.sh
-
-# Run updates
-./scripts/update-openup.sh
-```
-
-### Agent Teams
-
-The template includes pre-configured agent teams based on OpenUP roles:
-
-```bash
-# Enable agent teams
-export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
-
-# Create a team
-# "Create an OpenUP agent team with analyst, architect, developer, and tester"
-```
-
-See [docs-eng-process/agent-teams-setup.md](docs-eng-process/agent-teams-setup.md) for details.
+## Quick start
 
 ### Prerequisites
+- Python 3.13+
+- PostgreSQL (optional for local dev — SQLite is used automatically when `POSTGRES_DB` is unset)
 
-- Python 3.10+
-- `curl` or `wget` (for downloading source files)
-- `unzip` utility
-
-### Installation
+### Setup
 
 ```bash
-# Clone or download this repository
-cd open-up-for-ai-agents
+# Clone and enter the repo
+cd es-invoices
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Create and activate a virtual environment
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+
+# Configure environment (see "Configuration" below)
+cp .env.example .env               # then edit values
+
+# Apply migrations and run
+python3 manage.py migrate
+python3 manage.py runserver
 ```
 
-### Download Source Files
+In `DEBUG` mode a dev-login shortcut is available at `/dev/login/` for fast local iteration.
 
-The OpenUP source files are not included in the repository. Download them first:
+### Run the tests
 
 ```bash
-# Download and extract OpenUP source files (~15 MB)
-bash scripts/download_openup.sh
+python3 manage.py test
 ```
 
-This will:
-- Download from Eclipse archive: https://archive.eclipse.org/epf/downloads/OpenUP/published/openup_published_1.5.1.5_20121212.zip
-- Extract to `.tmp/openup/` directory
-- Verify ~961 HTML files are present
+> 231 tests cover all apps. Two PostgreSQL-gated tests (concurrent numbering / hash-chain locks)
+> are skipped automatically on SQLite.
 
-### Usage
-
-**Single command converts everything:**
-
-```bash
-python3 scripts/convert.py
-```
-
-**Output:**
-- `openup-knowledge-base/` - 960 markdown files
-- `openup-knowledge-base/manifest.json` - Complete index
-- `openup-knowledge-base/images/` - Converted images
-
-**Processing time:** ~15 seconds
-
-## Conversion Pipeline
-
-The converter runs 7 phases automatically:
-
-1. **Discovery** - Find all HTML files (glob-based)
-2. **Conversion** - HTML → Markdown (parallel, 8 workers)
-3. **Write Files** - Save markdown files with frontmatter
-4. **Fix Internal Links** - Transform `.html` → `.md` links
-5. **Populate Related Metadata** - Extract relationships
-6. **Generate Manifest** - Create `manifest.json` index
-7. **Copy Images** - Copy/convert images (GIF → PNG)
-8. **Fix Image References** - Update image paths
-
-## Project Structure
-
-```
-open-up-for-ai-agents/
-├── AGENTS.md              # Entrypoint for AI agents (thin pointer)
-├── docs-eng-process/       # Engineering process (strict, do not modify during project tasks)
-│   ├── README.md          # Canonical agent entrypoint
-│   ├── agent-workflow.md  # Complete agent operating procedures
-│   ├── agent-teams-setup.md  # Agent teams setup and usage guide
-│   ├── updating.md        # How to update projects from template
-│   ├── how-to-work.md     # Minimal orientation
-│   ├── getting-started.md # Project initialization guide
-│   ├── init-prompts.md    # Copy/paste prompts for agent-driven setup
-│   ├── .claude-templates/ # Agent team templates (installed to .claude/)
-│   │   ├── teammates/     # Individual role instructions
-│   │   ├── teams/         # Team configuration files
-│   │   └── CLAUDE.md      # Main CLAUDE.md template
-│   ├── templates/         # Document templates (from OpenUP KB)
-│   └── openup-knowledge-base/  # Vendored OpenUP knowledge base
-├── docs/                   # Project-specific artifacts (created during development)
-│   ├── .gitkeep          # Placeholder (docs created as needed)
-│   ├── project-status.md # Current project state (created during development)
-│   ├── roadmap.md        # Prioritized work items (created during development)
-│   └── phases/           # Phase-specific docs (created during development)
-├── scripts/
-│   ├── bootstrap-project.sh    # Create new project from template
-│   ├── setup-agent-teams.sh    # Install agent team templates
-│   ├── update-from-template.sh # Update existing project from latest template
-│   ├── update-openup.sh        # One-liner update script
-│   ├── convert.py              # OpenUP HTML to Markdown conversion
-│   └── download_openup.sh      # Download OpenUP source files
-├── converter/             # Core conversion modules (for KB generation)
-│   ├── config.py         # Configuration and path mappings
-│   ├── parser.py         # HTML parsing and metadata extraction
-│   ├── path_mapper.py    # Path transformation logic
-│   └── markdown_converter.py  # HTML to Markdown conversion
-├── requirements.txt       # Python dependencies
-├── .tmp/                  # Archive/ignored (source HTML files)
-└── openup-knowledge-base/ # Source KB (vendored into docs-eng-process/)
-```
-
-## Output Structure
-
-### Markdown Files
-
-Each file includes YAML frontmatter:
-
-```yaml
 ---
-title: "Page Title"
-source_url: "original/html/path.html"
-type: "Role|Task|Artifact|Concept|Guideline..."
-uma_name: "internal_name"
-page_guid: "_uniqueGUID"
-keywords:
-  - keyword1
-  - keyword2
-related:
-  roles:
-    - role-slug
-  tasks:
-    - task-slug
-  workproducts:
-    - artifact-slug
----
-```
-
-### Manifest.json
-
-AI-friendly index with:
-
-```json
-{
-  "version": "1.0",
-  "generated": "2026-01-12",
-  "title": "OpenUP Knowledge Base",
-  "total_files": 960,
-  "content_types": {...},
-  "files": [...],
-  "index": {
-    "by_type": {...},
-    "by_keyword": {...},
-    "by_slug": {...}
-  }
-}
-```
-
-**Use cases:**
-- Quick lookup by slug
-- Filter by content type
-- Search by keyword
-- Traverse relationships
-- Get statistics
 
 ## Configuration
 
-Edit `converter/config.py` to customize:
+Configuration is loaded from environment variables (via `.env`). Key settings:
 
-- `SOURCE_DIR` - Input HTML directory
-- `OUTPUT_DIR` - Output markdown directory
-- `PARALLEL_WORKERS` - Number of parallel workers (default: 8)
-- `PATH_MAPPINGS` - Path transformation rules
-- Content type mappings and parsing selectors
+| Variable | Purpose |
+|---|---|
+| `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS` | Core Django settings |
+| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT` | PostgreSQL (omit `POSTGRES_DB` to use SQLite) |
+| `CERT_ENCRYPTION_KEY` | Key for AES-256-GCM encryption of stored certificates |
+| `AEAT_ENV`, `AEAT_SUBMISSION_LIVE`, `AEAT_SUBMISSION_TIMEOUT`, `AEAT_SUBMISSION_MAX_RETRIES` | AEAT submission behaviour (`LIVE` defaults OFF) |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL` | Email delivery |
 
-## Dependencies
+See [`docs/deployment-runbook.md`](docs/deployment-runbook.md) for the full operator reference.
+
+---
+
+## Architecture
+
+FacturaSimple is a **modular monolith** — a single deployable Django app partitioned into
+focused modules, chosen for lean operability over microservice overhead:
 
 ```
-beautifulsoup4==4.12.3  # HTML parsing
-lxml==5.1.0             # XML/HTML processing
-html2text==2024.2.26    # HTML to Markdown conversion
-PyYAML==6.0.1           # YAML frontmatter generation
-Pillow>=12.0.0          # Image conversion (GIF to PNG)
+accounts/      Registration, auth, account lifecycle
+clients/       Client CRUD, B2B/B2C tax-ID validation
+invoicing/     Invoice issuance, series, gap-free numbering
+compliance/    Verifactu records, hash chain, XAdES signing  (isolated + versioned)
+submission/    AEAT mTLS adapter, submission outcomes        (swappable behind an interface)
+documents/     PDF rendering + email delivery
+certificates/  Encrypted PKCS#12 certificate storage
+config/        Django project settings & URLs
+devtools/      DEBUG-only dev-login shim (never loaded in production)
 ```
 
-## Results
+**Design highlights**
 
-**Conversion Statistics:**
-- ✅ 960/961 files converted (99.9% success)
-- ✅ 740 files with fixed internal links
-- ✅ 473 files with populated related metadata
-- ✅ 233 images copied/converted
-- ✅ 916 files with fixed image references
-- ✅ 31 content types categorized
-- ✅ 347 unique keywords indexed
+- **Compliance isolation (AD-2):** all Verifactu rules live in one versioned module so spec
+  changes are absorbed in one place.
+- **Swappable AEAT adapter (AD-3):** direct mTLS-SOAP integration was proven via PoC, with a
+  third-party gateway as a fallback behind the same interface.
+- **Integrity guarantees:** gap-free numbering, an anti-tampering hash chain, and
+  post-issuance immutability (corrections/cancellations recorded in separate fields).
+- **RGPD by design:** EU data residency, encryption in transit (TLS/mTLS) and at rest
+  (AES-256-GCM), least-privilege access, and automated retention/purge.
 
-**Content Types:**
-- WorkProductDescriptor (154)
-- Activity (130)
-- CapabilityPattern (85)
-- Guideline (55)
-- Concept (52)
-- And 26 more types...
+---
 
-## Advanced Usage
+## Project status
 
-### Query Manifest Programmatically
+**Construction phase complete**, with a **GO** decision toward the Transition (beta) phase:
+all core features implemented, tested, and documented. Target metrics: first invoice in
+**< 5 min**, **≥ 99 %** first-submission acceptance at the AEAT, and **≥ 50 %** first-week
+activation.
 
-```python
-import json
+---
 
-# Load manifest
-manifest = json.load(open('openup-knowledge-base/manifest.json'))
+## Documentation
 
-# Get all Roles
-roles = manifest['index']['by_type']['Role']
+- [`docs/presentacion-facturasimple.md`](docs/presentacion-facturasimple.md) — project presentation (Spanish)
+- [`docs/deployment-runbook.md`](docs/deployment-runbook.md) — operator runbook
+- [`docs/vision.md`](docs/vision.md), [`docs/architecture-notebook.md`](docs/architecture-notebook.md), [`docs/use-cases/`](docs/use-cases/) — vision, architecture, use cases
+- [`docs/roadmap.md`](docs/roadmap.md) — work items and status
 
-# Find by keyword
-iterations = manifest['index']['by_keyword']['iteration']
-
-# Lookup specific page
-architect = manifest['index']['by_slug']['architect-6']
-print(f"{architect['title']}: {architect['path']}")
-```
-
-### Customize Path Mappings
-
-Edit `PATH_MAPPINGS` in `converter/config.py`:
-
-```python
-PATH_MAPPINGS = {
-    r"practice\.mgmt\.": "practice-management/",
-    r"practice\.tech\.": "practice-technical/",
-    # Add your own mappings...
-}
-```
-
-## Development
-
-The codebase is organized into modular components:
-
-- **parser.py** - Extracts content and metadata from HTML
-- **path_mapper.py** - Transforms paths and manages slug generation
-- **markdown_converter.py** - Converts HTML to Markdown with frontmatter
-- **convert.py** - Orchestrates the complete pipeline
-
-All post-processing (link fixing, metadata population, manifest generation) is integrated into the main script for single-command execution.
-
-## Troubleshooting
-
-**Issue:** `No such file or directory: .tmp/openup`
-- **Solution:** Place source HTML files in `.tmp/openup/` directory
-
-**Issue:** Import errors
-- **Solution:** Ensure virtual environment is activated and dependencies installed
-
-**Issue:** Permission errors
-- **Solution:** Check file permissions on source and output directories
-
-## License
-
-This converter tool is provided as-is. The OpenUP content it processes is made available under the Eclipse Public License V1.0.
-
-## Credits
-
-Converts Eclipse Process Framework (EPF) OpenUP documentation.
-
-**Conversion Tool:**
-- BeautifulSoup4 for HTML parsing
-- html2text for Markdown generation
-- Pillow for image conversion
-- Custom Python pipeline for complete transformation
+> This repository follows the **OpenUP** engineering process. See [`.claude/CLAUDE.md`](.claude/CLAUDE.md)
+> and [`docs-eng-process/`](docs-eng-process/) for the agent workflow and process docs.
