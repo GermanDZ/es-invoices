@@ -10,7 +10,13 @@ certificates.crypto).
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env from the project root before any _env() call. Already-set
+# environment variables (e.g. from a systemd EnvironmentFile) take precedence.
+load_dotenv(BASE_DIR / ".env", override=False)
 
 
 def _env(name, default=None):
