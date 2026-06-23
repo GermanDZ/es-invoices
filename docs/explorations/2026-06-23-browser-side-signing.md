@@ -285,3 +285,152 @@ Dispositions:
 AEAT accepts it, scope a standard-track iteration to implement Option C (browser
 key, server holds cert chain only) with a pre-signed batch queue for unattended
 retry.
+
+## 2026-06-23 — Security-first revision pass
+
+The original notes researched the space well and the threat section was honest,
+but the **disposition optimised for UX friction on an axis the founder has now
+explicitly deprioritised**: security and privacy come first, UX can be adapted.
+Re-evaluated under that lexicographic ordering (security ≻ privacy ≻ UX), several
+conclusions invert. This section supersedes the option ranking, the AutoFirma
+rejection, the unattended-retry decision, and the PoC scope above.
+
+### Re-ranking the options security-first
+
+The original ranking ("worst UX" for A, "good UX after first import" for B,
+landing on C) sorts by convenience. Under security-first the sort key is *residual
+attack surface*, and the order changes:
+
+1. **Option D (AutoFirma / native client + hardware token)** — *strongest.* With
+   a smartcard/QSCD the private key never enters the browser JS context at all,
+   not even as a non-extractable `CryptoKey`. A compromised frontend bundle cannot
+   invoke `sign()` without the user's per-operation token/PIN presence. This is the
+   only option that defends against the dominant residual threat (§ "Two structural
+   threats" below). The original rejected it purely on activation-rate/mobile
+   grounds — **a UX argument, now out of scope as a disqualifier.**
+2. **Option A (session-only, in-memory P12)** — *strong.* No key at rest anywhere;
+   gone on page unload. The original called this "worst UX"; security-first makes it
+   the **default for the JS-upload path.**
+3. **Option C (browser key, server holds cert chain only)** — *acceptable, but
+   only with hardening + WYSIWYS.* Clean custody split, but does **not** by itself
+   defend against a server that serves malicious JS (see below). Keep as the
+   persistent-convenience variant, gated on the controls in "JS-path hardening".
+4. **Option B (non-extractable key in IndexedDB)** — *downgrade, not upgrade.*
+   Persisting key material in the browser profile re-introduces a key-at-rest
+   surface (profile theft, shared/managed machines). Security-first treats B as
+   **below A**, contrary to the original framing.
+
+**The product shape is a dual track, which is what the founder asked for:**
+AutoFirma (Option D) for high-assurance users / hardware tokens, and JS upload
+(Option A by default, C as an opt-in convenience) for reach. AutoFirma is
+reinstated as a **first-class option, not a rejected shortcut.**
+
+### Two structural threats the original under-weighted
+
+The original honesty section named "compromised frontend bundle" then did not
+carry it into the conclusions. Two consequences:
+
+- **The server still controls *what* gets signed (WYSIWYS gap).** The server
+  builds the `RegistroAlta` (`compliance/records.py`) and hands it to the browser
+  to sign. "The key never leaves the browser" does **not** mean "only documents the
+  user approved get signed." A breached server can present a malicious record and a
+  non-extractable key will sign it blindly. The value of client-side signing
+  **collapses** unless the browser derives and displays the material terms (NIF,
+  importe, fecha, contraparte) from the to-be-signed XML and the user confirms —
+  *What You See Is What You Sign*. This is a hard requirement for the JS path, and
+  it is currently absent from the design.
+- **Server-breach re-enters through the JS the server serves.** The original claims
+  Options B/C protect against "server breach." True for key *exfiltration*; false
+  for *signing abuse* — a breached server ships malicious JS that calls `sign()` on
+  attacker-chosen content. The non-extractable property prevents stealing the key,
+  not misusing it. Honest guarantee, narrowed: **"your key bytes never reach our
+  server, and signing requires your live device plus (token PIN | confirmation of
+  the displayed terms)."** Only Option D delivers the strong form.
+
+### JS-path hardening (was entirely missing)
+
+If the JS-upload path ships, security-first *requires* naming the controls that
+make "the server cannot silently sign for you" credible — none were in the
+original:
+
+- **CSP + Subresource Integrity + dependency pinning.** `pkijs` + `xadesjs` +
+  transitive deps are a large crypto surface with `sign()` access. That dependency
+  tree *is* the supply-chain/XSS vector. Adding it without SRI/pinning/CSP makes the
+  threat worse, not better.
+- **Isolation** of the signing code (dedicated origin / sandboxed iframe; a browser
+  extension or Option D is stronger) so a compromised main bundle cannot reach the
+  key.
+
+### Unattended retry — decision committed
+
+The original left three options open and leaned toward the pre-signed batch queue.
+Security-first **commits the constraint**: drop unattended server-side signing
+(Option 1 in the original). Failures resurface in the UI for the user to re-sign.
+Rationale: the passphrase-storage requirement (DD4) and the unattended-retry
+requirement are in direct conflict, and the founder's directive ("never store the
+private key or passphrase on the server") resolves it. The **pre-signed batch queue
+is shelved**, not adopted, because it (a) makes the server custodian of
+pre-authorised signed records it can reorder/withhold/replay against the Verifactu
+hash chain — an integrity claim the original waved off rather than proved — and (b)
+likely needs XAdES-T (TSA dependency) to survive retry-window timestamp expiry. If
+revisited, it must carry a concrete chain-integrity-under-adversarial-submitter
+argument first.
+
+### A legal question the original got backwards
+
+The original cited "AEAT wouldn't know or care where signing runs" as a point *for*
+browser signing. eIDAS points the other way: a **qualified** electronic signature
+generally requires a **QSCD** (smartcard/HSM). A software-extracted P12 key signed
+in a browser may be a valid *advanced* signature but **not a qualified** one, even
+if the XAdES is structurally identical. **Decision-critical open question for
+legal:** does Verifactu require a *qualified* signature (QSCD-backed), or merely a
+valid signature from a qualified certificate? If the former, the JS-only path may be
+non-compliant and Option D (hardware token) becomes the compliant path — reinforcing
+the dual track.
+
+### Updated open questions
+
+- **[legal, blocking]** Qualified-vs-advanced: does Verifactu mandate a QSCD? This
+  gates whether the JS-upload path is legally viable at all.
+- **[design]** WYSIWYS: how does the browser render the material terms of a
+  `RegistroAlta` for user confirmation before signing?
+- **[security]** JS-path hardening: CSP policy, SRI on the signing bundle, isolation
+  boundary — specify before any JS signing ships.
+- (retained) `xadesjs` `SignedInfo`/`X509Data` acceptance by AEAT pre-prod.
+- (retained, now lower priority) multi-device UX for Option A/C.
+
+### Product-manager challenge pass (revision)
+
+- **Pushback — the original disposition is mis-ranked for this product.** It
+  selected the most convenient defensible option; the founder's security-first
+  directive makes residual attack surface the sort key. Accepted: option ranking
+  rewritten above.
+- **Pushback — "server breach has nothing to steal" oversells the guarantee.** A
+  breached server can still serve malicious JS and abuse-sign. Accepted: guarantee
+  re-framed and the WYSIWYS requirement added.
+- **Complement — the RGPD/data-minimisation argument still holds and strengthens.**
+  The strongest *business* case (not being a private-key data processor under RGPD
+  Art. 28; trims R-06 and `rgpd-checklist.md`) survives the security re-ranking
+  intact — both A and D remove the storage surface. Accepted: carried forward as the
+  primary business argument, unchanged from the original.
+- **Complement — AutoFirma is half the founder's ask, not a shortcut to reject.**
+  Accepted: reinstated as first-class (dual track).
+- **Refine — the decision-critical unknown is legal, not technical.** A
+  structurally-accepted signature that is not *legally qualified* is a trap; the PoC
+  must answer the QSCD question, not just "does AEAT pre-prod parse it." Accepted:
+  PoC scope broadened below.
+- Disposition: all challenges accepted into the notes above. No team deployed —
+  role hat only.
+
+### Where this goes next (revised)
+
+→ quick-task — Two parallel de-risking probes before scoping any iteration:
+(1) **legal** — confirm whether Verifactu requires a QSCD-backed *qualified*
+signature or accepts an *advanced* signature from a qualified cert (gates the
+JS-upload path); and (2) **technical** — sign one `RegistroAlta` in the browser
+with `xadesjs` + `pkijs` and verify AEAT pre-prod acceptance. If legal clears the
+JS path, scope a standard-track iteration for the **dual track**: AutoFirma (Option
+D) + JS upload (Option A default, C opt-in) with WYSIWYS confirmation, JS-path
+hardening (CSP/SRI/isolation), server holding cert chain only, and **no** unattended
+server-side retry. If legal mandates a QSCD, scope the AutoFirma/hardware-token path
+as the primary, JS upload demoted or dropped.
