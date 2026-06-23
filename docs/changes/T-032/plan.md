@@ -22,7 +22,7 @@ touches:
   - "submission/selectors.py"
   - "submission/templatetags/"
   - "documents/templates/"
-  - "devtools/tests/urls.py"
+  - "devtools/tests/"
 depends-on: [T-022, T-023, T-025]
 ---
 
