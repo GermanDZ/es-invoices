@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "task_id": "T-034b",
+  "iteration": 0,
+  "phase": "construction",
+  "track": "quick",
+  "branch": "quick/20260623-112516-register-issuer-fields",
+  "worktree": "/Users/germandz/personal-code/ai-dev-framework/es-invoices",
+  "session_id": null,
+  "started_at": "2026-06-23T09:25:17Z",
+  "gates": {
+    "team_deployed": false,
+    "plan_persisted": false,
+    "log_written": true,
+    "roadmap_synced": true,
+    "retro_due": false
+  },
+  "iterations_since_retro": 0
+}
