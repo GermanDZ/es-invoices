@@ -3,35 +3,47 @@ AEAT submission panel for an invoice's latest alta record (T-023, UC-002).
 Context: submission_record, submission_attempts (newest first), submission_can_submit.
 Included by invoicing/invoice_detail.html.
 {% endcomment %}
-<section class="submission">
-  <h2>Envío a la AEAT (Verifactu)</h2>
+<section class="submission mb-4">
+  <h5 class="mb-3">Envío Verifactu a la AEAT</h5>
 
   {% if not submission_record %}
-    <p>Esta factura aún no tiene un registro Verifactu que enviar.</p>
+    <div class="alert alert-info">
+      <p class="mb-0">Esta factura aún no tiene un registro Verifactu que enviar.</p>
+    </div>
   {% else %}
     {% if submission_attempts %}
-      <dl class="submission-outcome">
+      <div class="accordion mb-3" id="submissionAttempts">
         {% for attempt in submission_attempts %}
-          <dt>{{ attempt.get_status_display }}</dt>
-          <dd>
-            {% if attempt.csv %}CSV: {{ attempt.csv }}{% endif %}
-            {% if attempt.aeat_code %}Código: {{ attempt.aeat_code }}{% endif %}
-            {% if attempt.aeat_message %}— {{ attempt.aeat_message }}{% endif %}
-            <small>({{ attempt.created_at }})</small>
-          </dd>
+          <div class="accordion-item">
+            <h6 class="accordion-header">
+              <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#attempt{{ forloop.counter }}">
+                <span class="badge bg-{% if attempt.status == 'accepted' %}success{% elif attempt.status == 'pending' %}info{% elif attempt.status == 'rejected' %}danger{% else %}secondary{% endif %} me-2">{{ attempt.get_status_display }}</span>
+                {{ attempt.created_at|date:"d/m/Y H:i" }}
+              </button>
+            </h6>
+            <div id="attempt{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#submissionAttempts">
+              <div class="accordion-body">
+                {% if attempt.csv %}<p><strong>CSV:</strong> {{ attempt.csv }}</p>{% endif %}
+                {% if attempt.aeat_code %}<p><strong>Código AEAT:</strong> {{ attempt.aeat_code }}</p>{% endif %}
+                {% if attempt.aeat_message %}<p><strong>Mensaje:</strong> {{ attempt.aeat_message }}</p>{% endif %}
+              </div>
+            </div>
+          </div>
         {% endfor %}
-      </dl>
+      </div>
     {% else %}
-      <p>Sin envíos todavía.</p>
+      <p class="text-muted mb-3">Sin envíos todavía.</p>
     {% endif %}
 
     {% if submission_can_submit %}
       <form method="post" action="{% url 'submission:submit' submission_record.invoice_id %}">
         {% csrf_token %}
-        <button type="submit">Enviar a la AEAT</button>
+        <button type="submit" class="btn btn-primary">Enviar a la AEAT</button>
       </form>
     {% else %}
-      <p>El registro ya fue aceptado por la AEAT.</p>
+      <div class="alert alert-success mb-0">
+        <strong>✓ El registro fue aceptado por la AEAT.</strong>
+      </div>
     {% endif %}
   {% endif %}
 </section>

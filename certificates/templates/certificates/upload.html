@@ -1,28 +1,47 @@
-<!doctype html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Certificado AEAT</title></head>
-<body>
-  <h1>Certificado AEAT</h1>
+{% extends "base.html" %}
 
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}<li class="msg">{{ message }}</li>{% endfor %}
-    </ul>
-  {% endif %}
+{% block title %}Certificado AEAT — FacturaSimple{% endblock %}
 
-  <p>Status: <strong>{{ status }}</strong></p>
+{% block content %}
+<h1 class="mb-4">Certificado AEAT</h1>
 
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload certificate</button>
-  </form>
+<div class="alert alert-info mb-4" role="alert">
+  <strong>Estado: {{ status }}</strong>
+  <p class="mb-0">El certificado se encripta en el servidor EU-residente y se usa únicamente para enviar registros Verifactu a la AEAT.</p>
+</div>
 
-  {% if configured %}
-    <form method="post" action="{% url 'certificates:delete' %}">
+<div class="row">
+  <div class="col-md-8 col-lg-6">
+    <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
-      <button type="submit">Delete certificate</button>
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="invalid-feedback d-block">{{ field.errors.0 }}</div>
+          {% endif %}
+          {% if field.help_text %}
+            <small class="form-text text-muted d-block">{{ field.help_text|safe }}</small>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Subir certificado</button>
     </form>
-  {% endif %}
-</body>
-</html>
+
+    {% if configured %}
+      <div class="mt-4">
+        <form method="post" action="{% url 'certificates:delete' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-danger">Eliminar certificado</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</div>
+<style>
+  input[type="file"] {
+    width: 100%;
+  }
+</style>
+{% endblock %}

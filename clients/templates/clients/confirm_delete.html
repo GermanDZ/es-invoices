@@ -1,13 +1,23 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Delete client</title></head>
-<body>
-  <h1>Delete client</h1>
-  <p>Delete <strong>{{ client.fiscal_name }}</strong>?</p>
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirm delete</button>
-  </form>
-  <p><a href="{% url 'clients:list' %}">Cancel</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Eliminar cliente — FacturaSimple{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-danger">
+      <div class="card-body">
+        <h4 class="card-title text-danger mb-3">Eliminar cliente</h4>
+        <p>¿Estás seguro de que deseas eliminar <strong>{{ client.fiscal_name }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Eliminar</button>
+            <a href="{% url 'clients:list' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

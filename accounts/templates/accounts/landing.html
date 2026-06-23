@@ -1,20 +1,13 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>FacturaSimple</title></head>
-<body>
-  <h1>FacturaSimple</h1>
-  <p>Sesión iniciada como <strong>{{ user.email|default:user.username }}</strong>.</p>
-  <ul>
-    <li><a href="{% url 'invoicing:create' %}">Nueva factura</a></li>
-    <li><a href="{% url 'clients:list' %}">Clientes</a></li>
-    <li><a href="{% url 'certificates:upload' %}">Certificado</a></li>
-  </ul>
-  <form method="post" action="{% url 'accounts:logout' %}">
-    {% csrf_token %}
-    <button type="submit">Cerrar sesión</button>
-  </form>
+{% extends "base.html" %}
 
-  <hr>
-  <p><a href="{% url 'accounts:delete_account_confirm' %}">Eliminar mi cuenta</a></p>
-</body>
-</html>
+{% block title %}FacturaSimple{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+  <h1 class="mb-4">Redirigiendo...</h1>
+  <p class="lead">Ir a <a href="{% url 'invoicing:list' %}">mis facturas</a>.</p>
+</div>
+<script>
+  window.location.href = "{% url 'invoicing:list' %}";
+</script>
+{% endblock %}

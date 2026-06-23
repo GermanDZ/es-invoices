@@ -1,37 +1,46 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Eliminar cuenta — FacturaSimple</title></head>
-<body>
-  <h1>Eliminar mi cuenta</h1>
+{% extends "base.html" %}
 
-  <h2>¿Qué se eliminará?</h2>
-  <ul>
-    <li>Tu perfil de usuario y credenciales de acceso.</li>
-    <li>Tus certificados digitales almacenados.</li>
-    <li>Tus datos de clientes y contactos.</li>
-  </ul>
+{% block title %}Eliminar cuenta — FacturaSimple{% endblock %}
 
-  <h2>¿Qué se conservará?</h2>
-  <p>
-    Los registros fiscales (facturas emitidas) se conservarán durante el plazo
-    legalmente exigido (<strong>5 años</strong>) sin datos de carácter personal
-    adicionales, en cumplimiento de la obligación tributaria (Ley 58/2003, art. 66).
-  </p>
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h1 class="mb-4 text-danger">Eliminar mi cuenta</h1>
 
-  <h2>Plazo de eliminación</h2>
-  <p>
-    Tu cuenta será desactivada de inmediato. Tus datos personales se eliminarán
-    definitivamente en un plazo de <strong>30 días</strong>, conforme al artículo 17
-    del Reglamento General de Protección de Datos (RGPD).
-  </p>
+    <div class="card mb-4">
+      <div class="card-header bg-danger text-white">
+        <h5 class="mb-0">⚠️ Esta acción no se puede deshacer</h5>
+      </div>
+      <div class="card-body">
+        <h6 class="mb-3">¿Qué se eliminará?</h6>
+        <ul class="mb-3">
+          <li>Tu perfil de usuario y credenciales de acceso.</li>
+          <li>Tus certificados digitales almacenados.</li>
+          <li>Tus datos de clientes y contactos.</li>
+        </ul>
 
-  <p><strong>Esta acción no se puede deshacer.</strong></p>
+        <h6 class="mb-3">¿Qué se conservará?</h6>
+        <p class="mb-3">
+          Los registros fiscales (facturas emitidas) se conservarán durante el plazo
+          legalmente exigido (<strong>5 años</strong>) sin datos de carácter personal
+          adicionales, en cumplimiento de la obligación tributaria.
+        </p>
 
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Confirmar eliminación de cuenta</button>
-  </form>
+        <h6 class="mb-3">Plazo de eliminación</h6>
+        <p>
+          Tu cuenta será desactivada de inmediato. Tus datos personales se eliminarán
+          definitivamente en un plazo de <strong>30 días</strong>, conforme al artículo 17
+          del RGPD.
+        </p>
+      </div>
+    </div>
 
-  <p><a href="{% url 'accounts:landing' %}">Cancelar y volver</a></p>
-</body>
-</html>
+    <form method="post" class="mb-3">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger btn-lg w-100">Confirmar eliminación de cuenta</button>
+    </form>
+
+    <p class="text-center"><a href="{% url 'invoicing:list' %}">Cancelar y volver</a></p>
+  </div>
+</div>
+{% endblock %}

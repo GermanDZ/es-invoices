@@ -1,42 +1,75 @@
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="utf-8"><title>Rectificar factura {{ original.series.prefix }}{{ original.number }}</title></head>
-<body>
-  <h1>Emitir factura rectificativa</h1>
-  <p>Corrige la factura
-     <strong>{{ original.series.prefix }}{{ original.number }}</strong>
-     ({{ original.recipient_name }}). La rectificativa restituye la factura
-     corregida completa (<em>por sustitución</em>).</p>
+{% extends "base.html" %}
 
-  {% if messages %}
-  <ul class="messages">
-    {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-  </ul>
-  {% endif %}
+{% block title %}Factura rectificativa {{ original.series.prefix }}{{ original.number }} — FacturaSimple{% endblock %}
 
-  <form method="post" action="{% url 'invoicing:rectificar' original.pk %}">
-    {% csrf_token %}
-    {{ form.as_p }}
+{% block content %}
+<h1 class="mb-3">Emitir factura rectificativa</h1>
+<p class="lead text-muted">Corrige la factura <strong>{{ original.series.prefix }}{{ original.number }}</strong> ({{ original.recipient_name }}). La rectificativa restituye la factura corregida completa (<em>por sustitución</em>).</p>
 
-    <h2>Líneas corregidas</h2>
+<form method="post" action="{% url 'invoicing:rectificar' original.pk %}" novalidate>
+  {% csrf_token %}
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h5 class="mb-3">Emisor</h5>
+      {% for field in form %}
+        {% if "issuer" in field.name %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="col-md-6">
+      <h5 class="mb-3">Opciones de corrección</h5>
+      {% for field in form %}
+        {% if field.name in "metodo,tipo_factura" %}
+          <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <h5 class="mb-3">Líneas corregidas</h5>
+  <div class="table-responsive mb-4">
     {{ formset.management_form }}
-    <table>
-      <thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio unit.</th><th>IVA</th></tr></thead>
+    <table class="table table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Descripción</th>
+          <th style="width: 12%;">Cantidad</th>
+          <th style="width: 12%;">Precio unit.</th>
+          <th style="width: 10%;">IVA</th>
+        </tr>
+      </thead>
       <tbody>
         {% for row in formset %}
-        <tr>
-          <td>{{ row.description }}</td>
-          <td>{{ row.quantity }}</td>
-          <td>{{ row.unit_price }}</td>
-          <td>{{ row.iva_rate }}</td>
-        </tr>
+          <tr>
+            <td>{{ row.description }}{% if row.description.errors %}<div class="invalid-feedback d-block">{{ row.description.errors.0 }}</div>{% endif %}</td>
+            <td>{{ row.quantity }}{% if row.quantity.errors %}<div class="invalid-feedback d-block">{{ row.quantity.errors.0 }}</div>{% endif %}</td>
+            <td>{{ row.unit_price }}{% if row.unit_price.errors %}<div class="invalid-feedback d-block">{{ row.unit_price.errors.0 }}</div>{% endif %}</td>
+            <td>{{ row.iva_rate }}</td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
+  </div>
 
-    <button type="submit">Emitir rectificativa</button>
-  </form>
+  <div class="d-flex gap-2">
+    <button type="submit" class="btn btn-primary">Emitir rectificativa</button>
+    <a href="{% url 'invoicing:detail' original.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+  </div>
+</form>
 
-  <p><a href="{% url 'invoicing:detail' original.pk %}">Cancelar</a></p>
-</body>
-</html>
+<style>
+  input[type="text"], input[type="number"], input[type="email"], select, textarea {
+    width: 100%;
+  }
+</style>
+{% endblock %}
