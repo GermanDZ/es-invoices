@@ -196,12 +196,62 @@ risk above.
 
 ## Where this goes next
 
-→ quick-task — **Produce a one-page founder decision brief: SaaS (status quo +
-custody hardening) vs. local-monolith-ONCE vs. local + paid regulatory-currency
-plan (hybrid)**, scored on the dimensions that actually decide it — certificate &
-data custody, compliance-currency/staleness risk, revenue model, packaging/3-OS
-cost, segment fit (solo vs pyme), and which prior explorations each path
-obviates. The brief frames a single founder decision; it does **not** scope
-implementation. Only after the founder picks a model does delivery work begin —
-and that choice retroactively closes most of the custody thread (browser-signing,
-transport-custody, non-verifactu-cert-safety) as moot-if-local or live-if-SaaS.
+→ iteration — **Founder decided the model (see below); promote to a vision +
+architecture pivot.** The decision brief is superseded by a direct founder call.
+
+## 2026-06-23 — Founder decision: ship the local ONCE model
+
+The founder resolved both decision-critical questions directly:
+
+1. **Model: ONCE-style local monolith — confirmed.** The staleness risk is
+   handled by **honest disclaimer/versioning**, not a forced-update mechanism:
+   the product states **"cumple con la normativa Veri\*FACTU vigente"** (compliant
+   with *current* Verifactu) as of its release. Simple value proposition, clear
+   tradeoff stated up front. This selects **Option 1 (pure local ONCE)** as the
+   day-one shape.
+2. **Regulatory currency: defer, don't pre-build.** Verifactu is not expected to
+   change often (the government does not revise frequently); we are explicit about
+   "current" in the disclaimer, and **an upgrade plan for existing customers is a
+   *later* offering**, not a launch requirement. Option 2's paid update channel is
+   thus a **future** evolution of Option 1, not a prerequisite.
+
+### Corollary the decision forces: local-run makes VERI\*FACTU the clear mode
+
+The only reason non-VERI\*FACTU was ever attractive
+([non-verifactu-cert-safety](2026-06-23-non-verifactu-cert-safety.md)) was to turn
+the cert into a *local signing key* and keep it off our server. **Local-run
+removes the cert from our server in *both* modes** — so that rationale is gone.
+With custody no longer the deciding factor, the modes sort purely by burden, and
+**VERI\*FACTU wins decisively**: lighter compliance surface (no event log, no
+alarm management, no signature-verification/export machinery, no per-record XAdES
+obligation), and it is fully custody-free locally because the mTLS submission
+fires **from the user's own machine** with the user's own cert. Net shape:
+
+> **Local monolith (Win/macOS/Linux) + VERI\*FACTU mode + "compliant with current
+> Verifactu" disclaimer + the user's cert held only on their own machine.**
+
+### What this closes
+
+- **transport-custody, browser-side-signing** — *moot.* No server in the data
+  path; native local mTLS + native local signing where needed.
+- **non-verifactu-cert-safety** — *not pursued.* Local-run + VERI\*FACTU is
+  lighter and equally custody-free; the heavier non-verifiable path buys nothing
+  here.
+- **Q0 (per-record-signing)** — its finding stands (VERI\*FACTU submits no
+  per-record signature); `compliance/signing.py` remains unwired groundwork.
+
+### Delivery path (spec-first, per CLAUDE.md — behaviour/architecture change)
+
+This is a vision-level pivot; the spec must change before code. In order:
+1. **Vision** (`/openup-create-vision`) — reposition from "aplicación web" to a
+   locally-run, user-owned product; state the Verifactu-vigente disclaimer and the
+   "your data never leaves your computer" privacy claim as the headline.
+2. **Architecture** (`/openup-create-architecture-notebook`) — supersede **AD-3**
+   (server-stored encrypted cert) with a local-custody decision; record the ONCE
+   packaging decision (Django-as-localhost bundle vs. native — own AD); note mTLS
+   now originates client-side.
+3. **Roadmap re-plan** (product-manager ordering) — packaging/distribution + 3-OS
+   code-signing become first-class work items; the SaaS cert-storage/encryption
+   surface (`certificates/crypto.py` server custody) is reframed or retired.
+
+This is multi-role (architect + analyst + PM) and architectural → **full track**.
