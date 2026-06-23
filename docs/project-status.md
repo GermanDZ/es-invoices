@@ -2,16 +2,18 @@
 
 **Project**: FacturaSimple
 **Phase**: construction
-**Iteration**: 30
-**Iteration Goal**: T-029 — Self-service account + data deletion UI (RGPD Art. 17)
-**Status**: in-progress
-**Current Task**: T-032
+**Iteration**: 31
+**Iteration Goal**: T-033 — Wire generate_alta into invoice issuance
+**Status**: completed
+**Current Task**: T-033
 **Started**: 2026-06-15
 **Iteration Started**: 2026-06-18
 **Last Updated**: 2026-06-23
 **Updated By**: sync-status.py
 
 ## Notes
+
+- **Iteration 31** (2026-06-23): T-033 complete — wired compliance.generate_alta() into invoice issuance; alta VerifactuRecord now auto-generated at create time so the detail page submit button is active immediately. 231/231 tests pass.
 
 - **Iteration 30** (2026-06-23): T-032 UI overhaul complete — Bootstrap 5 base template, global navbar, invoice list view (owner-scoped, with empty state), Verifactu status badge (5 states) on invoice detail, QR explanation callout. All 15 product templates converted to extend base.html with Bootstrap components. 228/228 tests pass (2 postgres-gated skips); zero regressions.
 

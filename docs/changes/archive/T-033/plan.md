@@ -1,8 +1,10 @@
 ---
 id: T-033
-type: work-item
-status: in-progress
+title: "Wire generate_alta into invoice issuance"
+status: done
 priority: high
+track: standard
+phase: construction
 depends-on: [T-023, T-022]
 touches:
   - invoicing/views.py

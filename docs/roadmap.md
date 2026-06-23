@@ -66,6 +66,8 @@ build. Priorities and estimates are PM-set; the Status column stays derived.
 | T-031 | OCM sign-off + beta readiness documentation (test evidence, go/no-go) | completed (2026-06-22) | high | T-030 |
 | T-028 | Automated data retention enforcement / scheduled deletion (RGPD Art. 17) | completed (2026-06-22) | medium | T-030 |
 | T-029 | Self-service account + data deletion UI (RGPD Art. 17) | completed (2026-06-22) | medium | T-028 |
+| T-032 | UI Overhaul — invoice list, global nav, submission status, Bootstrap polish | completed (2026-06-23) | high | T-023, T-022 |
+| T-033 | Wire generate_alta into invoice issuance | completed (2026-06-23) | high | T-023, T-022 |
 
 ### Task notes
 
