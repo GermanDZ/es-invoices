@@ -390,8 +390,15 @@ the dual track.
 
 ### Updated open questions
 
-- **[legal, blocking]** Qualified-vs-advanced: does Verifactu mandate a QSCD? This
-  gates whether the JS-upload path is legally viable at all.
+- **[legal, ~~blocking~~ RESOLVED 2026-06-23]** Qualified-vs-advanced: does
+  Verifactu mandate a QSCD? **No.** (a) Verifactu mode requires *no* per-record
+  signature at all (AEAT FAQ); (b) where a signature is required (NO-Verifactu),
+  Orden HAC/1177/2024 mandates XAdES + a *qualified certificate* but **no QSCD** —
+  software P12 signing is valid. JS-upload path legally cleared; AutoFirma is a
+  security preference, not a compliance requirement. Full citations:
+  [2026-06-23-legal-qscd-finding.md](2026-06-23-legal-qscd-finding.md). NB the
+  finding also raises that per-record XAdES may not be needed for Verifactu
+  submission at all — own follow-up.
 - **[design]** WYSIWYS: how does the browser render the material terms of a
   `RegistroAlta` for user confirmation before signing?
 - **[security]** JS-path hardening: CSP policy, SRI on the signing bundle, isolation
