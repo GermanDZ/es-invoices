@@ -9,14 +9,20 @@ estimate: 2–3 sessions
 traces-from: [UC-001, UC-002, VIS-001]
 touches:
   - "templates/"
+  - "config/settings.py"
   - "invoicing/views.py"
   - "invoicing/urls.py"
   - "invoicing/templates/"
+  - "accounts/views.py"
   - "accounts/templates/"
+  - "accounts/tests/"
   - "clients/templates/"
   - "certificates/templates/"
   - "submission/templates/"
+  - "submission/selectors.py"
+  - "submission/templatetags/"
   - "documents/templates/"
+  - "devtools/tests/urls.py"
 depends-on: [T-022, T-023, T-025]
 ---
 
