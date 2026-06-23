@@ -52,7 +52,14 @@ Paste the output into `.env` as `CERT_ENCRYPTION_KEY=<value>`.
 
 ## Run the development server
 
+> **Note:** `setup_local.sh` can't activate the venv in your shell (a child process
+> can't modify the parent shell's environment). Always activate it yourself before
+> running `manage.py` commands.
+
 ```bash
+# Activate the venv (required every new shell session)
+source .venv/bin/activate
+
 # Apply database migrations (creates db.sqlite3 on first run)
 python manage.py migrate
 
