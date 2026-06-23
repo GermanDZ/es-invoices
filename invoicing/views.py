@@ -346,3 +346,41 @@ def invoice_list(request):
         .order_by("-issue_date", "-number")
     )
     return render(request, "invoicing/invoice_list.html", {"invoices": invoices})
+
+
+@login_required
+def invoice_register_verifactu(request, pk):
+    """Generate an alta VerifactuRecord for an already-issued invoice (T-034).
+
+    POST-only. For invoices created before T-033 auto-wired generate_alta, or any
+    invoice that somehow lacks a record. Requires issuer in session; without it
+    the user is told to re-enter issuer data via the PDF flow first.
+    """
+    invoice = get_object_or_404(_owner_invoices(request.user), pk=pk)
+    if request.method != "POST":
+        return redirect("invoicing:detail", pk=pk)
+
+    if not invoice.issued:
+        messages.error(request, "Solo se puede registrar una factura emitida.")
+        return redirect("invoicing:detail", pk=pk)
+
+    if latest_alta_record(invoice) is not None:
+        messages.info(request, "Esta factura ya tiene un registro Verifactu.")
+        return redirect("invoicing:detail", pk=pk)
+
+    issuer = _issuer_from_session(request)
+    if issuer is None:
+        messages.warning(
+            request,
+            "Introduce los datos del emisor descargando el PDF primero — "
+            "los datos quedan guardados en la sesión.",
+        )
+        return redirect("invoicing:detail", pk=pk)
+
+    import compliance
+    try:
+        compliance.generate_alta(invoice, issuer_nif=issuer.nif, issuer_name=issuer.name)
+        messages.success(request, "Registro Verifactu generado. Ya puedes enviarlo a la AEAT.")
+    except Exception as exc:
+        messages.error(request, f"No se pudo generar el registro: {exc}")
+    return redirect("invoicing:detail", pk=pk)

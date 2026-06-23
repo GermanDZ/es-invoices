@@ -7,8 +7,14 @@ Included by invoicing/invoice_detail.html.
   <h5 class="mb-3">Envío Verifactu a la AEAT</h5>
 
   {% if not submission_record %}
-    <div class="alert alert-info">
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
       <p class="mb-0">Esta factura aún no tiene un registro Verifactu que enviar.</p>
+      {% if invoice.issued %}
+      <form method="post" action="{% url 'invoicing:register_verifactu' invoice.pk %}" class="ms-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-primary">Generar registro Verifactu</button>
+      </form>
+      {% endif %}
     </div>
   {% else %}
     {% if submission_attempts %}
