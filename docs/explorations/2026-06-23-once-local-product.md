@@ -255,3 +255,27 @@ This is a vision-level pivot; the spec must change before code. In order:
    surface (`certificates/crypto.py` server custody) is reframed or retired.
 
 This is multi-role (architect + analyst + PM) and architectural → **full track**.
+
+### 2026-06-23 — v1 packaging decision (founder)
+
+Two constraints set the packaging direction:
+- **Binary size ≤ ~150MB** → disqualifies bundling a browser engine. **Electron
+  is out** (Chromium ~120–150MB before the Python payload). Viable: system-browser
+  (PyInstaller) or system-WebView (Tauri) — both omit Chromium and fit after
+  pruning.
+- **OS-keystore mTLS desirable** (Windows CertStore / macOS Keychain / PKCS#11
+  smartcard, DNIe) — but **client-cert TLS from an OS store is painful in pure
+  Python** (stdlib `ssl`/OpenSSL won't use non-exportable store keys; current
+  `requests_pkcs12` is P12-bytes-only). Doing it well wants a **native (Rust)
+  transport layer**.
+
+**Decision: keystore is a *later* enhancement, not v1.** v1 ships:
+
+> **PyInstaller Django-as-localhost + system browser + the current P12-upload
+> flow (`requests_pkcs12`).** Smallest, simplest, maximal reuse of `compliance/` +
+> `invoicing/` + `submission/`. Native keystore/PKCS#11 transport (smartcard/DNIe)
+> is a **follow-on AD**, likely a small Rust/native transport helper.
+
+**De-risking spike (before locking the packaging AD):** measure the pruned
+PyInstaller Django artifact size on all three OSes against the 150MB budget. (The
+keystore-mTLS feasibility probe is deferred with the feature.)
